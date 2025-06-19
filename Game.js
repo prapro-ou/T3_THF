@@ -164,7 +164,9 @@ export class Game {
                 enemy.y + enemy.height > this.player.y - this.player.height / 2
             ) {
                 if (!enemy.markedForDeletion) {
-                    this.player.lives--;
+                    // HPを減らす
+                    this.player.hp -= 20;
+                    if (this.player.hp < 0) this.player.hp = 0;
                     this.livesDisplay.textContent = `ライフ: ${this.player.lives}`;
                     enemy.markedForDeletion = true;
                     for (let p = 0; p < 15; p++) {
@@ -178,7 +180,7 @@ export class Game {
         });
         this.enemies = enemiesToKeep;
 
-        if (this.player.lives <= 0) {
+        if (this.player.hp <= 0) {
             this.gameOver = true;
         }
 
@@ -191,4 +193,4 @@ export class Game {
         this.gameFrame++;
         this.animationId = requestAnimationFrame(() => this.animate());
     }
-} 
+}

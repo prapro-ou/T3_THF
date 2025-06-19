@@ -7,6 +7,8 @@ export class Player {
         this.y = this.game.MAP_H / 2;
         this.color = '#00f';
         this.lives = this.game.INITIAL_PLAYER_LIVES;
+        this.maxHP = 100; // 最大HP
+        this.hp = this.maxHP; // 現在HP
     }
 
     update() {
@@ -14,14 +16,11 @@ export class Player {
         if (this.game.keys['s']) this.y += this.game.PLAYER_SPEED;
         if (this.game.keys['a']) this.x -= this.game.PLAYER_SPEED;
         if (this.game.keys['d']) this.x += this.game.PLAYER_SPEED;
-
-        // マップ端で止める
         this.x = Math.max(this.width / 2, Math.min(this.x, this.game.MAP_W - this.width / 2));
         this.y = Math.max(this.height / 2, Math.min(this.y, this.game.MAP_H - this.height / 2));
     }
 
     draw(ctx, scrollX, scrollY) {
-        // プレイヤーの描画位置を補正
         let drawX = this.game.VIEW_W / 2 - this.width / 2;
         let drawY = this.game.VIEW_H / 2 - this.height / 2;
         if (this.x < this.game.VIEW_W / 2) drawX = this.x - scrollX - this.width / 2;
@@ -33,11 +32,23 @@ export class Player {
         ctx.fillRect(drawX, drawY, this.width, this.height);
         ctx.strokeStyle = '#fff';
         ctx.strokeRect(drawX, drawY, this.width, this.height);
+
+        // HPバー描画
+        const barWidth = this.width;
+        const barHeight = 10;
+        const hpRatio = Math.max(0, this.hp / this.maxHP);
+        ctx.fillStyle = '#222';
+        ctx.fillRect(drawX, drawY - barHeight - 4, barWidth, barHeight);
+        ctx.fillStyle = '#0f0';
+        ctx.fillRect(drawX, drawY - barHeight - 4, barWidth * hpRatio, barHeight);
+        ctx.strokeStyle = '#fff';
+        ctx.strokeRect(drawX, drawY - barHeight - 4, barWidth, barHeight);
     }
 
     reset() {
         this.x = this.game.MAP_W / 2;
         this.y = this.game.MAP_H / 2;
         this.lives = this.game.INITIAL_PLAYER_LIVES;
+        this.hp = this.maxHP;
     }
-} 
+}
