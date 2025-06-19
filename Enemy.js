@@ -1,10 +1,10 @@
 export class Enemy {
-    constructor(game) {
+    constructor(game, color = '#888') {
         this.game = game;
         this.width = 50;
         this.height = 50;
         this.markedForDeletion = false;
-        this.color = `hsl(${Math.random() * 360}, 70%, 50%)`;
+        this.color = color;
         this.speed = this.game.ENEMY_BASE_SPEED + Math.random() * 1;
 
         // マップ端からランダムスポーン
@@ -32,7 +32,6 @@ export class Enemy {
     }
 
     update() {
-        // プレイヤーを追尾
         const deltaX = this.game.player.x - this.x;
         const deltaY = this.game.player.y - this.y;
         const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -48,7 +47,6 @@ export class Enemy {
         this.x += this.dx;
         this.y += this.dy;
 
-        // マップ外に出たら削除
         if (
             this.x < -this.width * 2 || this.x > this.game.MAP_W + this.width * 2 ||
             this.y < -this.height * 2 || this.y > this.game.MAP_H + this.height * 2
@@ -63,4 +61,31 @@ export class Enemy {
         ctx.strokeStyle = '#fff';
         ctx.strokeRect(this.x - scrollX, this.y - scrollY, this.width, this.height);
     }
-} 
+}
+
+// 赤鬼
+export class RedOni extends Enemy {
+    constructor(game) {
+        super(game, 'red');
+        this.speed += 1; // 速い
+    }
+}
+
+// 青鬼
+export class BlueOni extends Enemy {
+    constructor(game) {
+        super(game, 'blue');
+        this.speed -= 1; // 遅い
+        if (this.speed < 1) this.speed = 1;
+    }
+}
+
+// 黒鬼
+export class BlackOni extends Enemy {
+    constructor(game) {
+        super(game, 'black');
+        this.width = 70;
+        this.height = 70;
+        this.speed += 0.5;
+    }
+}

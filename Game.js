@@ -1,5 +1,5 @@
 import { Player } from './Player.js';
-import { Enemy } from './Enemy.js';
+import { Enemy, RedOni, BlueOni, BlackOni } from './Enemy.js';
 import { Particle } from './Particle.js';
 
 export class Game {
@@ -109,7 +109,14 @@ export class Game {
     }
 
     spawnEnemy() {
-        this.enemies.push(new Enemy(this));
+        const r = Math.random();
+        if (r < 0.34) {
+            this.enemies.push(new RedOni(this));
+        } else if (r < 0.67) {
+            this.enemies.push(new BlueOni(this));
+        } else {
+            this.enemies.push(new BlackOni(this));
+        }
     }
 
     drawBackground(scrollX, scrollY) {
