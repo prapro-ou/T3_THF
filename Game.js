@@ -20,8 +20,8 @@ export class Game {
         this.MIN_ENEMY_SPAWN_INTERVAL = 30;
         this.SPAWN_INTERVAL_DECREASE_RATE = 2;
         this.SPAWN_INTERVAL_DECREASE_FREQUENCY = 300;
-        this.ENEMY_BASE_SPEED = 5;
-        this.PLAYER_SPEED = 7;
+        this.ENEMY_BASE_SPEED = 4;
+        this.PLAYER_SPEED = 6;
         this.INITIAL_PLAYER_LIVES = 3;
 
         this.score = 0;
@@ -46,8 +46,18 @@ export class Game {
         window.addEventListener('keyup', (e) => {
             this.keys[e.key.toLowerCase()] = false;
         });
-        this.canvas.addEventListener('click', (event) => {
+
+        // 右クリックを無効化
+        this.canvas.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+
+        // 左クリックのみ処理（mousedownで判定）
+        this.canvas.addEventListener('mousedown', (event) => {
+            if (event.button !== 0) return; // 0:左, 2:右
             if (this.gameOver) return;
+            if (this.player.ammo <= 0) return;
+
             let scrollX = this.player.x - this.VIEW_W / 2;
             let scrollY = this.player.y - this.VIEW_H / 2;
             scrollX = Math.max(0, Math.min(this.MAP_W - this.VIEW_W, scrollX));
@@ -70,7 +80,11 @@ export class Game {
                     }
                 }
             }
+            // 弾を消費
+            this.player.ammo--;
+            this.livesDisplay.textContent = `残弾数: ${this.player.ammo}/${this.player.maxAmmo}`;
         });
+
         this.restartButton.addEventListener('click', () => {
             this.initializeGame();
         });
@@ -84,7 +98,7 @@ export class Game {
         this.gameOver = false;
         this.scoreDisplay.textContent = `スコア: ${this.score}`;
         this.player.reset();
-        this.livesDisplay.textContent = `ライフ: ${this.player.lives}`;
+        this.livesDisplay.textContent = `残弾数: ${this.player.ammo}`;
         this.gameOverMessage.classList.add('hidden');
         if (this.animationId) {
             cancelAnimationFrame(this.animationId);
@@ -131,6 +145,12 @@ export class Game {
             return;
         }
 
+        // deltaTime計算
+        const now = performance.now();
+        this.lastTime = this.lastTime || now;
+        const deltaTime = (now - this.lastTime) / 1000; // 秒
+        this.lastTime = now;
+
         // スクロール位置計算
         let scrollX = this.player.x - this.VIEW_W / 2;
         let scrollY = this.player.y - this.VIEW_H / 2;
@@ -140,7 +160,7 @@ export class Game {
         this.ctx.clearRect(0, 0, this.VIEW_W, this.VIEW_H);
         this.drawBackground(scrollX, scrollY);
 
-        this.player.update();
+        this.player.update(deltaTime);
         this.player.draw(this.ctx, scrollX, scrollY);
 
         if (this.gameFrame > 0 && this.gameFrame % this.SPAWN_INTERVAL_DECREASE_FREQUENCY === 0) {
@@ -167,7 +187,6 @@ export class Game {
                     // HPを減らす
                     this.player.hp -= 20;
                     if (this.player.hp < 0) this.player.hp = 0;
-                    this.livesDisplay.textContent = `ライフ: ${this.player.lives}`;
                     enemy.markedForDeletion = true;
                     for (let p = 0; p < 15; p++) {
                         this.particles.push(new Particle(this, enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, enemy.color));
