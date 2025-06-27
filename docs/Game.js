@@ -11,13 +11,14 @@ export class Game {
     static SPAWN_INTERVAL_DECREASE_FREQUENCY = 300;
     static ATTACK_RADIUS = 80; // 攻撃範囲の半径（ピクセル）
 
-    constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton) {
+    constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay) {
         this.canvas = canvas;
         this.ctx = ctx;
         this.scoreDisplay = scoreDisplay;
         this.livesDisplay = livesDisplay;
         this.gameOverMessage = gameOverMessage;
         this.restartButton = restartButton;
+        this.timerDisplay = timerDisplay; // ★追加
 
         this.VIEW_W = this.canvas.width;
         this.VIEW_H = this.canvas.height;
@@ -37,6 +38,9 @@ export class Game {
         this.player = new Player(this);
 
         this.isPaused = false; // ポーズ状態を追加
+
+        this.elapsedSeconds = 0; // ★追加: 累積経過秒数
+        this.lastTimerResume = Date.now(); // ★追加
 
         this.setupEvents();
         this.initializeGame();
@@ -120,12 +124,16 @@ export class Game {
     togglePause() {
         this.isPaused = !this.isPaused;
         if (this.isPaused) {
-            // ポーズ時はアニメーション停止
+            // ポーズ時: ここで経過時間を加算
+            if (this.lastTimerResume) {
+                this.elapsedSeconds += Math.floor((Date.now() - this.lastTimerResume) / 1000);
+                this.lastTimerResume = null;
+            }
             if (this.animationId) cancelAnimationFrame(this.animationId);
-            // ポーズ表示
             this.showPauseMessage();
         } else {
-            // ポーズ解除時は再開
+            // ポーズ解除時: 再開時刻を記録
+            this.lastTimerResume = Date.now();
             this.hidePauseMessage();
             this.animate();
         }
@@ -163,6 +171,8 @@ export class Game {
         }
         this.keys = {};
         this.currentEnemySpawnInterval = Game.INITIAL_ENEMY_SPAWN_INTERVAL;
+        this.elapsedSeconds = 0; // ★追加
+        this.lastTimerResume = Date.now(); // ★追加
         this.animate();
     }
 
@@ -234,6 +244,8 @@ export class Game {
         if (this.isPaused) return; // ポーズ中は何もしない
 
         this.updateDeltaTime();
+        this.timer(); // ★ここでタイマーを毎フレーム更新
+
         const { scrollX, scrollY } = this.calcScroll();
 
         this.ctx.clearRect(0, 0, this.VIEW_W, this.VIEW_H);
@@ -336,6 +348,23 @@ export class Game {
     checkGameOver() {
         if (this.player.hp <= 0) {
             this.gameOver = true;
+        }
+    }
+
+    timer() {
+        let totalElapsed = this.elapsedSeconds;
+        if (this.lastTimerResume) {
+            totalElapsed += Math.floor((Date.now() - this.lastTimerResume) / 1000);
+        }
+        const remaining = Math.max(0, 300 - totalElapsed); // 5分（300秒）
+        const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const seconds = String(remaining % 60).padStart(2, '0');
+        this.timerDisplay.textContent = `残り時間: ${minutes}:${seconds}`;
+
+        if (remaining <= 0) {
+            this.gameOver = true;
+            this.gameOverMessage.textContent = '時間切れ！ゲームオーバー';
+            this.gameOverMessage.classList.remove('hidden');
         }
     }
 }
