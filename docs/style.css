@@ -40,14 +40,35 @@ h1 {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%); /* Center */
-    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
     color: #fff;
-    font-size: 2em;
-    padding: 30px;
-    border-radius: 10px;
+    font-size: 2.2em;
+    padding: 40px 60px;
+    border-radius: 18px;
     text-align: center;
     border: 2px solid #fff;
-    z-index: 10; /* Display in front of other elements */
+    z-index: 30;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+    letter-spacing: 2px;
+}
+
+#gameOverMessage button {
+    display: inline-block;
+    margin: 18px 12px 0 12px;
+    padding: 16px 36px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 7px;
+    background: linear-gradient(90deg, #ff5252 0%, #ffb347 100%);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #0003;
+    transition: background 0.2s, transform 0.1s;
+}
+#gameOverMessage button:hover {
+    background: linear-gradient(90deg, #ff1744 0%, #ff9100 100%);
+    transform: translateY(-2px) scale(1.04);
 }
 
 /* Class for hiding elements */

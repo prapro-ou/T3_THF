@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpButton = document.getElementById('help');
     const helpModal = document.getElementById('helpModal');
     const closeHelp = document.getElementById('closeHelp');
+    const backToStartButton = document.querySelector('.backToStart');
 
     let game = null;
 
@@ -40,4 +41,16 @@ document.addEventListener('DOMContentLoaded', () => {
     closeHelp.addEventListener('click', () => {
         helpModal.classList.add('hidden');
     });
+    // スタート画面へ戻る
+    backToStartButton.addEventListener('click', () => {
+        gameCanvas.classList.add('hidden');
+        scoreDisplay.classList.add('hidden');
+        livesDisplay.classList.add('hidden');
+        gameOverMessage.classList.add('hidden');
+        startScreen.classList.remove('hidden');
+        if (game) {
+            game.stop(); // ゲームを停止
+            game = null; // ゲームインスタンスをリセット
+        }
+    })
 });
