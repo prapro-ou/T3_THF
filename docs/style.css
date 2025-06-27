@@ -70,4 +70,97 @@ h1 {
 
 #restartButton:hover {
     background-color: #45a049;
-} 
+}
+
+/* スタート画面 */
+#startScreen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    color: #fff;
+    padding: 48px 72px;
+    border-radius: 18px;
+    text-align: center;
+    z-index: 20;
+    border: 2px solid #fff;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+}
+#startScreen h1 {
+    font-size: 2.4em;
+    margin-bottom: 28px;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 8px #000a;
+}
+#startButton, #help {
+    background: linear-gradient(90deg, #2196F3 0%, #21CBF3 100%);
+    color: white;
+    padding: 16px 36px;
+    margin: 12px 10px 0 10px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 1.2em;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #0003;
+    transition: background 0.2s, transform 0.1s;
+}
+#startButton:hover, #help:hover {
+    background: linear-gradient(90deg, #1976D2 0%, #00BCD4 100%);
+    transform: translateY(-2px) scale(1.04);
+}
+
+/* 操作説明モーダル */
+#helpModal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#helpModal.hidden {
+    display: none;
+}
+.help-content {
+    background: #232526;
+    color: #fff;
+    padding: 36px 48px;
+    border-radius: 14px;
+    text-align: left;
+    min-width: 320px;
+    box-shadow: 0 0 24px #000a;
+    border: 2px solid #fff;
+    position: relative;
+}
+.help-content h2 {
+    margin-top: 0;
+    font-size: 1.5em;
+    margin-bottom: 18px;
+    text-align: center;
+    letter-spacing: 1px;
+}
+.help-content ul {
+    margin: 0 0 18px 0;
+    padding-left: 22px;
+    font-size: 1.1em;
+}
+#closeHelp {
+    margin-top: 10px;
+    padding: 10px 28px;
+    background: linear-gradient(90deg, #2196F3 0%, #21CBF3 100%);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: bold;
+    box-shadow: 0 2px 8px #0003;
+    transition: background 0.2s, transform 0.1s;
+}
+#closeHelp:hover {
+    background: linear-gradient(90deg, #1976D2 0%, #00BCD4 100%);
+    transform: translateY(-2px) scale(1.04);
+}
