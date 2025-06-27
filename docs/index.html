@@ -16,18 +16,34 @@
         <div class="help-content">
             <h2>操作説明</h2>
             <ul>
-                <li>WASDキー：プレイヤー移動</li>
-                <li>マウス左クリック：攻撃（弾を消費）</li>
-                <li>敵を倒してスコアを稼ごう！</li>
-                <li>弾は時間で回復します</li>
+                <li><b>W/A/S/Dキー：</b> プレイヤーを上下左右に移動</li>
+                <li><b>マウス左クリック：</b> 攻撃（弾を1つ消費）</li>
+                <li><b>弾：</b> 最大10発。時間経過で自動回復</li>
+                <li><b>敵：</b> 近づいてくる敵を攻撃して倒そう</li>
+                <li><b>スコア：</b> 敵を倒すとスコアが増える</li>
+                <li><b>ゲームオーバー：</b> HPが0になると終了</li>
+                <li><b>Pキー：</b> ゲームの一時中断/再開</li>
             </ul>
             <button id="closeHelp">閉じる</button>
         </div>
     </div>
+
+    <div class="game-container">
     <canvas id="gameCanvas" width="800" height="600" class="hidden"></canvas>
     <div id="scoreDisplay" class="hidden">スコア: 0</div>
     <div id="livesDisplay" class="hidden">残弾数: 10</div>
-    <div id="gameOverMessage" class="hidden">ゲームオーバー！<br><button id="restartButton">もう一度プレイ</button>
+    <!-- ゲーム中の簡易操作説明 -->
+    <div id="quickHelp" class="hidden">
+        <b>操作
+        <br> WASD : 移動 
+        <br> 左クリック : 攻撃 
+        <br> P : ポーズ
+    </div>
+</div>
+
+    <div id="gameOverMessage" class="hidden">ゲームオーバー！
+        <button id="restartButton">もう一度プレイ</button>
+        <button class="backToStart">スタート画面へ戻る</button>
     </div>
     <script type="module" src="main.js"></script>  
 </body>

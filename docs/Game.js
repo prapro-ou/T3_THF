@@ -36,6 +36,8 @@ export class Game {
 
         this.player = new Player(this);
 
+        this.isPaused = false; // ポーズ状態を追加
+
         this.setupEvents();
         this.initializeGame();
     }
@@ -43,6 +45,10 @@ export class Game {
     setupEvents() {
         window.addEventListener('keydown', (e) => {
             this.keys[e.key.toLowerCase()] = true;
+            // Pキーでポーズ切り替え
+            if (e.key.toLowerCase() === 'p') {
+                this.togglePause();
+            }
         });
         window.addEventListener('keyup', (e) => {
             this.keys[e.key.toLowerCase()] = false;
@@ -57,6 +63,7 @@ export class Game {
         this.canvas.addEventListener('mousedown', (event) => {
             if (event.button !== 0) return;
             if (this.gameOver) return;
+            if (this.isPaused) return; // ←この行を追加
             if (this.player.ammo <= 0) return;
 
             let scrollX = this.player.x - this.VIEW_W / 2;
@@ -108,6 +115,37 @@ export class Game {
         this.restartButton.addEventListener('click', () => {
             this.initializeGame();
         });
+    }
+
+    togglePause() {
+        this.isPaused = !this.isPaused;
+        if (this.isPaused) {
+            // ポーズ時はアニメーション停止
+            if (this.animationId) cancelAnimationFrame(this.animationId);
+            // ポーズ表示
+            this.showPauseMessage();
+        } else {
+            // ポーズ解除時は再開
+            this.hidePauseMessage();
+            this.animate();
+        }
+    }
+
+    showPauseMessage() {
+        // ポーズメッセージを表示
+        if (!this.pauseMessage) {
+            this.pauseMessage = document.createElement('div');
+            this.pauseMessage.id = 'pauseMessage';
+            this.pauseMessage.innerHTML = 'ポーズ中 (Pキーで再開)<br><span style="font-size:0.7em;">Hキーで操作説明</span>';
+            document.body.appendChild(this.pauseMessage);
+        }
+        this.pauseMessage.classList.remove('hidden');
+    }
+
+    hidePauseMessage() {
+        if (this.pauseMessage) {
+            this.pauseMessage.classList.add('hidden');
+        }
     }
 
     initializeGame() {
@@ -193,6 +231,7 @@ export class Game {
             this.gameOverMessage.classList.remove('hidden');
             return;
         }
+        if (this.isPaused) return; // ポーズ中は何もしない
 
         this.updateDeltaTime();
         const { scrollX, scrollY } = this.calcScroll();
