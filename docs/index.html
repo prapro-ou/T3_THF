@@ -7,12 +7,28 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
-    <div id="scoreDisplay">スコア: 0</div>
-    <div id="livesDisplay">残弾数: 10</div>
+    <div id="startScreen">
+        <h1>追尾シューティングゲーム</h1>
+        <button id="startButton">ゲームスタート</button>
+        <button id="help">操作説明</button>
+    </div>
+    <div id="helpModal" class="hidden">
+        <div class="help-content">
+            <h2>操作説明</h2>
+            <ul>
+                <li>WASDキー：プレイヤー移動</li>
+                <li>マウス左クリック：攻撃（弾を消費）</li>
+                <li>敵を倒してスコアを稼ごう！</li>
+                <li>弾は時間で回復します</li>
+            </ul>
+            <button id="closeHelp">閉じる</button>
+        </div>
+    </div>
+    <canvas id="gameCanvas" width="800" height="600" class="hidden"></canvas>
+    <div id="scoreDisplay" class="hidden">スコア: 0</div>
+    <div id="livesDisplay" class="hidden">残弾数: 10</div>
     <div id="gameOverMessage" class="hidden">ゲームオーバー！<br><button id="restartButton">もう一度プレイ</button>
     </div>
-    
     <script type="module" src="main.js"></script>  
 </body>
 </html>
