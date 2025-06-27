@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameCanvas = document.getElementById('gameCanvas');
     const scoreDisplay = document.getElementById('scoreDisplay');
     const livesDisplay = document.getElementById('livesDisplay');
+    const timerDisplay = document.getElementById('timerDisplay');
     const gameOverMessage = document.getElementById('gameOverMessage');
     const restartButton = document.getElementById('restartButton');
     const startScreen = document.getElementById('startScreen');
@@ -23,8 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCanvas.classList.remove('hidden');
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
+        timerDisplay.classList.remove('hidden'); // タイマー表示を有効化
         // ゲーム開始
-        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton);
+        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay);
         quickHelp.classList.remove('hidden'); // ゲーム開始時に表示
     });
 
@@ -33,6 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCanvas.classList.remove('hidden');
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
+        timerDisplay.classList.remove('hidden'); // タイマー表示を維持
         quickHelp.classList.remove('hidden'); // リスタート時も表示
     });
 
@@ -49,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameCanvas.classList.add('hidden');
         scoreDisplay.classList.add('hidden');
         livesDisplay.classList.add('hidden');
+        timerDisplay.classList.add('hidden'); // タイマー表示を非表示
         gameOverMessage.classList.add('hidden');
         startScreen.classList.remove('hidden');
         quickHelp.classList.add('hidden'); // スタート画面では非表示
@@ -72,6 +76,13 @@ document.addEventListener('DOMContentLoaded', () => {
     helpButton.addEventListener('click', () => {
         if (game && game.isPaused) {
             helpModal.classList.remove('hidden');
+        }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+        if (!game) return;
+        if (document.hidden && !game.isPaused) {
+            game.togglePause();
         }
     });
 });

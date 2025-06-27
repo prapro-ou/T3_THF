@@ -28,7 +28,7 @@ h1 {
 }
 
 /* Score and Lives display style settings */
-#scoreDisplay, #livesDisplay {
+#scoreDisplay, #livesDisplay  #timerDisplay {
     margin-top: 10px; /* Add top margin */
     font-size: 1.5em; /* Increase font size */
     font-weight: bold; /* Bold font */
@@ -259,6 +259,24 @@ h1 {
     left: 24px;
     margin: 0;
     font-size: 1.1em;
+    font-weight: bold;
+    color: #fff;
+    background: rgba(30,30,30,0.85);
+    padding: 7px 18px;
+    border-radius: 8px;
+    z-index: 10;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 8px #0004;
+}
+
+/* タイマー表示：左上（スコア表示の右隣） */
+#timerDisplay {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    left: auto; 
+    margin: 0;
+    font-size: 1.3em;
     font-weight: bold;
     color: #fff;
     background: rgba(30,30,30,0.85);
