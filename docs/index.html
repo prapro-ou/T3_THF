@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -16,13 +16,13 @@
         <div class="help-content">
             <h2>操作説明</h2>
             <ul>
-                <li><b>W/A/S/Dキー：</b> プレイヤーを上下左右に移動</li>
-                <li><b>マウス左クリック：</b> 攻撃（弾を1つ消費）</li>
-                <li><b>弾：</b> 最大10発。時間経過で自動回復</li>
-                <li><b>敵：</b> 近づいてくる敵を攻撃して倒そう</li>
-                <li><b>スコア：</b> 敵を倒すとスコアが増える</li>
-                <li><b>ゲームオーバー：</b> HPが0になると終了</li>
-                <li><b>Pキー：</b> ゲームの一時中断/再開</li>
+                <li><b>W/A/S/Dキー</b> プレイヤーを上下左右に移動</li>
+                <li><b>マウス左クリック</b> 攻撃（弾1つ消費）</li>
+                <li><b>弾</b> 最大10発。時間経過で自動回復</li>
+                <li><b>敵</b> 近づいてくる敵を攻撃して倒そう</li>
+                <li><b>スコア</b> 敵を倒すとスコアが増える</li>
+                <li><b>ゲームオーバー</b> HPが0になると終了</li>
+                <li><b>Pキー</b> ゲームの一時中断/再開</li>
             </ul>
             <button id="closeHelp">閉じる</button>
         </div>
@@ -33,16 +33,17 @@
     <div id="scoreDisplay" class="hidden">スコア: 0</div>
     <div id="livesDisplay" class="hidden">残弾数: 10</div>
     <div id="timerDisplay" class="hidden">残り時間: 05:00</div>
-    <!-- ゲーム中の簡易操作説明 -->
+    <!-- ゲーム中の簡易操作説明-->
     <div id="quickHelp" class="hidden">
-        <b>操作
-        <br> WASD : 移動 
-        <br> 左クリック : 攻撃 
+        <b>操作</b>
+        <br> WASD : 移動
+        <br> 左クリック : 攻撃
         <br> P : ポーズ
     </div>
 </div>
 
-    <div id="gameOverMessage" class="hidden">ゲームオーバー！
+    <div id="gameOverMessage" class="hidden">
+        <span class="game-over-text">ゲームオーバー</span>
         <button id="restartButton">もう一度プレイ</button>
         <button class="backToStart">スタート画面へ戻る</button>
     </div>
