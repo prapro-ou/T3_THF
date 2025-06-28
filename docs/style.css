@@ -1,4 +1,4 @@
-/* filepath: c:\Users\pochi\programs\momoGo_2\style.css */
+﻿/* filepath: c:\Users\pochi\programs\momoGo_2\style.css */
 /* Overall style settings */
 body {
     display: flex; /* Use Flexbox to center elements */
@@ -17,7 +17,7 @@ body {
 /* Canvas style settings */
 canvas {
     background-color: #000; /* Set canvas background color to black */
-    border: 2px solid #f00; /* 赤い枠線に変更 */
+    border: 2px solid #f00; /* 赤い線に変更 */
     cursor: crosshair; /* Change mouse pointer to crosshair */
     border-radius: 8px; /* Round corners */
 }
@@ -208,7 +208,7 @@ h1 {
     letter-spacing: 2px;
 }
 
-/* ゲーム中の簡易操作説明 */
+/* ゲーム中の簡易操作説明*/
 #quickHelp {
     position: fixed;
     top: 24px;
@@ -235,7 +235,7 @@ h1 {
     margin: 0 auto;
 }
 
-/* スコア表示：左上 */
+/* スコア表示（左上）*/
 #scoreDisplay {
     position: absolute;
     top: 18px;
@@ -252,7 +252,7 @@ h1 {
     box-shadow: 0 2px 8px #0004;
 }
 
-/* 残弾数表示：左下 */
+/* 残弾数表示（左下）*/
 #livesDisplay {
     position: absolute;
     bottom: 18px;
@@ -269,7 +269,7 @@ h1 {
     box-shadow: 0 2px 8px #0004;
 }
 
-/* タイマー表示：左上（スコア表示の右隣） */
+/* タイマー表示（右上）*/
 #timerDisplay {
     position: absolute;
     top: 18px;
@@ -287,7 +287,7 @@ h1 {
     box-shadow: 0 2px 8px #0004;
 }
 
-/* ゲーム中の簡易操作説明：右上 */
+/* ゲーム中の簡易操作説明（右上）*/
 #quickHelp {
     position: fixed;
     top: 24px;

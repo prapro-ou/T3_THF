@@ -1,29 +1,37 @@
+﻿import { distance } from '../utils/Utils.js';
+
 export class Particle {
     constructor(game, x, y, color) {
         this.game = game;
         this.x = x;
         this.y = y;
-        this.size = Math.random() * 7 + 3;
+        this.color = color;
+        this.size = Math.random() * 3 + 1;
         this.speedX = Math.random() * 6 - 3;
         this.speedY = Math.random() * 6 - 3;
-        this.color = color;
-        this.life = 30;
+        this.gravity = 0.1;
+        this.life = 1.0;
+        this.decay = Math.random() * 0.02 + 0.02;
         this.markedForDeletion = false;
     }
 
     update() {
+        this.speedY += this.gravity;
         this.x += this.speedX;
         this.y += this.speedY;
-        this.life--;
+        this.life -= this.decay;
         if (this.life <= 0) {
             this.markedForDeletion = true;
         }
     }
 
     draw(ctx, scrollX, scrollY) {
+        ctx.save();
+        ctx.globalAlpha = this.life;
         ctx.fillStyle = this.color;
-        ctx.globalAlpha = this.life / 30;
-        ctx.fillRect(this.x - scrollX, this.y - scrollY, this.size, this.size);
-        ctx.globalAlpha = 1;
+        ctx.beginPath();
+        ctx.arc(this.x - scrollX, this.y - scrollY, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
     }
 } 

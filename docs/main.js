@@ -1,4 +1,4 @@
-import { Game } from './Game.js';
+﻿import { Game } from './core/Game.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('keydown', (e) => {
         if (e.key.toLowerCase() === 'h') {
             // ゲームインスタンスが存在し、ポーズ中のみ許可
-            if (game && game.isPaused) {
+            if (game && game.pauseManager.isPaused) {
                 helpModal.classList.remove('hidden');
             }
         }
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 操作説明ボタンもポーズ中のみ有効
     helpButton.addEventListener('click', () => {
-        if (game && game.isPaused) {
+        if (game && game.pauseManager.isPaused) {
             helpModal.classList.remove('hidden');
         }
     });
