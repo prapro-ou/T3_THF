@@ -12,18 +12,30 @@ export class AttackManager {
     handleAttack(event) {
         const { scrollX, scrollY } = this.game.calcScroll();
         const rect = this.game.canvas.getBoundingClientRect();
-        
-        // より確実な座標計算
+
+        // キャンバス上のクリック座標
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
-        
-        // プレイヤー中心からの相対座標で攻撃判定
-        const playerCenterX = this.game.canvas.width / 2;
-        const playerCenterY = this.game.canvas.height / 2;
-        const relativeX = canvasX - playerCenterX;
-        const relativeY = canvasY - playerCenterY;
-        
-        // マップ座標系での攻撃位置
+
+        // プレイヤーの描画座標をPlayerRendererと同じロジックで計算
+        const { width: viewWidth, height: viewHeight } = this.game.renderer.getViewDimensions();
+        const { width: mapWidth, height: mapHeight } = this.game.renderer.getMapDimensions();
+        let drawX = viewWidth / 2 - this.game.player.width / 2;
+        let drawY = viewHeight / 2 - this.game.player.height / 2;
+        if (this.game.player.x < viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
+        if (this.game.player.x > mapWidth - viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
+        if (this.game.player.y < viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
+        if (this.game.player.y > mapHeight - viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
+
+        // プレイヤーの描画中心
+        const playerDrawCenterX = drawX + this.game.player.width / 2;
+        const playerDrawCenterY = drawY + this.game.player.height / 2;
+
+        // マウス座標からプレイヤー描画中心への相対座標
+        const relativeX = canvasX - playerDrawCenterX;
+        const relativeY = canvasY - playerDrawCenterY;
+
+        // マップ座標での攻撃位置
         const mouseX = this.game.player.x + relativeX;
         const mouseY = this.game.player.y + relativeY;
         const attackRadius = this.game.player.getAttackRadius();
@@ -116,4 +128,4 @@ export class AttackManager {
     reset() {
         this.attackCircle = null;
     }
-} 
+}

@@ -1,4 +1,5 @@
 ﻿import { Game } from './core/Game.js';
+import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -19,15 +20,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let game = null;
 
     startButton.addEventListener('click', () => {
-        // スタート画面を非表示、ゲーム画面を表示
-        startScreen.classList.add('hidden');
-        gameCanvas.classList.remove('hidden');
-        scoreDisplay.classList.remove('hidden');
-        livesDisplay.classList.remove('hidden');
-        timerDisplay.classList.remove('hidden'); // タイマー表示を有効化
-        // ゲーム開始
-        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay);
-        quickHelp.classList.remove('hidden'); // ゲーム開始時に表示
+        preloadMomotaroSpriteSheet(() => {
+            // スタート画面を非表示、ゲーム画面を表示
+            startScreen.classList.add('hidden');
+            gameCanvas.classList.remove('hidden');
+            scoreDisplay.classList.remove('hidden');
+            livesDisplay.classList.remove('hidden');
+            timerDisplay.classList.remove('hidden'); // タイマー表示を有効化
+            // ゲーム開始
+            game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay);
+            quickHelp.classList.remove('hidden'); // ゲーム開始時に表示
+        });
     });
 
     // リスタート時もゲーム画面を維持
