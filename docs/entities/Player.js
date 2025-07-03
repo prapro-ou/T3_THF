@@ -12,14 +12,26 @@ export class Player extends Character {
         this.controller = controller;
         this.renderer = new PlayerRenderer(game.renderer);
         this.ammoManager = new AmmoManager(this);
+        this.direction = 'down';
+        this.isMoving = false;
+        this.moveFrame = 0;
     }
 
     update(deltaTime) {
-        this.controller.updatePlayerMovement(this, deltaTime);
         this.ammoManager.update(deltaTime);
         
         // UI更新
         this.game.uiManager.updateAmmo(this.ammoManager.getAmmo(), this.ammoManager.getMaxAmmo());
+
+        // ここでdirection, isMoving, moveFrameを更新
+        const prevX = this.x, prevY = this.y;
+        this.controller.updatePlayerMovement(this, deltaTime);
+        this.isMoving = (this.x !== prevX || this.y !== prevY);
+        if (this.isMoving) this.moveFrame++;
+        else this.moveFrame = 0;
+
+        // 方向判定（例: コントローラーの入力から）
+        // this.direction = 'up' | 'down' | 'left' | 'right';
     }
 
     draw(ctx, scrollX, scrollY) {

@@ -1,5 +1,41 @@
 ﻿import { Sprite } from '../utils/Sprite.js';
 import { HealthBar } from './HealthBar.js';
+import { SpriteSheet } from '../utils/SpriteSheet.js';
+
+let momotaroSpriteSheet = null;
+let momotaroSpriteSheetLoaded = false;
+
+export function preloadMomotaroSpriteSheet(callback) {
+    if (momotaroSpriteSheetLoaded) {
+        window.momotaroSpriteSheetLoaded = true;
+        return callback();
+    }
+    const img = new Image();
+    img.src = 'assets/momotaro_spritesheet.png';
+    fetch('assets/momotaro_spritesheet.json')
+        .then(res => {
+            if (!res.ok) throw new Error('JSON not found');
+            return res.json();
+        })
+        .then(json => {
+            img.onload = () => {
+                momotaroSpriteSheet = new SpriteSheet(img, json);
+                momotaroSpriteSheetLoaded = true;
+                window.momotaroSpriteSheetLoaded = true; // ←ここを必ずセット
+                callback();
+            };
+            img.onerror = () => {
+                window.momotaroSpriteSheetLoaded = false;
+                alert('画像の読み込みに失敗しました');
+                callback();
+            };
+        })
+        .catch(err => {
+            window.momotaroSpriteSheetLoaded = false;
+            alert('スプライトシートの読み込みに失敗しました');
+            callback();
+        });
+}
 
 export class PlayerRenderer {
     constructor(renderer) {
@@ -18,11 +54,34 @@ export class PlayerRenderer {
         if (player.y < viewHeight / 2) drawY = player.y - scrollY - player.height / 2;
         if (player.y > mapHeight - viewHeight / 2) drawY = player.y - scrollY - player.height / 2;
 
-        // スプライト描画
-        const sprite = new Sprite(drawX, drawY, player.width, player.height, player.color);
-        sprite.draw(ctx, 0, 0);
+        // momotaroスプライトシートがロード済みならアニメーション描画
+        if (momotaroSpriteSheetLoaded && momotaroSpriteSheet) {
+            let frameName = 'momotaro_frontstand';
+            if (player.direction === 'up') {
+                frameName = (player.isMoving && player.moveFrame % 30 < 15)
+                    ? 'momotaro_backwalk1'
+                    : 'momotaro_backwalk2';
+            } else if (player.direction === 'down') {
+                frameName = (player.isMoving && player.moveFrame % 30 < 15)
+                    ? 'momotaro_frontwalk'
+                    : 'momotaro_frontstand';
+            } else if (player.direction === 'left') {
+                frameName = (player.isMoving && player.moveFrame % 30 < 15)
+                    ? 'momotaro_leftwalk'
+                    : 'momotaro_leftstand';
+            } else if (player.direction === 'right') {
+                frameName = (player.isMoving && player.moveFrame % 30 < 15)
+                    ? 'momotaro_rightwalk'
+                    : 'momotaro_rightstand';
+            }
+            momotaroSpriteSheet.drawFrame(ctx, frameName, drawX, drawY, player.width, player.height);
+        } else {
+            // ロード前は四角だけ描画
+            const sprite = new Sprite(drawX, drawY, player.width, player.height, player.color);
+            sprite.draw(ctx, 0, 0);
+        }
 
-        // HPバ�E描画
+        // HPバー・ゲージ描画
         const barWidth = player.width;
         const barHeight = 10;
         const healthBar = new HealthBar(drawX, drawY - barHeight - 4, barWidth, barHeight, player.hp, player.maxHP);
@@ -37,4 +96,4 @@ export class PlayerRenderer {
             this.renderer.drawAmmoGauge(drawX, gaugeY, gaugeWidth, gaugeHeight, ratio);
         }
     }
-} 
+}

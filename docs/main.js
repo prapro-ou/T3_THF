@@ -1,4 +1,5 @@
 ﻿import { Game } from './core/Game.js';
+import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -17,8 +18,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const quickHelp = document.getElementById('quickHelp');
 
     let game = null;
+    let assetsLoaded = false;
+
+    // 1. ゲーム開始ボタンを一時的に無効化
+    startButton.disabled = true;
+    startButton.textContent = 'ロード中...';
+
+    // リトライ付きプリロード
+    function tryPreload(retryCount = 0) {
+        preloadMomotaroSpriteSheet(() => {
+            if (window.momotaroSpriteSheetLoaded) { // グローバル変数でロード済み判定
+                assetsLoaded = true;
+                startButton.disabled = false;
+                startButton.textContent = 'ゲームスタート';
+            } else if (retryCount < 10) {
+                // 失敗時は0.5秒後に再試行（最大10回）
+                setTimeout(() => tryPreload(retryCount + 1), 500);
+            } else {
+                startButton.textContent = 'ロード失敗（再読み込みしてください）';
+            }
+        });
+    }
+    tryPreload();
 
     startButton.addEventListener('click', () => {
+        if (!assetsLoaded) return; // 念のため
         // スタート画面を非表示、ゲーム画面を表示
         startScreen.classList.add('hidden');
         gameCanvas.classList.remove('hidden');

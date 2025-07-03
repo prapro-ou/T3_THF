@@ -5,11 +5,11 @@
     "files.insertFinalNewline": true,
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.fixAll": true
+        "source.fixAll": "explicit"
     },
     "javascript.format.enable": true,
     "typescript.format.enable": true,
     "html.format.enable": true,
     "css.format.enable": true,
     "json.format.enable": true
-} 
+}

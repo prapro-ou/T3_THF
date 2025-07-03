@@ -172,4 +172,23 @@ export class Game {
     get score() { return this.gameState.getScore(); }
     set score(value) { this.gameState.score = value; }
     get isPaused() { return this.pauseManager.isPaused; }
-} 
+}
+
+// スプライトシート関連のコード
+let momotaroSpriteSheet;
+let momotaroSpriteSheetLoaded = false;
+
+export function preloadMomotaroSpriteSheet(callback) {
+    if (momotaroSpriteSheetLoaded) return callback();
+    const img = new Image();
+    img.src = 'assets/momotaro_spritesheet.png';
+    fetch('assets/momotaro_spritesheet.json')
+        .then(res => res.json())
+        .then(json => {
+            img.onload = () => {
+                momotaroSpriteSheet = new SpriteSheet(img, json);
+                momotaroSpriteSheetLoaded = true;
+                callback();
+            };
+        });
+}
