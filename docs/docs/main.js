@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeHelp = document.getElementById('closeHelp');
     const backToStartButton = document.querySelector('.backToStart');
     const quickHelp = document.getElementById('quickHelp');
-    const loadingScreen = document.getElementById('loading-screen');
 
     let game = null;
     let assetsLoaded = false;
@@ -24,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. ゲーム開始ボタンを一時的に無効化
     startButton.disabled = true;
     startButton.textContent = 'ロード中...';
-    loadingScreen.style.display = '';
 
     // リトライ付きプリロード
     function tryPreload(retryCount = 0) {
@@ -33,13 +31,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 assetsLoaded = true;
                 startButton.disabled = false;
                 startButton.textContent = 'ゲームスタート';
-                loadingScreen.style.display = 'none';
             } else if (retryCount < 10) {
                 // 失敗時は0.5秒後に再試行（最大10回）
                 setTimeout(() => tryPreload(retryCount + 1), 500);
             } else {
                 startButton.textContent = 'ロード失敗（再読み込みしてください）';
-                loadingScreen.innerHTML = '<h2>ロード失敗</h2><p>ページを再読み込みしてください</p>';
             }
         });
     }
