@@ -6,17 +6,34 @@ let momotaroSpriteSheet = null;
 let momotaroSpriteSheetLoaded = false;
 
 export function preloadMomotaroSpriteSheet(callback) {
-    if (momotaroSpriteSheetLoaded) return callback();
+    if (momotaroSpriteSheetLoaded) {
+        window.momotaroSpriteSheetLoaded = true;
+        return callback();
+    }
     const img = new Image();
     img.src = 'assets/momotaro_spritesheet.png';
     fetch('assets/momotaro_spritesheet.json')
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error('JSON not found');
+            return res.json();
+        })
         .then(json => {
             img.onload = () => {
                 momotaroSpriteSheet = new SpriteSheet(img, json);
                 momotaroSpriteSheetLoaded = true;
+                window.momotaroSpriteSheetLoaded = true; // ←ここを必ずセット
                 callback();
             };
+            img.onerror = () => {
+                window.momotaroSpriteSheetLoaded = false;
+                alert('画像の読み込みに失敗しました');
+                callback();
+            };
+        })
+        .catch(err => {
+            window.momotaroSpriteSheetLoaded = false;
+            alert('スプライトシートの読み込みに失敗しました');
+            callback();
         });
 }
 
