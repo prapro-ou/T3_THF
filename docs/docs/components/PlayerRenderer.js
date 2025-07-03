@@ -15,40 +15,22 @@ export function preloadMomotaroSpriteSheet(callback) {
     fetch('assets/momotaro_spritesheet.json')
         .then(res => {
             if (!res.ok) throw new Error('JSON not found');
-            console.log('JSON fetch success');
             return res.json();
         })
         .then(json => {
-            let retryCount = 0;
-            const maxRetries = 10;
-            function tryLoadImage() {
-                const img = new Image();
-                img.src = 'assets/momotaro_spritesheet.png?' + new Date().getTime(); // キャッシュバスター
-                console.log('Trying to load image, attempt', retryCount + 1, 'src:', img.src);
-                img.onload = () => {
-                    console.log('Image loaded successfully');
-                    momotaroSpriteSheet = new SpriteSheet(img, json);
-                    momotaroSpriteSheetLoaded = true;
-                    window.momotaroSpriteSheetLoaded = true;
-                    callback();
-                };
-                img.onerror = () => {
-                    console.log('Image load failed, attempt', retryCount + 1, 'src:', img.src);
-                    retryCount++;
-                    if (retryCount < maxRetries) {
-                        setTimeout(tryLoadImage, 500);
-                    } else {
-                        console.log('Image load failed after', maxRetries, 'attempts');
-                        window.momotaroSpriteSheetLoaded = false;
-                        alert('画像の読み込みに失敗しました');
-                        callback();
-                    }
-                };
-            }
-            tryLoadImage();
+            img.onload = () => {
+                momotaroSpriteSheet = new SpriteSheet(img, json);
+                momotaroSpriteSheetLoaded = true;
+                window.momotaroSpriteSheetLoaded = true; // ←ここを必ずセット
+                callback();
+            };
+            img.onerror = () => {
+                window.momotaroSpriteSheetLoaded = false;
+                alert('画像の読み込みに失敗しました');
+                callback();
+            };
         })
         .catch(err => {
-            console.log('JSON fetch or image load failed:', err);
             window.momotaroSpriteSheetLoaded = false;
             alert('スプライトシートの読み込みに失敗しました');
             callback();

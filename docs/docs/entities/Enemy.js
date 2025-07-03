@@ -67,20 +67,6 @@ export class Enemy extends Character {
         const healthBar = new HealthBar(this.x, this.y - barHeight - 2, barWidth, barHeight, this.hp, this.maxHP, '#f00');
         healthBar.draw(ctx, scrollX, scrollY);
     }
-
-    takeDamage(amount) {
-        this.hp -= amount;
-        if (this.hp <= 0) {
-            this.hp = 0;
-            this.markedForDeletion = true;
-            // パーティクル生成
-            this.game.particleManager.createExplosion(
-                this.x + this.width / 2,
-                this.y + this.height / 2,
-                this.color
-            );
-        }
-    }
 }
 
 // 赤鬼

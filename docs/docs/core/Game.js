@@ -11,8 +11,6 @@ import { AttackManager } from '../managers/AttackManager.js';
 import { GameState } from './GameState.js';
 import { CameraManager } from '../managers/CameraManager.js';
 import { PlayerController } from '../components/PlayerController.js';
-import { Otomo } from '../entities/Otomo.js';
-import { ProjectileManager } from '../managers/ProjectileManager.js';
 
 export class Game {
     constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay) {
@@ -32,16 +30,10 @@ export class Game {
         this.attackManager = new AttackManager(this);
         this.gameState = new GameState(this);
 
-        // ProjectileManagerの初期化
-        this.projectileManager = new ProjectileManager(this);
-
         // プレイヤーの初期化
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
         this.playerController = new PlayerController(this.inputManager, this.cameraManager);
         this.player = new Player(this, mapWidth / 2, mapHeight / 2, this.playerController);
-
-        // Otomoの初期化
-        this.otomo = null;
 
         this.setupEvents();
         this.initializeGame();
@@ -78,22 +70,6 @@ export class Game {
         document.addEventListener('visibilitychange', () => {
             this.pauseManager.handleVisibilityChange();
         });
-
-        // Otomoのモード切替（数字キー）
-        window.addEventListener('keydown', (e) => {
-            if (!this.otomo) return;
-            switch (e.key) {
-                case '1':
-                    this.otomo.setMode('follow');
-                    break;
-                case '2':
-                    this.otomo.setMode('wander');
-                    break;
-                case '3':
-                    this.otomo.setMode('charge');
-                    break;
-            }
-        });
     }
 
     initializeGame() {
@@ -107,10 +83,6 @@ export class Game {
         this.uiManager.updateScore(this.gameState.getScore());
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
         this.uiManager.hideGameOver();
-        
-        this.otomo = new Otomo(this, this.player.x, this.player.y);
-        // ProjectileManagerのリセット
-        this.projectileManager.reset();
         
         this.animate();
     }
@@ -150,12 +122,6 @@ export class Game {
         this.player.update(deltaTime);
         this.player.draw(this.ctx, scrollX, scrollY);
 
-        // Otomoの更新・描画
-        if (this.otomo) {
-            this.otomo.updateBehavior(this.player, deltaTime);
-            this.otomo.draw(this.ctx, scrollX, scrollY);
-        }
-
         // 敵更新・描画
         this.enemyManager.update();
         this.enemyManager.getEnemies().forEach(enemy => {
@@ -187,10 +153,6 @@ export class Game {
 
         this.attackManager.updateAttackCircle();
         this.enemyManager.incrementFrame();
-        
-        // ProjectileManagerのupdate/draw
-        this.projectileManager.update(deltaTime);
-        this.projectileManager.draw(this.ctx, scrollX, scrollY);
         
         const animationId = requestAnimationFrame(() => this.animate());
         this.gameState.setAnimationId(animationId);
