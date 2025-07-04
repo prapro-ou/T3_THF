@@ -25,25 +25,25 @@ export function preloadMomotaroSpriteSheet(callback) {
                 const img = new Image();
                 img.src = 'assets/momotaro_spritesheet.png?' + new Date().getTime(); // キャッシュバスター
                 console.log('Trying to load image, attempt', retryCount + 1, 'src:', img.src);
-                img.onload = () => {
+            img.onload = () => {
                     console.log('Image loaded successfully');
-                    momotaroSpriteSheet = new SpriteSheet(img, json);
-                    momotaroSpriteSheetLoaded = true;
+                momotaroSpriteSheet = new SpriteSheet(img, json);
+                momotaroSpriteSheetLoaded = true;
                     window.momotaroSpriteSheetLoaded = true;
-                    callback();
-                };
-                img.onerror = () => {
+                callback();
+            };
+            img.onerror = () => {
                     console.log('Image load failed, attempt', retryCount + 1, 'src:', img.src);
                     retryCount++;
                     if (retryCount < maxRetries) {
                         setTimeout(tryLoadImage, 500);
                     } else {
                         console.log('Image load failed after', maxRetries, 'attempts');
-                        window.momotaroSpriteSheetLoaded = false;
-                        alert('画像の読み込みに失敗しました');
-                        callback();
+                window.momotaroSpriteSheetLoaded = false;
+                alert('画像の読み込みに失敗しました');
+                callback();
                     }
-                };
+            };
             }
             tryLoadImage();
         })

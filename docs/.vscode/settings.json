@@ -11,5 +11,13 @@
     "typescript.format.enable": true,
     "html.format.enable": true,
     "css.format.enable": true,
-    "json.format.enable": true
+    "json.format.enable": true,
+    "momotaro_leftwalk": {
+        "frame": {
+            "x": 1500,
+            "y": 0,
+            "w": 300,
+            "h": 470
+        }
+    }
 }
