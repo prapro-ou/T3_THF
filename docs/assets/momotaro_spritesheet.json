@@ -42,7 +42,7 @@
     },
     "momotaro_frontstand": {
       "frame": {
-        "x": 600,
+        "x": 620,
         "y": 0,
         "w": 300,
         "h": 470
@@ -62,7 +62,7 @@
     },
     "momotaro_frontwalk": {
       "frame": {
-        "x": 900,
+        "x": 930,
         "y": 0,
         "w": 300,
         "h": 470
@@ -82,7 +82,7 @@
     },
     "momotaro_leftstand": {
       "frame": {
-        "x": 1200,
+        "x": 1250,
         "y": 0,
         "w": 300,
         "h": 470
@@ -102,7 +102,7 @@
     },
     "momotaro_leftwalk": {
       "frame": {
-        "x": 1500,
+        "x": 1550,
         "y": 0,
         "w": 300,
         "h": 470
@@ -122,7 +122,7 @@
     },
     "momotaro_rightstand": {
       "frame": {
-        "x": 1800,
+        "x": 1860,
         "y": 0,
         "w": 300,
         "h": 470
@@ -142,9 +142,9 @@
     },
     "momotaro_rightwalk": {
       "frame": {
-        "x": 2100,
+        "x": 2150,
         "y": 0,
-        "w": 300,
+        "w": 330,
         "h": 470
       },
       "rotated": false,
@@ -152,11 +152,11 @@
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
-        "w": 300,
+        "w": 330,
         "h": 470
       },
       "sourceSize": {
-        "w": 300,
+        "w": 330,
         "h": 470
       }
     }
