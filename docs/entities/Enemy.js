@@ -2,6 +2,7 @@
 import { distance } from '../utils/Utils.js';
 import { Sprite } from '../utils/Sprite.js';
 import { HealthBar } from '../components/HealthBar.js';
+import { EnemyRenderer } from '../components/EnemyRenderer.js';
 
 export class Enemy extends Character {
     static BASE_HP = 30;
@@ -36,6 +37,7 @@ export class Enemy extends Character {
         this.speed = Enemy.BASE_SPEED + Math.random();
         this.dx = 0;
         this.dy = 0;
+        this.renderer = new EnemyRenderer(game.renderer);
     }
 
     update() {
@@ -43,7 +45,8 @@ export class Enemy extends Character {
     }
 
     updateMovement() {
-        // プレイヤーに向かって移勁E        const deltaX = this.game.player.x - this.x;
+        // プレイヤーに向かって移動
+        const deltaX = this.game.player.x - this.x;
         const deltaY = this.game.player.y - this.y;
         const dist = distance(this.game.player.x, this.game.player.y, this.x, this.y);
         if (dist > 0) {
@@ -55,17 +58,21 @@ export class Enemy extends Character {
         }
         this.x += this.dx;
         this.y += this.dy;
+        // 移動方向を設定（アニメーション用）
+        this.direction = this.getDirection();
+    }
+    
+    getDirection() {
+        if (Math.abs(this.dx) > Math.abs(this.dy)) {
+            return this.dx > 0 ? 'right' : 'left';
+        } else {
+            return this.dy > 0 ? 'front' : 'back';
+        }
     }
 
     draw(ctx, scrollX, scrollY) {
         // スプライト描画
-        const sprite = new Sprite(this.x, this.y, this.width, this.height, this.color);
-        sprite.draw(ctx, scrollX, scrollY);
-        // HPバ�E
-        const barWidth = this.width;
-        const barHeight = 6;
-        const healthBar = new HealthBar(this.x, this.y - barHeight - 2, barWidth, barHeight, this.hp, this.maxHP, '#f00');
-        healthBar.draw(ctx, scrollX, scrollY);
+        this.renderer.drawEnemy(this, ctx, scrollX, scrollY);
     }
 
     takeDamage(amount) {
@@ -106,6 +113,8 @@ export class RedOni extends Enemy {
         }
         this.x += this.dx;
         this.y += this.dy;
+        // 移動方向を設定（アニメーション用）
+        this.direction = this.getDirection();
     }
 }
 
@@ -135,6 +144,8 @@ export class BlueOni extends Enemy {
         }
         this.x += this.dx;
         this.y += this.dy;
+        // 移動方向を設定（アニメーション用）
+        this.direction = this.getDirection();
     }
 }
 
@@ -163,6 +174,8 @@ export class BlackOni extends Enemy {
         }
         this.x += this.dx;
         this.y += this.dy;
+        // 移動方向を設定（アニメーション用）
+        this.direction = this.getDirection();
     }
 }
 
@@ -197,5 +210,7 @@ export class BossOni extends Enemy {
         }
         this.x += this.dx;
         this.y += this.dy;
+        // 移動方向を設定（アニメーション用）
+        this.direction = this.getDirection();
     }
 }
