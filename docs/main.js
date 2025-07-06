@@ -1,5 +1,6 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
+import { preloadRedOniSpriteSheet } from './components/EnemyRenderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -29,13 +30,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // リトライ付きプリロード
     function tryPreload(retryCount = 0) {
         preloadMomotaroSpriteSheet(() => {
-            if (window.momotaroSpriteSheetLoaded) { // グローバル変数でロード済み判定
-                assetsLoaded = true;
-                startButton.disabled = false;
-                startButton.textContent = 'ゲームスタート';
-                loadingScreen.style.display = 'none';
+            if (window.momotaroSpriteSheetLoaded) {
+                preloadRedOniSpriteSheet(() => {
+                    if (window.redOniSpriteSheetLoaded) {
+                        assetsLoaded = true;
+                        startButton.disabled = false;
+                        startButton.textContent = 'ゲームスタート';
+                        loadingScreen.style.display = 'none';
+                    } else if (retryCount < 10) {
+                        setTimeout(() => tryPreload(retryCount + 1), 500);
+                    } else {
+                        startButton.textContent = 'ロード失敗（再読み込みしてください）';
+                        loadingScreen.innerHTML = '<h2>ロード失敗</h2><p>ページを再読み込みしてください</p>';
+                    }
+                });
             } else if (retryCount < 10) {
-                // 失敗時は0.5秒後に再試行（最大10回）
                 setTimeout(() => tryPreload(retryCount + 1), 500);
             } else {
                 startButton.textContent = 'ロード失敗（再読み込みしてください）';
