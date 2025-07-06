@@ -8,9 +8,11 @@
         this.maxHP = maxHP;
         this.color = color;
         this.bgColor = bgColor;
+        console.log('HealthBar constructor - hp:', hp, 'maxHP:', maxHP); // デバッグログ
     }
     draw(ctx, scrollX, scrollY) {
         const hpRatio = Math.max(0, this.hp / this.maxHP);
+        console.log('HealthBar draw - hp:', this.hp, 'maxHP:', this.maxHP, 'ratio:', hpRatio); // デバッグログ
         ctx.fillStyle = this.bgColor;
         ctx.fillRect(this.x - scrollX, this.y - scrollY, this.width, this.height);
         ctx.fillStyle = this.color;

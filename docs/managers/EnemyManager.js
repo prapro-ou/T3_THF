@@ -1,6 +1,11 @@
-﻿import { RedOni, BlueOni, BlackOni } from '../entities/Enemy.js';
+﻿import { RedOni, BlueOni, BlackOni, BossOni } from '../entities/enemies/index.js';
 import { CollisionManager } from './CollisionManager.js';
+import { EnemyRenderer } from '../components/EnemyRenderer.js';
 
+/**
+ * 敵管理クラス
+ * 単一責任: 敵の生成、更新、描画の管理
+ */
 export class EnemyManager {
     static INITIAL_ENEMY_SPAWN_INTERVAL = 100;
     static MIN_ENEMY_SPAWN_INTERVAL = 30;
@@ -11,82 +16,61 @@ export class EnemyManager {
         this.game = game;
         this.collisionManager = collisionManager;
         this.enemies = [];
-        this.currentEnemySpawnInterval = EnemyManager.INITIAL_ENEMY_SPAWN_INTERVAL;
-        this.gameFrame = 0;
+        this.frame = 0;
+        this.spawnTimer = 0;
+        this.spawnInterval = 60; // 60フレームごとに敵を生成
+        this.maxEnemies = 20;
+        
+        // 単一責任の原則: 描画責任を統合
+        this.renderer = new EnemyRenderer(game.renderer);
     }
 
     update() {
-        this.updateEnemySpawn();
-        this.updateEnemies();
+        this.spawnTimer++;
+        if (this.spawnTimer >= this.spawnInterval && this.enemies.length < this.maxEnemies) {
+            this.spawnEnemy();
+            this.spawnTimer = 0;
+        }
+
+        // 敵の更新
+        this.enemies.forEach(enemy => {
+            enemy.update();
+        });
+
+        // 削除マークされた敵を削除
+        this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
+
+        // 敵同士の重複を解決
+        for (let i = 0; i < this.enemies.length; i++) {
+            for (let j = i + 1; j < this.enemies.length; j++) {
+                this.collisionManager.resolveEnemyOverlap(this.enemies[i], this.enemies[j]);
+            }
+        }
+
+        // 画面外の敵を削除
+        const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
+        this.enemies = this.enemies.filter(enemy => 
+            !this.collisionManager.isEnemyOutOfBounds(enemy, mapWidth, mapHeight)
+        );
     }
 
-    updateEnemySpawn() {
-        if (this.gameFrame > 0 && this.gameFrame % EnemyManager.SPAWN_INTERVAL_DECREASE_FREQUENCY === 0) {
-            this.currentEnemySpawnInterval = Math.max(
-                EnemyManager.MIN_ENEMY_SPAWN_INTERVAL, 
-                this.currentEnemySpawnInterval - EnemyManager.SPAWN_INTERVAL_DECREASE_RATE
-            );
-        }
-        
-        const actualSpawnInterval = Math.max(1, Math.floor(this.currentEnemySpawnInterval + (Math.random() * 40 - 20)));
-        if (this.gameFrame % actualSpawnInterval === 0) {
-            this.spawnEnemy();
-        }
+    // 単一責任の原則: 描画責任を統合
+    draw(ctx, scrollX, scrollY) {
+        this.enemies.forEach(enemy => {
+            this.renderer.drawEnemy(enemy, ctx, scrollX, scrollY);
+        });
     }
 
     spawnEnemy() {
-        let enemy;
-        let overlap;
-        let tryCount = 0;
-        
-        do {
-            // ランダムに敵を生戁E
-            const r = Math.random();
-            if (r < 0.65) {
-                enemy = new RedOni(this.game);
-            } else if (r < 0.9) {
-                enemy = new BlueOni(this.game);
-            } else {
-                enemy = new BlackOni(this.game);
-            }
-
-            // 既存�E敵と重なってぁE��ぁE��判宁E
-            overlap = this.collisionManager.checkEnemySpawnOverlap(enemy, this.enemies);
-
-            tryCount++;
-            // 無限ループ防止�E�E0回試してもダメなら諦める�E�E
-            if (tryCount > 20) break;
-        } while (overlap);
-
+        const enemyTypes = [RedOni, BlueOni, BlackOni];
+        const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+        const enemy = new randomType(this.game);
         this.enemies.push(enemy);
     }
 
-    updateEnemies() {
-        const enemiesToKeep = [];
-        const { mapWidth, mapHeight } = this.game.renderer.getMapDimensions();
-        
-        this.enemies.forEach(enemy => {
-            enemy.update();
-            
-            // 敵同士の重なり解涁E
-            for (const other of this.enemies) {
-                if (other === enemy) continue;
-                if (this.collisionManager.checkEnemyOverlap(enemy, other)) {
-                    this.collisionManager.resolveEnemyOverlap(enemy, other);
-                }
-            }
-            
-            // 画面外に出た敵を削除
-            if (this.collisionManager.isEnemyOutOfBounds(enemy, mapWidth, mapHeight)) {
-                enemy.markedForDeletion = true;
-            }
-            
-            if (!enemy.markedForDeletion) {
-                enemiesToKeep.push(enemy);
-            }
-        });
-        
-        this.enemies = enemiesToKeep;
+    spawnBoss() {
+        const boss = new BossOni(this.game);
+        this.enemies.push(boss);
     }
 
     getEnemies() {
@@ -105,12 +89,12 @@ export class EnemyManager {
     }
 
     incrementFrame() {
-        this.gameFrame++;
+        this.frame++;
     }
 
     reset() {
         this.enemies = [];
-        this.gameFrame = 0;
-        this.currentEnemySpawnInterval = EnemyManager.INITIAL_ENEMY_SPAWN_INTERVAL;
+        this.frame = 0;
+        this.spawnTimer = 0;
     }
 } 

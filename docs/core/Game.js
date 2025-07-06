@@ -141,7 +141,7 @@ export class Game {
 
         const { scrollX, scrollY } = this.calcScroll();
 
-        // 描画
+        // 描画処理を各Managerに委譲（単一責任の原則）
         this.renderer.clear();
         this.renderer.drawBackground(scrollX, scrollY);
         this.renderer.drawAttackCircle(this.attackManager.getAttackCircle(), scrollX, scrollY);
@@ -156,16 +156,16 @@ export class Game {
             this.otomo.draw(this.ctx, scrollX, scrollY);
         }
 
-        // 敵更新・描画
+        // 敵更新・描画（EnemyManagerに委譲）
         this.enemyManager.update();
+        this.enemyManager.draw(this.ctx, scrollX, scrollY);
+        
+        // プレイヤーとの衝突判定
         this.enemyManager.getEnemies().forEach(enemy => {
-            enemy.draw(this.ctx, scrollX, scrollY);
-            
-            // プレイヤーとの衝突判定
             if (this.collisionManager.checkPlayerEnemyCollision(this.player, enemy)) {
                 if (!enemy.markedForDeletion) {
-                    this.player.hp -= 20;
-                    if (this.player.hp < 0) this.player.hp = 0;
+                    this.player.health -= 20;
+                    if (this.player.health < 0) this.player.health = 0;
                     enemy.markedForDeletion = true;
                     this.particleManager.createExplosion(
                         enemy.x + enemy.width / 2, 
@@ -181,7 +181,7 @@ export class Game {
         this.particleManager.draw(scrollX, scrollY);
 
         // ゲームオーバー判定
-        if (this.player.hp <= 0) {
+        if (this.player.health <= 0) {
             this.gameState.setGameOver();
         }
 
