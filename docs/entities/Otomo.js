@@ -1,4 +1,4 @@
-import { Character } from './Character.js';
+import { Character } from './base/Character.js';
 import { Projectile } from './Projectile.js';
 import { FollowOtomoBehavior } from './OtomoFile/followOtomo.js';
 import { WanderOtomoBehavior } from './OtomoFile/wanderOtomo.js';

@@ -1,37 +1,45 @@
-﻿import { Character } from './Character.js';
+﻿import { Character } from './base/Character.js';
 import { PlayerController } from '../components/PlayerController.js';
 import { PlayerRenderer } from '../components/PlayerRenderer.js';
 import { AmmoManager } from '../managers/AmmoManager.js';
 
+/**
+ * プレイヤークラス
+ * 単一責任: プレイヤーの状態管理と行動
+ * 継承: Characterから基本機能を継承
+ */
 export class Player extends Character {
     static SPEED = 3.5; // クラス定数として定義
+    
     constructor(game, x, y, controller) {
         super(game, x, y, 80, 80, 'pink', 100);
-        this.maxAmmo = 10;
         this.attackRadius = 80;
         this.controller = controller;
         this.renderer = new PlayerRenderer(game.renderer);
-        this.ammoManager = new AmmoManager(this);
+        this.ammoManager = new AmmoManager(this, 10);
         this.direction = 'down';
         this.isMoving = false;
         this.moveFrame = 0;
+        
+        // ammoManager初期化後にmaxAmmoを設定
+        this.maxAmmo = 10;
     }
 
+    // カプセル化: プロパティへのアクセスを制御
+    get ammo() { return this.ammoManager.getAmmo(); }
+    set ammo(value) { this.ammoManager.setAmmo(value); }
+    
+    get maxAmmo() { return this.ammoManager.getMaxAmmo(); }
+    set maxAmmo(value) { this.ammoManager.setMaxAmmo(value); }
+    
+    get ammoRecoveryTimer() { return this.ammoManager.ammoRecoveryTimer; }
+    get ammoRecoveryTime() { return this.ammoManager.ammoRecoveryTime; }
+
+    // 多態性: 親クラスのメソッドをオーバーライド
     update(deltaTime) {
-        this.ammoManager.update(deltaTime);
-        
-        // UI更新
-        this.game.uiManager.updateAmmo(this.ammoManager.getAmmo(), this.ammoManager.getMaxAmmo());
-
-        // ここでdirection, isMoving, moveFrameを更新
-        const prevX = this.x, prevY = this.y;
         this.controller.updatePlayerMovement(this, deltaTime);
-        this.isMoving = (this.x !== prevX || this.y !== prevY);
-        if (this.isMoving) this.moveFrame++;
-        else this.moveFrame = 0;
-
-        // 方向判定（例: コントローラーの入力から）
-        // this.direction = 'up' | 'down' | 'left' | 'right';
+        this.ammoManager.update(deltaTime);
+        this.updateMovementState();
     }
 
     draw(ctx, scrollX, scrollY) {
@@ -52,9 +60,14 @@ export class Player extends Character {
         return this.attackRadius;
     }
 
-    // AmmoManagerへの委譲
-    get ammo() { return this.ammoManager.getAmmo(); }
-    get ammoRecoveryTimer() { return this.ammoManager.ammoRecoveryTimer; }
-    get ammoRecoveryTime() { return this.ammoManager.ammoRecoveryTime; }
+    // プライベートメソッド
+    updateMovementState() {
+        this.isMoving = this.controller.isMoving;
+        if (this.isMoving) {
+            this.moveFrame++;
+        } else {
+            this.moveFrame = 0;
+        }
+    }
 }
 //test

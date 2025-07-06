@@ -94,12 +94,13 @@ export class AttackManager {
                 playerToEnemyDist: playerToEnemyDist,
                 attackToEnemyDist: attackToEnemyDist,
                 attackRadius: attackRadius,
-                isHit: isHit
+                isHit: isHit,
+                enemyHealth: enemy.health
             });
             
             if (isHit) {
-                enemy.hp -= this.damage;
-                if (enemy.hp <= 0) {
+                enemy.takeDamage(this.damage);
+                if (!enemy.isAlive) {
                     enemy.markedForDeletion = true;
                     this.game.gameState.addScore(this.scorePerKill);
                     hitCount++;

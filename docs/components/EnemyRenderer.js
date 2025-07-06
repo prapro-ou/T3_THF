@@ -166,7 +166,8 @@ export class EnemyRenderer {
         // HPバー描画
         const barWidth = enemy.width;
         const barHeight = 6;
-        const healthBar = new HealthBar(drawX, drawY - barHeight - 2, barWidth, barHeight, enemy.hp, enemy.maxHP, '#f00');
+        console.log('EnemyRenderer - enemy.health:', enemy.health, 'enemy.maxHP:', enemy.maxHP); // デバッグログ
+        const healthBar = new HealthBar(drawX, drawY - barHeight - 2, barWidth, barHeight, enemy.health, enemy.maxHP, '#f00');
         healthBar.draw(ctx, 0, 0);
     }
 } 

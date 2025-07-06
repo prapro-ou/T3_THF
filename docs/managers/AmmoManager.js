@@ -1,7 +1,7 @@
 ﻿export class AmmoManager {
-    constructor(player) {
+    constructor(player, initialMaxAmmo = 10) {
         this.player = player;
-        this.maxAmmo = player.maxAmmo;
+        this.maxAmmo = initialMaxAmmo;
         this.ammo = this.maxAmmo;
         this.ammoRecoveryTime = 3;
         this.ammoRecoveryTimer = 0;
@@ -31,8 +31,17 @@
         return this.ammo;
     }
 
+    setAmmo(value) {
+        this.ammo = Math.max(0, Math.min(value, this.maxAmmo));
+    }
+
     getMaxAmmo() {
         return this.maxAmmo;
+    }
+
+    setMaxAmmo(value) {
+        this.maxAmmo = Math.max(1, value);
+        this.ammo = Math.min(this.ammo, this.maxAmmo);
     }
 
     getRecoveryRatio() {
