@@ -1,6 +1,6 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
-import { preloadRedOniSpriteSheet } from './components/EnemyRenderer.js';
+import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet } from './components/EnemyRenderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -33,10 +33,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.momotaroSpriteSheetLoaded) {
                 preloadRedOniSpriteSheet(() => {
                     if (window.redOniSpriteSheetLoaded) {
-                        assetsLoaded = true;
-                        startButton.disabled = false;
-                        startButton.textContent = 'ゲームスタート';
-                        loadingScreen.style.display = 'none';
+                        preloadEnemySpriteSheet('blue', () => {
+                            preloadEnemySpriteSheet('black', () => {
+                                assetsLoaded = true;
+                                startButton.disabled = false;
+                                startButton.textContent = 'ゲームスタート';
+                                loadingScreen.style.display = 'none';
+                            });
+                        });
                     } else if (retryCount < 10) {
                         setTimeout(() => tryPreload(retryCount + 1), 500);
                     } else {
