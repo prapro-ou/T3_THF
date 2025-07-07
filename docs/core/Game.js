@@ -43,6 +43,11 @@ export class Game {
         // Otomoの初期化
         this.otomo = null;
 
+        this.bossAppeared = false;
+        this.bossDefeated = false;
+        this.bossTimer = 120; // ボス出現から2分
+        this.bossStartTime = null;
+
         this.setupEvents();
         this.initializeGame();
     }
@@ -112,6 +117,10 @@ export class Game {
         // ProjectileManagerのリセット
         this.projectileManager.reset();
         
+        this.bossAppeared = false;
+        this.bossDefeated = false;
+        this.bossStartTime = null;
+        
         this.animate();
     }
 
@@ -133,7 +142,36 @@ export class Game {
         this.timer.update();
         this.uiManager.updateTimer(this.timer.getFormattedTime());
         
-        if (this.timer.isTimeUp()) {
+        // ボス未出現かつ残り時間が120秒（3分経過）になったらボス演出＋出現
+        if (!this.bossAppeared && this.timer.update() <= 120) {
+            this.bossAppeared = true;
+            this.uiManager.showBossCutIn();
+            setTimeout(() => this.uiManager.hideBossCutIn(), 1500);
+            this.enemyManager.clearEnemies(); // 通常敵を一掃（任意）
+            this.enemyManager.spawnBoss();
+            this.bossStartTime = Date.now();
+        }
+        // ボス出現中の処理
+        if (this.bossAppeared && !this.bossDefeated) {
+            // ボス鬼が生きているか判定
+            const boss = this.enemyManager.getEnemies().find(e => e.constructor.name === 'BossOni');
+            if (!boss) {
+                // ボスがいない＝倒した
+                this.bossDefeated = true;
+                this.gameState.setGameOver();
+                this.uiManager.showGameOver('クリア！ボス鬼を倒した！');
+                return;
+            }
+            // ボス用タイマー
+            const elapsed = Math.floor((Date.now() - this.bossStartTime) / 1000);
+            if (elapsed >= this.bossTimer) {
+                this.gameState.setGameOver();
+                this.uiManager.showGameOver('時間切れ！ボス鬼を倒せなかった…');
+                return;
+            }
+        }
+        // 通常の時間切れはボス未出現時のみ
+        if (!this.bossAppeared && this.timer.isTimeUp()) {
             this.gameState.setGameOver();
             this.uiManager.showGameOver('時間切れでゲームオーバー');
             return;
@@ -157,8 +195,16 @@ export class Game {
         }
 
         // 敵更新・描画（EnemyManagerに委譲）
-        this.enemyManager.update();
-        this.enemyManager.draw(this.ctx, scrollX, scrollY);
+        if (this.bossAppeared && !this.bossDefeated) {
+            // ボスのみ更新・描画
+            this.enemyManager.getEnemies().forEach(enemy => {
+                if (enemy.constructor.name === 'BossOni') enemy.update();
+            });
+            this.enemyManager.draw(this.ctx, scrollX, scrollY);
+        } else {
+            this.enemyManager.update();
+            this.enemyManager.draw(this.ctx, scrollX, scrollY);
+        }
         
         // プレイヤーとの衝突判定
         this.enemyManager.getEnemies().forEach(enemy => {

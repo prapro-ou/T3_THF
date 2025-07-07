@@ -63,4 +63,18 @@
     setRestartCallback(callback) {
         this.restartButton.addEventListener('click', callback);
     }
+
+    showBossCutIn() {
+        const cutIn = document.getElementById('bossCutIn');
+        if (cutIn) {
+            cutIn.classList.remove('hidden');
+        }
+    }
+
+    hideBossCutIn() {
+        const cutIn = document.getElementById('bossCutIn');
+        if (cutIn) {
+            cutIn.classList.add('hidden');
+        }
+    }
 } 
