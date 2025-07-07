@@ -1,0 +1,23 @@
+{
+    "files.eol": "\n",
+    "files.encoding": "utf8",
+    "files.trimTrailingWhitespace": true,
+    "files.insertFinalNewline": true,
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "explicit"
+    },
+    "javascript.format.enable": true,
+    "typescript.format.enable": true,
+    "html.format.enable": true,
+    "css.format.enable": true,
+    "json.format.enable": true,
+    "momotaro_leftwalk": {
+        "frame": {
+            "x": 1500,
+            "y": 0,
+            "w": 300,
+            "h": 470
+        }
+    }
+}

@@ -1,0 +1,92 @@
+{
+  "frames": {
+    "red_oni_back": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "sourceSize": {
+        "w": 200,
+        "h": 300
+      }
+    },
+    "red_oni_front": {
+      "frame": {
+        "x": 200,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "sourceSize": {
+        "w": 200,
+        "h": 300
+      }
+    },
+    "red_oni_left": {
+      "frame": {
+        "x": 400,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "sourceSize": {
+        "w": 200,
+        "h": 300
+      }
+    },
+    "red_oni_right": {
+      "frame": {
+        "x": 600,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 300
+      },
+      "sourceSize": {
+        "w": 200,
+        "h": 300
+      }
+    }
+  },
+  "meta": {
+    "image": "red_oni_spritesheet.png",
+    "size": {
+      "w": 800,
+      "h": 300
+    },
+    "scale": "1"
+  }
+}
