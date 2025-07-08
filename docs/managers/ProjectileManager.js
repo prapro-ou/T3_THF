@@ -1,3 +1,5 @@
+import { Projectile } from '../entities/Projectile.js';
+
 export class ProjectileManager {
     constructor(game) {
         this.game = game;
@@ -20,5 +22,11 @@ export class ProjectileManager {
 
     reset() {
         this.projectiles = [];
+    }
+
+    spawnEnemyProjectile(x, y, target, speed = 6, damage = 15) {
+        // 敵弾（ターゲットはプレイヤー）
+        const proj = new Projectile(this.game, x, y, target, speed, damage);
+        this.projectiles.push(proj);
     }
 } 

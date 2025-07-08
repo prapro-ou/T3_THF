@@ -15,7 +15,7 @@ import { Otomo } from '../entities/Otomo.js';
 import { ProjectileManager } from '../managers/ProjectileManager.js';
 
 export class Game {
-    constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay) {
+    constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0) {
         this.canvas = canvas;
         this.ctx = ctx;
 
@@ -47,6 +47,8 @@ export class Game {
         this.bossDefeated = false;
         this.bossTimer = 120; // ボス出現から2分
         this.bossStartTime = null;
+
+        this.selectedBossType = selectedBossType;
 
         this.setupEvents();
         this.initializeGame();
@@ -148,7 +150,7 @@ export class Game {
             this.uiManager.showBossCutIn();
             setTimeout(() => this.uiManager.hideBossCutIn(), 1500);
             this.enemyManager.clearEnemies(); // 通常敵を一掃（任意）
-            this.enemyManager.spawnBoss();
+            this.enemyManager.spawnBoss(this.selectedBossType);
             this.bossStartTime = Date.now();
         }
         // ボス出現中の処理
@@ -237,7 +239,10 @@ export class Game {
         // ProjectileManagerのupdate/draw
         this.projectileManager.update(deltaTime);
         this.projectileManager.draw(this.ctx, scrollX, scrollY);
-        
+
+        // 残弾数UIを毎フレーム更新
+        this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
+
         const animationId = requestAnimationFrame(() => this.animate());
         this.gameState.setAnimationId(animationId);
     }
