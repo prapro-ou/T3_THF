@@ -45,8 +45,13 @@ export class ChargeOtomoBehavior {
             }
 
             if (dist < (this.otomo.width + target.width) / 2) {
-                if (typeof target.hp === 'number') {
-                    target.hp -= 20;
+                // 弾の攻撃力と同じにする
+                const level = this.otomo.game.otomoLevel || 1;
+                const damage = 10 + (level - 1) * 5;
+                if (typeof target.takeDamage === 'function') {
+                    target.takeDamage(damage);
+                } else if (typeof target.hp === 'number') {
+                    target.hp -= damage;
                     if (target.hp <= 0) {
                         target.markedForDeletion = true;
                         this.otomo.game.particleManager.createExplosion(
@@ -75,4 +80,4 @@ export class ChargeOtomoBehavior {
     getColor() {
         return '#FF4500'; // オレンジレッド
     }
-} 
+}

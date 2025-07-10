@@ -16,4 +16,11 @@ export class RedOni extends Enemy {
         super.updateMovement(); // 親クラスの処理を再利用
         // 赤鬼特有の移動ロジックがあれば追加
     }
-} 
+
+    onDeath() {
+        if (this.game && typeof this.game.addOtomoExp === 'function') {
+            this.game.addOtomoExp(1);
+        }
+        super.onDeath && super.onDeath();
+    }
+}

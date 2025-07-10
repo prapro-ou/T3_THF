@@ -9,15 +9,12 @@ export class AttackManager {
         this.scorePerKill = 10;
     }
 
-    handleAttack(event) {
+    // 剣攻撃（近接）
+    handleSwordAttack(event) {
         const { scrollX, scrollY } = this.game.calcScroll();
         const rect = this.game.canvas.getBoundingClientRect();
-
-        // キャンバス上のクリック座標
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
-
-        // プレイヤーの描画座標をPlayerRendererと同じロジックで計算
         const { width: viewWidth, height: viewHeight } = this.game.renderer.getViewDimensions();
         const { width: mapWidth, height: mapHeight } = this.game.renderer.getMapDimensions();
         let drawX = viewWidth / 2 - this.game.player.width / 2;
@@ -26,45 +23,74 @@ export class AttackManager {
         if (this.game.player.x > mapWidth - viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
         if (this.game.player.y < viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
         if (this.game.player.y > mapHeight - viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-
-        // プレイヤーの描画中心
         const playerDrawCenterX = drawX + this.game.player.width / 2;
         const playerDrawCenterY = drawY + this.game.player.height / 2;
-
-        // マウス座標からプレイヤー描画中心への相対座標
         const relativeX = canvasX - playerDrawCenterX;
         const relativeY = canvasY - playerDrawCenterY;
-
-        // マップ座標での攻撃位置
         const mouseX = this.game.player.x + relativeX;
         const mouseY = this.game.player.y + relativeY;
-        const attackRadius = this.game.player.getAttackRadius();
-
-        // デバッグ情報をコンソールに出力
-        console.log('Attack Debug:', {
-            mouseX: mouseX,
-            mouseY: mouseY,
-            playerX: this.game.player.x,
-            playerY: this.game.player.y,
-            relativeX: relativeX,
-            relativeY: relativeY,
-            canvasX: canvasX,
-            canvasY: canvasY,
-            attackRadius: attackRadius,
-            clientX: event.clientX,
-            clientY: event.clientY,
-            canvasRect: this.game.canvas.getBoundingClientRect()
-        });
-
-        // 攻撃範囲の中心座標を保存（アニメーションで描画用）
+        // 剣の攻撃半径（狭める: 80px）
+        const attackRadius = 80;
         this.attackCircle = {
             x: mouseX,
             y: mouseY,
             radius: attackRadius,
             timer: 10
         };
+        let hitCount = 0;
+        const level = this.game.otomoLevel || 1;
+        const damage = 10 + (level - 1) * 5;
+        this.game.enemyManager.getEnemies().forEach(enemy => {
+            const ex = enemy.x + enemy.width / 2;
+            const ey = enemy.y + enemy.height / 2;
+            const dist = Math.hypot(mouseX - ex, mouseY - ey);
+            if (dist <= attackRadius) {
+                if (typeof enemy.takeDamage === 'function') {
+                    enemy.takeDamage(damage);
+                    hitCount++;
+                }
+            }
+        });
+        return hitCount;
+    }
 
+    // クリック攻撃（弾）
+    handleProjectileAttack(event) {
+        const { scrollX, scrollY } = this.game.calcScroll();
+        const rect = this.game.canvas.getBoundingClientRect();
+        const canvasX = event.clientX - rect.left;
+        const canvasY = event.clientY - rect.top;
+        const { width: viewWidth, height: viewHeight } = this.game.renderer.getViewDimensions();
+        const { width: mapWidth, height: mapHeight } = this.game.renderer.getMapDimensions();
+        let drawX = viewWidth / 2 - this.game.player.width / 2;
+        let drawY = viewHeight / 2 - this.game.player.height / 2;
+        if (this.game.player.x < viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
+        if (this.game.player.x > mapWidth - viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
+        if (this.game.player.y < viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
+        if (this.game.player.y > mapHeight - viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
+        const playerDrawCenterX = drawX + this.game.player.width / 2;
+        const playerDrawCenterY = drawY + this.game.player.height / 2;
+        const relativeX = canvasX - playerDrawCenterX;
+        const relativeY = canvasY - playerDrawCenterY;
+        const mouseX = this.game.player.x + relativeX;
+        const mouseY = this.game.player.y + relativeY;
+        const attackRadius = this.game.player.getAttackRadius();
+        this.attackCircle = {
+            x: mouseX,
+            y: mouseY,
+            radius: attackRadius,
+            timer: 10
+        };
         return this.processAttack(mouseX, mouseY, attackRadius);
+    }
+
+    // 既存のhandleAttackは用途に応じて呼び分ける（デフォルトは剣攻撃）
+    handleAttack(event, type = 'sword') {
+        if (type === 'projectile') {
+            return this.handleProjectileAttack(event);
+        } else {
+            return this.handleSwordAttack(event);
+        }
     }
 
     processAttack(attackX, attackY, attackRadius) {
