@@ -8,4 +8,10 @@ export class BossOni5 extends BossOni {
         this._hp = 500;
         this.name = 'BossOni5';
     }
+
+    update() {
+        // 親クラスの更新処理を呼び出し
+        super.update();
+        // BossOni5特有の挙動があればここに追加
+    }
 } 

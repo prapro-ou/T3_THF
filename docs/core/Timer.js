@@ -57,4 +57,21 @@
     setGameTime(seconds) {
         this.gameTime = seconds;
     }
+
+    getTime() {
+        return this.update();
+    }
+
+    getElapsedTime() {
+        if (this.isPaused) {
+            return this.elapsedSeconds;
+        }
+        
+        let totalElapsed = this.elapsedSeconds;
+        if (this.lastTimerResume) {
+            totalElapsed += Math.floor((Date.now() - this.lastTimerResume) / 1000);
+        }
+        
+        return totalElapsed;
+    }
 } 
