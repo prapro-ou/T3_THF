@@ -1,4 +1,5 @@
 ﻿import { RedOni, BlueOni, BlackOni, BossOni, BossOni1, BossOni2, BossOni3, BossOni4, BossOni5 } from '../entities/enemies/index.js';
+import { Enemy } from '../entities/base/Enemy.js';
 import { CollisionManager } from './CollisionManager.js';
 import { EnemyRenderer } from '../components/EnemyRenderer.js';
 
@@ -64,11 +65,46 @@ export class EnemyManager {
     spawnEnemy() {
         const enemyTypes = [RedOni, BlueOni, BlackOni];
         const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-        const enemy = new randomType(this.game);
+        
+        // デバッグ設定がある場合は適用
+        let enemy;
+        if (this.game.enemyBaseHP && this.game.enemyBaseSpeed) {
+            // デバッグ設定を使用して敵を生成
+            enemy = this.spawnEnemyWithDebugSettings(randomType);
+        } else {
+            // 通常の敵生成
+            enemy = new randomType(this.game);
+        }
+        
         this.enemies.push(enemy);
     }
 
+    spawnEnemyWithDebugSettings(EnemyClass) {
+        // 敵の種類に応じてHPを設定
+        let maxHP;
+        if (EnemyClass === RedOni) {
+            maxHP = this.game.enemyBaseHP.red;
+        } else if (EnemyClass === BlueOni) {
+            maxHP = this.game.enemyBaseHP.blue;
+        } else if (EnemyClass === BlackOni) {
+            maxHP = this.game.enemyBaseHP.black;
+        } else {
+            maxHP = Enemy.BASE_HP;
+        }
+        
+        // 敵を生成
+        const enemy = new EnemyClass(this.game, undefined, maxHP);
+        
+        // デバッグ設定の速度を適用
+        if (this.game.enemyBaseSpeed) {
+            enemy.speed = this.game.enemyBaseSpeed + Math.random();
+        }
+        
+        return enemy;
+    }
+
     spawnBoss(bossType = 0) {
+        console.log('ボス生成開始:', { bossType });
         let boss;
         switch (bossType) {
             case 1:
@@ -84,7 +120,14 @@ export class EnemyManager {
             default:
                 boss = new BossOni(this.game); break;
         }
+        console.log('ボス生成完了:', { 
+            bossType, 
+            bossClass: boss.constructor.name,
+            bossExists: !!boss,
+            enemyCount: this.enemies.length
+        });
         this.enemies.push(boss);
+        console.log('ボス追加後敵数:', this.enemies.length);
     }
 
     getEnemies() {

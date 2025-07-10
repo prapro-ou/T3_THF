@@ -6,8 +6,8 @@ import { Enemy } from '../base/Enemy.js';
  * 継承: Enemyから基本機能を継承
  */
 export class BlackOni extends Enemy {
-    constructor(game) {
-        super(game, 'black', 60);
+    constructor(game, color = 'black', maxHP = 60) {
+        super(game, color, maxHP);
         this.width = 70;
         this.height = 70;
         this.speed += 0.5;

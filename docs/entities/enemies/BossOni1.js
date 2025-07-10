@@ -12,7 +12,9 @@ export class BossOni1 extends BossOni {
     }
 
     update() {
-        // 動かない
+        // 親クラスの更新処理を呼び出し
+        super.update();
+        
         // 弾発射ロジック
         this.shootTimer++;
         if (this.shootTimer >= this.shootInterval) {

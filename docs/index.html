@@ -28,27 +28,27 @@
       <h2 class="wafu-title">ステージ選択</h2>
       <div class="boss-cards">
         <div class="boss-card" data-boss="1">
-          <img src="assets/boss1.png" alt="でかいボス" class="boss-img">
+          <div class="boss-placeholder">四天王1</div>
           <div class="boss-name">四天王1：でかいボス</div>
           <div class="boss-desc">動かず高耐久。弾を撃つ。</div>
         </div>
         <div class="boss-card" data-boss="2">
-          <img src="assets/boss2.png" alt="はやいボス" class="boss-img">
+          <div class="boss-placeholder">四天王2</div>
           <div class="boss-name">四天王2：はやいボス</div>
           <div class="boss-desc">急加速と停止を繰り返す。</div>
         </div>
         <div class="boss-card" data-boss="3">
-          <img src="assets/boss3.png" alt="ワープボス" class="boss-img">
+          <div class="boss-placeholder">四天王3</div>
           <div class="boss-name">四天王3：ワープボス</div>
           <div class="boss-desc">ワープで逃げ、鬼を呼ぶ。</div>
         </div>
         <div class="boss-card" data-boss="4">
-          <img src="assets/boss4.png" alt="2体1組ボス" class="boss-img">
+          <div class="boss-placeholder">四天王4</div>
           <div class="boss-name">四天王4：2体1組ボス</div>
           <div class="boss-desc">2体で異なる能力。</div>
         </div>
         <div class="boss-card" data-boss="5">
-          <img src="assets/boss5.png" alt="ラスボス" class="boss-img">
+          <div class="boss-placeholder">ラスボス</div>
           <div class="boss-name">ラスボス（いいとこどり）</div>
           <div class="boss-desc">四天王の力を併せ持つ。</div>
         </div>
@@ -65,6 +65,7 @@
                 <li><b>スコア</b> 敵を倒すとスコアが増える</li>
                 <li><b>ゲームオーバー</b> HPが0になると終了</li>
                 <li><b>Pキー</b> ゲームの一時中断/再開</li>
+                <li><b>F12キー</b> 開発者ツール（ゲーム中のみ）</li>
             </ul>
             <button id="closeHelp">閉じる</button>
         </div>
@@ -110,6 +111,71 @@
         </div>
     </div>
     <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">オトモLv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
+    
+    <!-- デバッグパネル -->
+    <div id="debugPanel" class="hidden debug-panel">
+        <div class="debug-header">
+            <h3>開発者ツール</h3>
+            <button id="closeDebug" class="debug-close-btn">×</button>
+        </div>
+        <div class="debug-content">
+            <div class="debug-section">
+                <h4>鬼の設定</h4>
+                <div class="debug-control">
+                    <label>出現頻度 (フレーム):</label>
+                    <input type="number" id="enemySpawnInterval" min="10" max="200" value="60">
+                </div>
+                <div class="debug-control">
+                    <label>最大敵数:</label>
+                    <input type="number" id="maxEnemies" min="5" max="50" value="20">
+                </div>
+                <div class="debug-control">
+                    <label>赤鬼HP:</label>
+                    <input type="number" id="redOniHP" min="1" max="200" value="20">
+                </div>
+                <div class="debug-control">
+                    <label>青鬼HP:</label>
+                    <input type="number" id="blueOniHP" min="1" max="200" value="40">
+                </div>
+                <div class="debug-control">
+                    <label>黒鬼HP:</label>
+                    <input type="number" id="blackOniHP" min="1" max="200" value="60">
+                </div>
+                <div class="debug-control">
+                    <label>鬼の基本速度:</label>
+                    <input type="number" id="enemyBaseSpeed" min="0.1" max="5" step="0.1" value="1">
+                </div>
+                <div class="debug-control">
+                    <label>ボス出現時間 (秒):</label>
+                    <input type="number" id="bossSpawnTime" min="5" max="300" value="180">
+                </div>
+            </div>
+            <div class="debug-section">
+                <h4>プレイヤーの設定</h4>
+                <div class="debug-control">
+                    <label>プレイヤーHP:</label>
+                    <input type="number" id="playerHP" min="1" max="500" value="100">
+                </div>
+                <div class="debug-control">
+                    <label>プレイヤー速度:</label>
+                    <input type="number" id="playerSpeed" min="1" max="10" step="0.1" value="3.5">
+                </div>
+                <div class="debug-control">
+                    <label>最大弾数:</label>
+                    <input type="number" id="maxAmmo" min="1" max="50" value="10">
+                </div>
+                <div class="debug-control">
+                    <label>弾回復時間 (秒):</label>
+                    <input type="number" id="ammoRecoveryTime" min="0.5" max="10" step="0.1" value="3">
+                </div>
+            </div>
+            <div class="debug-actions">
+                <button id="applyDebugSettings" class="debug-btn">設定を適用</button>
+                <button id="resetDebugSettings" class="debug-btn">設定をリセット</button>
+            </div>
+        </div>
+    </div>
+    
     <script type="module" src="main.js"></script>  
 </body>
 </html>
