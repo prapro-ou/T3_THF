@@ -27,16 +27,17 @@ export class WanderOtomoBehavior {
             this.otomo.y += (dy / dist) * this.otomo.speed * deltaTime;
         }
 
-        // ✅ オトモ自身の周囲にいる敵だけを攻撃
-        const target = this.otomo.findEnemyNearSelf(150);
+        // オトモ自身の一定範囲内の最も近い敵を弾で攻撃
+        const range = 150;
+        const target = this.otomo.findEnemyNearSelf(range);
         if (target && this.otomo.canShoot) {
             this.otomo.shootAt(target);
             this.otomo.canShoot = false;
-            setTimeout(() => this.otomo.canShoot = true, 1000);
+            setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }
     }
 
     getColor() {
         return '#32CD32'; // ライムグリーン
     }
-} 
+}

@@ -50,6 +50,11 @@ export class Game {
 
         this.selectedBossType = selectedBossType;
 
+        // Otomoのレベル・経験値
+        this.otomoLevel = 1;
+        this.otomoExp = 0;
+        this.otomoExpToLevelUp = 10;
+
         this.setupEvents();
         this.initializeGame();
     }
@@ -60,30 +65,20 @@ export class Game {
             e.preventDefault();
         });
 
-        // 左クリックのみ処理（mousedownで判定）
+        // 左クリック：playerの弾攻撃のみ
         this.canvas.addEventListener('mousedown', (event) => {
             if (event.button !== 0) return;
             if (this.gameState.isGameOver()) return;
             if (this.pauseManager.isPaused) return;
             if (this.player.ammo <= 0) return;
 
-            const hitCount = this.attackManager.handleAttack(event);
+            // playerのprojectile攻撃
+            const hitCount = this.attackManager.handleAttack(event, 'projectile');
             if (hitCount > 0) {
                 this.uiManager.updateScore(this.gameState.getScore());
             }
-            
-            // 弾を消費
             this.player.ammoManager.consumeAmmo();
             this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
-        });
-
-        this.uiManager.setRestartCallback(() => {
-            this.initializeGame();
-        });
-
-        // ページの可視性変更時の処理
-        document.addEventListener('visibilitychange', () => {
-            this.pauseManager.handleVisibilityChange();
         });
 
         // Otomoのモード切替（数字キー）
@@ -100,6 +95,15 @@ export class Game {
                     this.otomo.setMode('charge');
                     break;
             }
+        });
+
+        this.uiManager.setRestartCallback(() => {
+            this.initializeGame();
+        });
+
+        // ページの可視性変更時の処理
+        document.addEventListener('visibilitychange', () => {
+            this.pauseManager.handleVisibilityChange();
         });
     }
 
@@ -242,6 +246,8 @@ export class Game {
 
         // 残弾数UIを毎フレーム更新
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
+        // オトモレベルUIを毎フレーム更新
+        this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
 
         const animationId = requestAnimationFrame(() => this.animate());
         this.gameState.setAnimationId(animationId);
@@ -255,6 +261,27 @@ export class Game {
 
     togglePause() {
         this.pauseManager.togglePause();
+    }
+
+    // 経験値加算・レベルアップ処理
+    addOtomoExp(amount) {
+        this.otomoExp += amount;
+        let leveledUp = false;
+        while (this.otomoExp >= this.otomoExpToLevelUp) {
+            this.otomoExp -= this.otomoExpToLevelUp;
+            this.otomoLevel++;
+            this.otomoExpToLevelUp = Math.floor(this.otomoExpToLevelUp * 1.5);
+            leveledUp = true;
+        }
+        // UI即時反映
+        this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
+        // レベルアップ演出が必要ならここで
+    }
+
+    // レベルに応じた攻撃クールダウン(ms)を返す
+    getOtomoAttackCooldown() {
+        // デフォルト攻撃速度を速く（例: レベル1で700ms、レベルごとに10%短縮、下限250ms）
+        return Math.max(250, 700 * Math.pow(0.9, this.otomoLevel - 1));
     }
 
     // ゲッター

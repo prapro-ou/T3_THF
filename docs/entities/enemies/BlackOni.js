@@ -18,4 +18,11 @@ export class BlackOni extends Enemy {
         super.updateMovement();
         // 黒鬼特有の移動ロジックがあれば追加
     }
-} 
+
+    onDeath() {
+        if (this.game && typeof this.game.addOtomoExp === 'function') {
+            this.game.addOtomoExp(3);
+        }
+        super.onDeath && super.onDeath();
+    }
+}
