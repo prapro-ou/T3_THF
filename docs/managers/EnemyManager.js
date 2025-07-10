@@ -1,4 +1,4 @@
-﻿import { RedOni, BlueOni, BlackOni, BossOni } from '../entities/enemies/index.js';
+﻿import { RedOni, BlueOni, BlackOni, BossOni, BossOni1, BossOni2, BossOni3, BossOni4, BossOni5 } from '../entities/enemies/index.js';
 import { CollisionManager } from './CollisionManager.js';
 import { EnemyRenderer } from '../components/EnemyRenderer.js';
 
@@ -68,8 +68,22 @@ export class EnemyManager {
         this.enemies.push(enemy);
     }
 
-    spawnBoss() {
-        const boss = new BossOni(this.game);
+    spawnBoss(bossType = 0) {
+        let boss;
+        switch (bossType) {
+            case 1:
+                boss = new BossOni1(this.game); break;
+            case 2:
+                boss = new BossOni2(this.game); break;
+            case 3:
+                boss = new BossOni3(this.game); break;
+            case 4:
+                boss = new BossOni4(this.game); break;
+            case 5:
+                boss = new BossOni5(this.game); break;
+            default:
+                boss = new BossOni(this.game); break;
+        }
         this.enemies.push(boss);
     }
 

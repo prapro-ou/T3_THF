@@ -33,18 +33,16 @@
     }
 
     showPauseMessage() {
-        if (!this.pauseMessage) {
-            this.pauseMessage = document.createElement('div');
-            this.pauseMessage.id = 'pauseMessage';
-            this.pauseMessage.innerHTML = 'ポーズ中 (Pキーで再開)<br><span style="font-size:0.7em;">Hキーで操作説明</span>';
-            document.body.appendChild(this.pauseMessage);
+        const pauseMessage = document.getElementById('pauseMessage');
+        if (pauseMessage) {
+            pauseMessage.classList.remove('hidden');
         }
-        this.pauseMessage.classList.remove('hidden');
     }
 
     hidePauseMessage() {
-        if (this.pauseMessage) {
-            this.pauseMessage.classList.add('hidden');
+        const pauseMessage = document.getElementById('pauseMessage');
+        if (pauseMessage) {
+            pauseMessage.classList.add('hidden');
         }
     }
 
@@ -62,5 +60,19 @@
 
     setRestartCallback(callback) {
         this.restartButton.addEventListener('click', callback);
+    }
+
+    showBossCutIn() {
+        const cutIn = document.getElementById('bossCutIn');
+        if (cutIn) {
+            cutIn.classList.remove('hidden');
+        }
+    }
+
+    hideBossCutIn() {
+        const cutIn = document.getElementById('bossCutIn');
+        if (cutIn) {
+            cutIn.classList.add('hidden');
+        }
     }
 } 
