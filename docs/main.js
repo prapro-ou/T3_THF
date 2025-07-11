@@ -275,6 +275,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const blackOniHP = parseInt(document.getElementById('blackOniHP').value);
         const enemyBaseSpeed = parseFloat(document.getElementById('enemyBaseSpeed').value);
         const bossSpawnTime = parseInt(document.getElementById('bossSpawnTime').value);
+        const bossTimer = parseInt(document.getElementById('bossTimer').value);
+        const bossProjectileSpeed = parseFloat(document.getElementById('bossProjectileSpeed').value);
+        const bossProjectileLifetime = parseFloat(document.getElementById('bossProjectileLifetime').value);
+        const bossMovementSpeed = parseFloat(document.getElementById('bossMovementSpeed').value);
         
         // プレイヤーの設定を適用
         const playerHP = parseInt(document.getElementById('playerHP').value);
@@ -291,11 +295,18 @@ document.addEventListener('DOMContentLoaded', () => {
             blackOniHP,
             enemyBaseSpeed,
             bossSpawnTime,
+            bossTimer,
+            bossProjectileSpeed,
+            bossProjectileLifetime,
+            bossMovementSpeed,
             playerHP,
             playerSpeed,
             maxAmmo,
             ammoRecoveryTime
         });
+        
+        // タイマー表示を即座に更新
+        game.uiManager.updateBossTimer(game);
         
         debugPanel.classList.add('hidden');
     });
@@ -309,6 +320,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('blackOniHP').value = 60;
         document.getElementById('enemyBaseSpeed').value = 1;
         document.getElementById('bossSpawnTime').value = 180;
+        document.getElementById('bossTimer').value = 120;
+        document.getElementById('bossProjectileSpeed').value = 12;
+        document.getElementById('bossProjectileLifetime').value = 10;
+        document.getElementById('bossMovementSpeed').value = 0.1;
         document.getElementById('playerHP').value = 100;
         document.getElementById('playerSpeed').value = 3.5;
         document.getElementById('maxAmmo').value = 10;
@@ -322,6 +337,61 @@ document.addEventListener('DOMContentLoaded', () => {
             if (game) {
                 debugPanel.classList.remove('hidden');
             }
+        }
+    });
+
+    // 開発者ツールの入力フィールド変更時にリアルタイム更新
+    const debugInputs = [
+        'bossSpawnTime',
+        'bossTimer',
+        'bossProjectileSpeed',
+        'bossProjectileLifetime',
+        'bossMovementSpeed'
+    ];
+    
+    debugInputs.forEach(inputId => {
+        const input = document.getElementById(inputId);
+        if (input) {
+            input.addEventListener('input', () => {
+                if (game && !debugPanel.classList.contains('hidden')) {
+                    // 設定を適用してタイマー表示を更新
+                    const enemySpawnInterval = parseInt(document.getElementById('enemySpawnInterval').value);
+                    const maxEnemies = parseInt(document.getElementById('maxEnemies').value);
+                    const redOniHP = parseInt(document.getElementById('redOniHP').value);
+                    const blueOniHP = parseInt(document.getElementById('blueOniHP').value);
+                    const blackOniHP = parseInt(document.getElementById('blackOniHP').value);
+                    const enemyBaseSpeed = parseFloat(document.getElementById('enemyBaseSpeed').value);
+                    const bossSpawnTime = parseInt(document.getElementById('bossSpawnTime').value);
+                    const bossTimer = parseInt(document.getElementById('bossTimer').value);
+                    const bossProjectileSpeed = parseFloat(document.getElementById('bossProjectileSpeed').value);
+                    const bossProjectileLifetime = parseFloat(document.getElementById('bossProjectileLifetime').value);
+                    const bossMovementSpeed = parseFloat(document.getElementById('bossMovementSpeed').value);
+                    const playerHP = parseInt(document.getElementById('playerHP').value);
+                    const playerSpeed = parseFloat(document.getElementById('playerSpeed').value);
+                    const maxAmmo = parseInt(document.getElementById('maxAmmo').value);
+                    const ammoRecoveryTime = parseFloat(document.getElementById('ammoRecoveryTime').value);
+                    
+                    game.applyDebugSettings({
+                        enemySpawnInterval,
+                        maxEnemies,
+                        redOniHP,
+                        blueOniHP,
+                        blackOniHP,
+                        enemyBaseSpeed,
+                        bossSpawnTime,
+                        bossTimer,
+                        bossProjectileSpeed,
+                        bossProjectileLifetime,
+                        bossMovementSpeed,
+                        playerHP,
+                        playerSpeed,
+                        maxAmmo,
+                        ammoRecoveryTime
+                    });
+                    
+                    game.uiManager.updateBossTimer(game);
+                }
+            });
         }
     });
 

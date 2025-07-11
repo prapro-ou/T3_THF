@@ -147,7 +147,7 @@ export class Game {
         
         // タイマー更新
         this.timer.update();
-        this.uiManager.updateTimer(this.timer.getFormattedTime());
+        this.uiManager.updateBossTimer(this);
         
         // ボス未出現かつ経過時間が設定された時間になったらボス演出＋出現
         const elapsedTime = this.timer.getElapsedTime(); // 経過時間を取得
@@ -369,9 +369,16 @@ export class Game {
             this.player.ammoManager.ammoRecoveryTime = settings.ammoRecoveryTime;
         }
         
-        // ボス出現時間を設定
+        // ボス出現時間と攻略時間を設定
         this.bossSpawnTime = settings.bossSpawnTime;
-        this.bossTimer = settings.bossSpawnTime;
+        this.bossTimer = settings.bossTimer || 120; // デフォルト120秒
+        
+        // ボス弾の設定を適用
+        this.bossProjectileSpeed = settings.bossProjectileSpeed || 12;
+        this.bossProjectileLifetime = settings.bossProjectileLifetime || 10;
+        
+        // ボス移動速度の設定を適用
+        this.bossMovementSpeed = settings.bossMovementSpeed || 0.1;
         
         // 敵の基本パラメータを更新（新しい敵生成時に適用される）
         this.updateEnemyParameters(settings);

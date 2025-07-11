@@ -366,6 +366,9 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 #timerDisplay {
     top: 8px;
     right: 12px;
+    min-width: 140px;
+    max-width: 160px;
+    text-align: center;
 }
 
 #timer, #score {

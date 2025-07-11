@@ -8,6 +8,8 @@ export class Projectile {
         this.damage = damage;
         this.radius = 5;
         this.markedForDeletion = false;
+        this.lifetime = 0;
+        this.maxLifetime = 600; // 10秒間生存（60FPS想定）
 
         // ターゲットが無効な場合は即削除
         if (!target || typeof target.x !== 'number' || typeof target.y !== 'number') {
@@ -24,13 +26,20 @@ export class Projectile {
 
     update() {
         if (!this.target || this.target.markedForDeletion) {
-        console.log("Projectile deleted: invalid target");
-        this.markedForDeletion = true;
-        return;
+            console.log("Projectile deleted: invalid target");
+            this.markedForDeletion = true;
+            return;
         }
 
         this.x += this.vx;
         this.y += this.vy;
+        this.lifetime++;
+
+        // 生存時間を超えたら削除
+        if (this.lifetime >= this.maxLifetime) {
+            this.markedForDeletion = true;
+            return;
+        }
 
         // ターゲット中心との距離で衝突判定
         const ex = this.target.x + (this.target.width || 0) / 2;
@@ -44,10 +53,12 @@ export class Projectile {
             this.markedForDeletion = true;
         }
 
-        // 画面外に出たら削除
+        // 画面外判定を緩和（より遠くまで飛ばす）
+        const margin = 200; // 画面外200pxまで許容
+        const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
         if (
-            this.x < 0 || this.x > this.game.MAP_W ||
-            this.y < 0 || this.y > this.game.MAP_H
+            this.x < -margin || this.x > mapWidth + margin ||
+            this.y < -margin || this.y > mapHeight + margin
         ) {
             this.markedForDeletion = true;
         }

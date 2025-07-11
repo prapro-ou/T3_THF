@@ -18,7 +18,7 @@
     <div id="loading-screen">
         <h2>ロード中...</h2>
         <div class="loader"></div>
-    </div>
+    </div>\/
     <div id="startScreen" class="dark-bg">
         <button id="startButton" class="wafu-btn">ゲームスタート</button>
         <button id="help" class="wafu-btn">操作説明</button>
@@ -29,8 +29,8 @@
       <div class="boss-cards">
         <div class="boss-card" data-boss="1">
           <div class="boss-placeholder">四天王1</div>
-          <div class="boss-name">四天王1：でかいボス</div>
-          <div class="boss-desc">動かず高耐久。弾を撃つ。</div>
+          <div class="boss-name">四天王1：弾幕の支配者</div>
+          <div class="boss-desc">段階的攻撃、弾幕、衝撃波。HP低下で激化。</div>
         </div>
         <div class="boss-card" data-boss="2">
           <div class="boss-placeholder">四天王2</div>
@@ -148,6 +148,22 @@
                 <div class="debug-control">
                     <label>ボス出現時間 (秒):</label>
                     <input type="number" id="bossSpawnTime" min="5" max="300" value="180">
+                </div>
+                <div class="debug-control">
+                    <label>ボス攻略時間 (秒):</label>
+                    <input type="number" id="bossTimer" min="30" max="600" value="120">
+                </div>
+                <div class="debug-control">
+                    <label>ボス弾速度:</label>
+                    <input type="number" id="bossProjectileSpeed" min="3" max="20" step="0.5" value="12">
+                </div>
+                <div class="debug-control">
+                    <label>ボス弾生存時間 (秒):</label>
+                    <input type="number" id="bossProjectileLifetime" min="2" max="15" step="0.5" value="10">
+                </div>
+                <div class="debug-control">
+                    <label>ボス移動速度:</label>
+                    <input type="number" id="bossMovementSpeed" min="0" max="5" step="0.1" value="0.1">
                 </div>
             </div>
             <div class="debug-section">
