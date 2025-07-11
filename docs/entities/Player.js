@@ -60,6 +60,13 @@ export class Player extends Character {
         return this.attackRadius;
     }
 
+    getAttackPower() {
+        // レベル・倍率に応じて攻撃力を返す
+        const level = this.game.otomoLevel || 1;
+        const base = 10 + (level - 1) * 5;
+        return base * (this.game.playerAttackMultiplier || 1);
+    }
+
     // プライベートメソッド
     updateMovementState() {
         this.isMoving = this.controller.isMoving;

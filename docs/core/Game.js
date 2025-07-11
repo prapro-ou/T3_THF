@@ -54,6 +54,10 @@ export class Game {
         this.otomoLevel = 1;
         this.otomoExp = 0;
         this.otomoExpToLevelUp = 10;
+        // レベルアップで上昇する各種倍率
+        this.otomoSpeedMultiplier = 1;
+        this.playerAttackMultiplier = 1;
+        this.otomoAttackMultiplier = 1;
 
         this.setupEvents();
         this.initializeGame();
@@ -108,6 +112,13 @@ export class Game {
     }
 
     initializeGame() {
+        // Otomoのレベル・経験値をリセット
+        this.otomoLevel = 1;
+        this.otomoExp = 0;
+        this.otomoExpToLevelUp = 10;
+        this.otomoSpeedMultiplier = 1;
+        this.playerAttackMultiplier = 1;
+        this.otomoAttackMultiplier = 1;
         this.gameState.reset();
         this.player.reset();
         this.enemyManager.reset();
@@ -333,7 +344,15 @@ export class Game {
         while (this.otomoExp >= this.otomoExpToLevelUp) {
             this.otomoExp -= this.otomoExpToLevelUp;
             this.otomoLevel++;
-            this.otomoExpToLevelUp = Math.floor(this.otomoExpToLevelUp * 1.5);
+            // 必要経験値を1.3倍に（以前より少し減らす）
+            this.otomoExpToLevelUp = Math.floor(this.otomoExpToLevelUp * 1.3);
+            // レベルアップ時の各種上昇
+            this.otomoSpeedMultiplier *= 1.05; // オトモ速度5%アップ
+            this.playerAttackMultiplier *= 1.1; // プレイヤー攻撃力1.1倍
+            this.otomoAttackMultiplier *= 1.1; // オトモ攻撃力1.1倍
+            if (this.player && this.player.ammoManager) {
+                this.player.ammoManager.ammoRecoveryTime /= 1.1; // リロード速度1.1倍
+            }
             leveledUp = true;
         }
         // UI即時反映

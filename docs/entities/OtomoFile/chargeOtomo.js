@@ -2,6 +2,8 @@ export class ChargeOtomoBehavior {
     constructor(otomo) {
         this.otomo = otomo;
         this.chargeTarget = null;
+        this.damageInterval = 0.2; // ダメージ間隔（秒）
+        this.damageTimer = 0;
     }
 
     update(player, deltaTime) {
@@ -31,6 +33,7 @@ export class ChargeOtomoBehavior {
                 }
             }
             this.chargeTarget = closest;
+            this.damageTimer = 0; // 新しいターゲット時はタイマーリセット
         }
 
         const target = this.chargeTarget;
@@ -45,25 +48,35 @@ export class ChargeOtomoBehavior {
             }
 
             if (dist < (this.otomo.width + target.width) / 2) {
-                // 弾の攻撃力と同じにする
-                const level = this.otomo.game.otomoLevel || 1;
-                const damage = 10 + (level - 1) * 5;
-                if (typeof target.takeDamage === 'function') {
-                    target.takeDamage(damage);
-                } else if (typeof target.hp === 'number') {
-                    target.hp -= damage;
-                    if (target.hp <= 0) {
+                this.damageTimer += deltaTime;
+                if (this.damageTimer >= this.damageInterval) {
+                    this.damageTimer = 0;
+                    const level = this.otomo.game.otomoLevel || 1;
+                    const base = 10 + (level - 1) * 5;
+                    const damage = base * (this.otomo.game.otomoAttackMultiplier || 1);
+                    if (typeof target.takeDamage === 'function') {
+                        target.takeDamage(damage);
+                    } else if (typeof target.hp === 'number') {
+                        target.hp -= damage;
+                        if (target.hp <= 0) {
+                            target.markedForDeletion = true;
+                            this.otomo.game.particleManager.createExplosion(
+                                target.x + target.width / 2,
+                                target.y + target.height / 2,
+                                target.color
+                            );
+                        }
+                    } else {
                         target.markedForDeletion = true;
-                        this.otomo.game.particleManager.createExplosion(
-                            target.x + target.width / 2,
-                            target.y + target.height / 2,
-                            target.color
-                        );
                     }
-                } else {
-                    target.markedForDeletion = true;
                 }
-                this.chargeTarget = null;
+                // HPが0以下ならターゲット解除
+                if (target.markedForDeletion || target.hp <= 0) {
+                    this.chargeTarget = null;
+                }
+            } else {
+                // 離れたらタイマーリセット
+                this.damageTimer = 0;
             }
         } else {
             // 敵が画面内にいないときはプレイヤーに戻る
@@ -74,6 +87,7 @@ export class ChargeOtomoBehavior {
                 this.otomo.x += (dx / dist) * this.otomo.speed * deltaTime;
                 this.otomo.y += (dy / dist) * this.otomo.speed * deltaTime;
             }
+            this.damageTimer = 0;
         }
     }
 
