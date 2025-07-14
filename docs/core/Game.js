@@ -26,7 +26,7 @@ export class Game {
         this.collisionManager = new CollisionManager();
         this.enemyManager = new EnemyManager(this, this.collisionManager);
         this.particleManager = new ParticleManager(this);
-        this.timer = new Timer();
+        this.timer = new Timer(180); // デフォルト3分
         this.uiManager = new UIManager(scoreDisplay, livesDisplay, timerDisplay, gameOverMessage, restartButton);
         this.pauseManager = new PauseManager(this, this.uiManager);
         this.attackManager = new AttackManager(this);
@@ -158,7 +158,16 @@ export class Game {
         
         // タイマー更新
         this.timer.update();
-        this.uiManager.updateTimer(this.timer.getFormattedTime());
+        if (!this.bossAppeared) {
+            this.uiManager.updateTimer(this.timer.getFormattedTime(), 'normal');
+        } else if (this.bossAppeared && !this.bossDefeated) {
+            // ボス攻略残り時間を計算
+            const elapsed = Math.floor((Date.now() - this.bossStartTime) / 1000);
+            const remaining = Math.max(0, this.bossTimer - elapsed);
+            const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
+            const seconds = String(remaining % 60).padStart(2, '0');
+            this.uiManager.updateTimer(`${minutes}:${seconds}`, 'boss');
+        }
         
         // ボス未出現かつ経過時間が設定された時間になったらボス演出＋出現
         const elapsedTime = this.timer.getElapsedTime(); // 経過時間を取得
@@ -390,7 +399,15 @@ export class Game {
         
         // ボス出現時間を設定
         this.bossSpawnTime = settings.bossSpawnTime;
+        this.timer.setGameTime(settings.bossSpawnTime); // タイマーにも反映
+        // ボス攻略時間（新設）
+        if (settings.bossBattleTime !== undefined) {
+            this.bossTimer = settings.bossBattleTime;
+        }
+        else if (settings.bossSpawnTime !== undefined) {
+            // 互換性のため、bossSpawnTimeもbossTimerに入れる（古い設定）
         this.bossTimer = settings.bossSpawnTime;
+        }
         
         // 敵の基本パラメータを更新（新しい敵生成時に適用される）
         this.updateEnemyParameters(settings);
@@ -418,8 +435,8 @@ let momotaroSpriteSheetLoaded = false;
 export function preloadMomotaroSpriteSheet(callback) {
     if (momotaroSpriteSheetLoaded) return callback();
     const img = new Image();
-    img.src = 'assets/momotaro_spritesheet.png';
-    fetch('assets/momotaro_spritesheet.json')
+    img.src = 'assets/characters/players/momotaro/momotaro_spritesheet.png';
+    fetch('assets/characters/players/momotaro/momotaro_spritesheet.json')
         .then(res => res.json())
         .then(json => {
             img.onload = () => {

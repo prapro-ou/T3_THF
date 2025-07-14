@@ -1,0 +1,20 @@
+{"frames": [
+
+{
+	"filename": "fuzin.png",
+	"frame": {"x":0,"y":0,"w":400,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":400},
+	"sourceSize": {"w":400,"h":400}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "fuzin.png",
+	"format": "RGBA8888",
+	"size": {"w":400,"h":400},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:df1a2649caa70538a1f535d9039b36fe:1f2b66633498921ebcaeb9f5bf48d80d:dd430ac0fcb0fd575d379482afba77b7$"
+}
+}
