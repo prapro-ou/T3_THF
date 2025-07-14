@@ -1,0 +1,20 @@
+{"frames": [
+
+{
+	"filename": "tornade.png",
+	"frame": {"x":0,"y":0,"w":200,"h":200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":200},
+	"sourceSize": {"w":200,"h":200}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "tornade.png",
+	"format": "RGBA8888",
+	"size": {"w":200,"h":200},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:7875833c808071db7a0fc54705f5bdb3:1776ba77742b488b621ed39b8164044b:0226b2a5bc31a87cf92b32d7b301fb79$"
+}
+}
