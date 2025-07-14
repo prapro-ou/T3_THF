@@ -275,6 +275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const blackOniHP = parseInt(document.getElementById('blackOniHP').value);
         const enemyBaseSpeed = parseFloat(document.getElementById('enemyBaseSpeed').value);
         const bossSpawnTime = parseInt(document.getElementById('bossSpawnTime').value);
+        const bossBattleTime = parseInt(document.getElementById('bossBattleTime').value);
         
         // プレイヤーの設定を適用
         const playerHP = parseInt(document.getElementById('playerHP').value);
@@ -291,6 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
             blackOniHP,
             enemyBaseSpeed,
             bossSpawnTime,
+            bossBattleTime,
             playerHP,
             playerSpeed,
             maxAmmo,
@@ -309,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('blackOniHP').value = 60;
         document.getElementById('enemyBaseSpeed').value = 1;
         document.getElementById('bossSpawnTime').value = 180;
+        document.getElementById('bossBattleTime').value = 120;
         document.getElementById('playerHP').value = 100;
         document.getElementById('playerSpeed').value = 3.5;
         document.getElementById('maxAmmo').value = 10;

@@ -1,0 +1,20 @@
+{"frames": [
+
+{
+	"filename": "lighting.png",
+	"frame": {"x":0,"y":0,"w":200,"h":200},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":200,"h":200},
+	"sourceSize": {"w":200,"h":200}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "lightning.png",
+	"format": "RGBA8888",
+	"size": {"w":200,"h":200},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:906717cbaa29cf58276480197f8f8e4b:f2160a3a18632626c3e256b0b7f2603a:25be3648ac3d733248850a03c6feeca1$"
+}
+}
