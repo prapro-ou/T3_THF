@@ -18,7 +18,7 @@ export function preloadRedOniSpriteSheet(callback) {
         return callback();
     }
     
-    fetch('docs/assets/characters/oni/red_oni_script/red_oni_spritesheet.json')
+    fetch('assets/characters/oni/red_oni_script/red_oni_spritesheet.json')
         .then(res => {
             if (!res.ok) throw new Error('Red Oni JSON not found');
             console.log('Red Oni JSON fetch success');
@@ -29,7 +29,7 @@ export function preloadRedOniSpriteSheet(callback) {
             const maxRetries = 10;
             function tryLoadImage() {
                 const img = new Image();
-                img.src = 'docs/assets/characters/oni/red_oni_script/red_oni_spritesheet.png?' + new Date().getTime();
+                img.src = 'assets/characters/oni/red_oni_script/red_oni_spritesheet.png?' + new Date().getTime();
                 console.log('Trying to load red oni image, attempt', retryCount + 1, 'src:', img.src);
                 img.onload = () => {
                     console.log('Red Oni image loaded successfully');
@@ -65,7 +65,7 @@ export function preloadEnemySpriteSheet(enemyType, callback) {
         return callback();
     }
     
-    fetch(`docs/assets/characters/oni/${enemyType}_oni_script/${enemyType}_oni_spritesheet.json`)
+    fetch(`assets/characters/oni/${enemyType}_oni_script/${enemyType}_oni_spritesheet.json`)
         .then(res => {
             if (!res.ok) throw new Error(`${enemyType} Oni JSON not found`);
             console.log(`${enemyType} Oni JSON fetch success`);
@@ -76,7 +76,7 @@ export function preloadEnemySpriteSheet(enemyType, callback) {
             const maxRetries = 10;
             function tryLoadImage() {
                 const img = new Image();
-                img.src = `docs/assets/characters/oni/${enemyType}_oni_script/${enemyType}_oni_spritesheet.png?${new Date().getTime()}`;
+                img.src = `assets/characters/oni/${enemyType}_oni_script/${enemyType}_oni_spritesheet.png?${new Date().getTime()}`;
                 console.log(`Trying to load ${enemyType} oni image, attempt`, retryCount + 1, 'src:', img.src);
                 img.onload = () => {
                     console.log(`${enemyType} Oni image loaded successfully`);
@@ -108,7 +108,7 @@ export function preloadCannonOniSpriteSheet(callback) {
         return callback();
     }
     
-    fetch('docs/assets/characters/oni/cannon_oni/cannon_oni_j.json')
+    fetch('assets/characters/oni/cannon_oni/cannon_oni_j.json')
         .then(res => {
             if (!res.ok) throw new Error('Cannon Oni JSON not found');
             console.log('Cannon Oni JSON fetch success');
@@ -119,7 +119,7 @@ export function preloadCannonOniSpriteSheet(callback) {
             const maxRetries = 10;
             function tryLoadImage() {
                 const img = new Image();
-                img.src = `docs/assets/characters/oni/cannon_oni/cannon_oni.png?${new Date().getTime()}`;
+                img.src = `assets/characters/oni/cannon_oni/cannon_oni.png?${new Date().getTime()}`;
                 console.log(`Trying to load cannon oni image, attempt`, retryCount + 1, 'src:', img.src);
                 img.onload = () => {
                     console.log('Cannon Oni image loaded successfully');

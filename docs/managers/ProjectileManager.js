@@ -17,7 +17,7 @@ export class ProjectileManager {
             return callback();
         }
         
-        fetch('docs/assets/effects/boss_attack/cannon_ball.json')
+        fetch('assets/effects/boss_attack/cannon_ball.json')
             .then(res => {
                 if (!res.ok) throw new Error('Cannon Ball JSON not found');
                 console.log('Cannon Ball JSON fetch success');
@@ -29,7 +29,7 @@ export class ProjectileManager {
                 const maxRetries = 10;
                 const tryLoadImage = () => {
                     const img = new Image();
-                    img.src = `docs/assets/effects/boss_attack/cannon_ball.png?${new Date().getTime()}`;
+                    img.src = `assets/effects/boss_attack/cannon_ball.png?${new Date().getTime()}`;
                     console.log(`Trying to load cannon ball image, attempt`, retryCount + 1, 'src:', img.src);
                     img.onload = () => {
                         console.log('Cannon Ball image loaded successfully');

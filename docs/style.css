@@ -465,7 +465,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 
 /* ===== スタート画面 ===== */
 #startScreen, .dark-bg {
-    background: url('docs/assets/UI/title1.png') center center no-repeat;
+    background: url('assets/UI/title1.png') center center no-repeat;
     background-size: contain;
     min-height: 100vh;
     width: 100vw;

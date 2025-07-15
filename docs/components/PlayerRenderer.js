@@ -11,8 +11,8 @@ export function preloadMomotaroSpriteSheet(callback) {
         return callback();
     }
     const img = new Image();
-    img.src = 'docs/assets/characters/players/momotaro/momotaro_spritesheet.png';
-    fetch('docs/assets/characters/players/momotaro/momotaro_spritesheet.json')
+    img.src = 'assets/characters/players/momotaro/momotaro_spritesheet.png';
+    fetch('assets/characters/players/momotaro/momotaro_spritesheet.json')
         .then(res => {
             if (!res.ok) throw new Error('JSON not found');
             console.log('JSON fetch success');
@@ -23,7 +23,7 @@ export function preloadMomotaroSpriteSheet(callback) {
             const maxRetries = 10;
             function tryLoadImage() {
                 const img = new Image();
-                img.src = 'docs/assets/characters/players/momotaro/momotaro_spritesheet.png?' + new Date().getTime(); // キャッシュバスター
+                img.src = 'assets/characters/players/momotaro/momotaro_spritesheet.png?' + new Date().getTime(); // キャッシュバスター
                 console.log('Trying to load image, attempt', retryCount + 1, 'src:', img.src);
             img.onload = () => {
                     console.log('Image loaded successfully');
