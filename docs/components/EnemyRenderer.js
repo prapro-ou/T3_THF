@@ -7,7 +7,8 @@ const enemySpriteSheets = {
     red: { sheet: null, loaded: false },
     blue: { sheet: null, loaded: false },
     black: { sheet: null, loaded: false },
-    boss: { sheet: null, loaded: false }
+    boss: { sheet: null, loaded: false },
+    cannon: { sheet: null, loaded: false } // cannon_oni用
 };
 
 // 赤鬼のスプライトシート読み込み
@@ -101,6 +102,50 @@ export function preloadEnemySpriteSheet(enemyType, callback) {
         });
 }
 
+// cannon_oniのスプライトシート読み込み
+export function preloadCannonOniSpriteSheet(callback) {
+    if (enemySpriteSheets.cannon.loaded) {
+        return callback();
+    }
+    
+    fetch('assets/characters/oni/cannon_oni/cannon_oni_j.json')
+        .then(res => {
+            if (!res.ok) throw new Error('Cannon Oni JSON not found');
+            console.log('Cannon Oni JSON fetch success');
+            return res.json();
+        })
+        .then(json => {
+            let retryCount = 0;
+            const maxRetries = 10;
+            function tryLoadImage() {
+                const img = new Image();
+                img.src = `assets/characters/oni/cannon_oni/cannon_oni.png?${new Date().getTime()}`;
+                console.log(`Trying to load cannon oni image, attempt`, retryCount + 1, 'src:', img.src);
+                img.onload = () => {
+                    console.log('Cannon Oni image loaded successfully');
+                    enemySpriteSheets.cannon.sheet = new SpriteSheet(img, json);
+                    enemySpriteSheets.cannon.loaded = true;
+                    callback();
+                };
+                img.onerror = () => {
+                    console.log(`Cannon Oni image load failed, attempt`, retryCount + 1, 'src:', img.src);
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        setTimeout(tryLoadImage, 500);
+                    } else {
+                        console.log(`Cannon Oni image load failed after`, maxRetries, 'attempts');
+                        callback();
+                    }
+                };
+            }
+            tryLoadImage();
+        })
+        .catch(err => {
+            console.log(`Cannon Oni JSON fetch or image load failed:`, err);
+            callback();
+        });
+}
+
 export class EnemyRenderer {
     constructor(renderer) {
         this.renderer = renderer;
@@ -126,6 +171,8 @@ export class EnemyRenderer {
             enemyType = 'blue';
         } else if (enemy.constructor.name === 'BlackOni') {
             enemyType = 'black';
+        } else if (enemy.constructor.name === 'BossOni1') {
+            enemyType = 'cannon'; // cannon_oniのスプライトシートを使用
         } else if (enemy.constructor.name === 'BossOni') {
             enemyType = 'boss';
         }
@@ -146,7 +193,15 @@ export class EnemyRenderer {
         // スプライトシートがロード済みならアニメーション描画
         if (enemySpriteSheets[enemyType] && enemySpriteSheets[enemyType].loaded) {
             const spriteSheet = enemySpriteSheets[enemyType].sheet;
-            const frameName = `${enemyType}_oni_${direction}`;
+            let frameName;
+            
+            if (enemyType === 'cannon') {
+                // cannon_oniは単一フレーム
+                frameName = 'cannon_oni';
+            } else {
+                // 他の鬼は方向別フレーム
+                frameName = `${enemyType}_oni_${direction}`;
+            }
             
             // フレームが存在するかチェック
             if (spriteSheet.frames[frameName]) {

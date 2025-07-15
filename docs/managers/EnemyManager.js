@@ -38,6 +38,21 @@ export class EnemyManager {
             enemy.update();
         });
 
+        // 高速移動時のプレイヤー-敵衝突判定
+        const player = this.game.player;
+        if (player) {
+            const playerPos = player.getPreviousPosition();
+            this.enemies.forEach(enemy => {
+                if (this.collisionManager.checkPlayerEnemyCollisionWithMovement(
+                    player, enemy, playerPos.x, playerPos.y
+                )) {
+                    if (typeof player.takeDamage === 'function') {
+                        player.takeDamage(enemy.damage || 10);
+                    }
+                }
+            });
+        }
+
         // 削除マークされた敵を削除
         this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
 
@@ -105,26 +120,33 @@ export class EnemyManager {
 
     spawnBoss(bossType = 0) {
         console.log('ボス生成開始:', { bossType });
+        
+        // マップ中央の位置を計算
+        const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
+        const centerX = mapWidth / 2;
+        const centerY = mapHeight / 2;
+        
         let boss;
         switch (bossType) {
             case 1:
-                boss = new BossOni1(this.game); break;
+                boss = new BossOni1(this.game, centerX, centerY); break;
             case 2:
-                boss = new BossOni2(this.game); break;
+                boss = new BossOni2(this.game, centerX, centerY); break;
             case 3:
-                boss = new BossOni3(this.game); break;
+                boss = new BossOni3(this.game, centerX, centerY); break;
             case 4:
-                boss = new BossOni4(this.game); break;
+                boss = new BossOni4(this.game, centerX, centerY); break;
             case 5:
-                boss = new BossOni5(this.game); break;
+                boss = new BossOni5(this.game, centerX, centerY); break;
             default:
-                boss = new BossOni(this.game); break;
+                boss = new BossOni(this.game, centerX, centerY); break;
         }
         console.log('ボス生成完了:', { 
             bossType, 
             bossClass: boss.constructor.name,
             bossExists: !!boss,
-            enemyCount: this.enemies.length
+            enemyCount: this.enemies.length,
+            position: { x: centerX, y: centerY }
         });
         this.enemies.push(boss);
         console.log('ボス追加後敵数:', this.enemies.length);

@@ -21,6 +21,10 @@ export class Player extends Character {
         this.isMoving = false;
         this.moveFrame = 0;
         
+        // 高速移動時の衝突判定用
+        this.prevX = x;
+        this.prevY = y;
+        
         // ammoManager初期化後にmaxAmmoを設定
         this.maxAmmo = 10;
     }
@@ -37,6 +41,10 @@ export class Player extends Character {
 
     // 多態性: 親クラスのメソッドをオーバーライド
     update(deltaTime) {
+        // 移動前の位置を保存
+        this.prevX = this.x;
+        this.prevY = this.y;
+        
         this.controller.updatePlayerMovement(this, deltaTime);
         this.ammoManager.update(deltaTime);
         this.updateMovementState();
@@ -49,6 +57,8 @@ export class Player extends Character {
     reset() {
         const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
         super.reset(mapWidth / 2, mapHeight / 2);
+        this.prevX = this.x;
+        this.prevY = this.y;
         this.ammoManager.reset();
     }
 
@@ -65,6 +75,11 @@ export class Player extends Character {
         const level = this.game.otomoLevel || 1;
         const base = 10 + (level - 1) * 5;
         return base * (this.game.playerAttackMultiplier || 1);
+    }
+
+    // 高速移動時の衝突判定を取得
+    getPreviousPosition() {
+        return { x: this.prevX, y: this.prevY };
     }
 
     // プライベートメソッド

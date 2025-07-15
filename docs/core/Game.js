@@ -59,8 +59,34 @@ export class Game {
         this.playerAttackMultiplier = 1;
         this.otomoAttackMultiplier = 1;
 
+        // 当たり判定表示設定
+        this.debugSettings = {
+            showPlayerHitbox: false,
+            showEnemyHitbox: false,
+            showProjectileHitbox: false,
+            showAttackRange: false,
+            showCollisionDebug: false
+        };
+
+        // 高速移動設定
+        this.highSpeedThreshold = 10; // 高速移動判定の閾値
+        this.maxSubframeSteps = 10; // サブフレーム更新の最大ステップ数
+        this.enableLineIntersection = true; // 線分交差判定の有効化
+
+        // ボス設定
+        this.bossOni1ProjectileSpeed = 3; // ボス鬼1の弾の速度
+        this.bossOni1ProjectileDamage = 15; // ボス鬼1の弾のダメージ
+
+        // 当たり判定詳細設定
+        this.playerHitboxSize = 0.8; // プレイヤー当たり判定サイズ（0.8 = 80%）
+
         this.setupEvents();
         this.initializeGame();
+        
+        // cannon_ballのスプライトシート読み込みを開始
+        this.projectileManager.preloadCannonBallSpriteSheet(() => {
+            console.log('Cannon ball sprite sheet loaded in Game constructor');
+        });
     }
 
     setupEvents() {
@@ -312,8 +338,15 @@ export class Game {
         }
 
         this.attackManager.updateAttackCircle();
-        this.projectileManager.update();
+        
+        // 弾の描画を先に実行
         this.projectileManager.draw(this.ctx, scrollX, scrollY);
+        
+        // 当たり判定の描画
+        this.drawHitboxes(scrollX, scrollY);
+        
+        // 弾の更新を描画後に実行（当たり判定チェック）
+        this.projectileManager.update();
 
         // 残弾数UIを毎フレーム更新
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
@@ -334,6 +367,170 @@ export class Game {
                enemy.constructor.name === 'BossOni3' || 
                enemy.constructor.name === 'BossOni4' || 
                enemy.constructor.name === 'BossOni5';
+    }
+
+    // 当たり判定の描画
+    drawHitboxes(scrollX, scrollY) {
+        const ctx = this.ctx;
+        
+        // プレイヤーの当たり判定
+        if (this.debugSettings.showPlayerHitbox) {
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            
+            // プレイヤーの実際の中心座標（描画位置ではなく実際の座標）
+            const playerCenterX = this.player.x - scrollX;
+            const playerCenterY = this.player.y - scrollY;
+            const playerRadius = Math.min(this.player.width, this.player.height) / 2 * (this.playerHitboxSize || 0.8);
+            
+            ctx.beginPath();
+            ctx.arc(playerCenterX, playerCenterY, playerRadius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        // 敵の当たり判定
+        if (this.debugSettings.showEnemyHitbox) {
+            ctx.strokeStyle = '#ff0000';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            
+            this.enemyManager.getEnemies().forEach(enemy => {
+                const enemyCenterX = enemy.x + enemy.width / 2 - scrollX;
+                const enemyCenterY = enemy.y + enemy.height / 2 - scrollY;
+                const enemyRadius = Math.max(enemy.width, enemy.height) / 2;
+                
+                ctx.beginPath();
+                ctx.arc(enemyCenterX, enemyCenterY, enemyRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
+        
+        // 弾の当たり判定
+        if (this.debugSettings.showProjectileHitbox) {
+            ctx.strokeStyle = '#ffff00';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([3, 3]);
+            
+            this.projectileManager.getProjectiles().forEach(projectile => {
+                // すべての弾を円形の当たり判定で表示
+                ctx.beginPath();
+                ctx.arc(projectile.x - scrollX, projectile.y - scrollY, projectile.radius, 0, Math.PI * 2);
+                ctx.stroke();
+            });
+        }
+        
+        // 攻撃範囲の表示
+        if (this.debugSettings.showAttackRange && this.attackManager.attackCircle) {
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([]);
+            
+            const attackX = this.attackManager.attackCircle.x - scrollX;
+            const attackY = this.attackManager.attackCircle.y - scrollY;
+            const radius = this.attackManager.attackCircle.radius;
+            
+            ctx.beginPath();
+            ctx.arc(attackX, attackY, radius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        // 線のスタイルをリセット
+        ctx.setLineDash([]);
+    }
+
+    // デバッグ設定を適用
+    applyDebugSettings(settings) {
+        console.log('Applying debug settings:', settings);
+        
+        // 敵の設定
+        if (settings.enemySpawnInterval !== undefined) {
+            this.enemyManager.spawnInterval = settings.enemySpawnInterval;
+        }
+        if (settings.maxEnemies !== undefined) {
+            this.enemyManager.maxEnemies = settings.maxEnemies;
+        }
+        if (settings.redOniHP !== undefined || settings.blueOniHP !== undefined || settings.blackOniHP !== undefined) {
+            this.enemyBaseHP = {
+                red: settings.redOniHP || 20,
+                blue: settings.blueOniHP || 40,
+                black: settings.blackOniHP || 60
+            };
+        }
+        if (settings.enemyBaseSpeed !== undefined) {
+            this.enemyBaseSpeed = settings.enemyBaseSpeed;
+        }
+        if (settings.bossSpawnTime !== undefined) {
+            this.bossSpawnTime = settings.bossSpawnTime;
+            this.timer.setGameTime(settings.bossSpawnTime);
+        }
+        if (settings.bossBattleTime !== undefined) {
+            this.bossTimer = settings.bossBattleTime;
+        }
+        
+        // プレイヤーの設定
+        if (settings.playerHP !== undefined) {
+            this.player.maxHP = settings.playerHP;
+            this.player.health = settings.playerHP;
+        }
+        if (settings.playerSpeed !== undefined) {
+            this.player.constructor.SPEED = settings.playerSpeed;
+        }
+        if (settings.maxAmmo !== undefined) {
+            this.player.ammoManager.setMaxAmmo(settings.maxAmmo);
+        }
+        if (settings.ammoRecoveryTime !== undefined) {
+            this.player.ammoManager.ammoRecoveryTime = settings.ammoRecoveryTime;
+        }
+        
+        // 当たり判定表示設定
+        if (settings.showPlayerHitbox !== undefined) {
+            console.log('Setting showPlayerHitbox:', settings.showPlayerHitbox);
+            this.debugSettings.showPlayerHitbox = settings.showPlayerHitbox;
+        }
+        if (settings.showEnemyHitbox !== undefined) {
+            console.log('Setting showEnemyHitbox:', settings.showEnemyHitbox);
+            this.debugSettings.showEnemyHitbox = settings.showEnemyHitbox;
+        }
+        if (settings.showProjectileHitbox !== undefined) {
+            console.log('Setting showProjectileHitbox:', settings.showProjectileHitbox);
+            this.debugSettings.showProjectileHitbox = settings.showProjectileHitbox;
+        }
+        if (settings.showAttackRange !== undefined) {
+            console.log('Setting showAttackRange:', settings.showAttackRange);
+            this.debugSettings.showAttackRange = settings.showAttackRange;
+        }
+        
+        // 高速移動設定
+        if (settings.highSpeedThreshold !== undefined) {
+            this.highSpeedThreshold = settings.highSpeedThreshold;
+        }
+        if (settings.maxSubframeSteps !== undefined) {
+            this.maxSubframeSteps = settings.maxSubframeSteps;
+        }
+        if (settings.enableLineIntersection !== undefined) {
+            this.enableLineIntersection = settings.enableLineIntersection;
+        }
+        
+        // ボス設定
+        if (settings.bossOni1ProjectileSpeed !== undefined) {
+            this.bossOni1ProjectileSpeed = settings.bossOni1ProjectileSpeed;
+        }
+        if (settings.bossOni1ProjectileDamage !== undefined) {
+            this.bossOni1ProjectileDamage = settings.bossOni1ProjectileDamage;
+        }
+        
+        // 当たり判定詳細設定
+        if (settings.showCollisionDebug !== undefined) {
+            console.log('Setting showCollisionDebug:', settings.showCollisionDebug);
+            this.debugSettings.showCollisionDebug = settings.showCollisionDebug;
+        }
+        if (settings.playerHitboxSize !== undefined) {
+            console.log('Setting playerHitboxSize:', settings.playerHitboxSize);
+            this.playerHitboxSize = settings.playerHitboxSize;
+        }
+        
+        console.log('Debug settings after apply:', this.debugSettings);
     }
 
     stop() {
@@ -379,39 +576,6 @@ export class Game {
     get score() { return this.gameState.getScore(); }
     set score(value) { this.gameState.score = value; }
     get isPaused() { return this.pauseManager.isPaused; }
-
-    // デバッグ設定を適用するメソッド
-    applyDebugSettings(settings) {
-        // 鬼の設定を適用
-        if (this.enemyManager) {
-            this.enemyManager.spawnInterval = settings.enemySpawnInterval;
-            this.enemyManager.maxEnemies = settings.maxEnemies;
-        }
-        
-        // プレイヤーの設定を適用
-        if (this.player) {
-            this.player.maxHP = settings.playerHP;
-            this.player.health = settings.playerHP;
-            this.player.constructor.SPEED = settings.playerSpeed;
-            this.player.ammoManager.setMaxAmmo(settings.maxAmmo);
-            this.player.ammoManager.ammoRecoveryTime = settings.ammoRecoveryTime;
-        }
-        
-        // ボス出現時間を設定
-        this.bossSpawnTime = settings.bossSpawnTime;
-        this.timer.setGameTime(settings.bossSpawnTime); // タイマーにも反映
-        // ボス攻略時間（新設）
-        if (settings.bossBattleTime !== undefined) {
-            this.bossTimer = settings.bossBattleTime;
-        }
-        else if (settings.bossSpawnTime !== undefined) {
-            // 互換性のため、bossSpawnTimeもbossTimerに入れる（古い設定）
-        this.bossTimer = settings.bossSpawnTime;
-        }
-        
-        // 敵の基本パラメータを更新（新しい敵生成時に適用される）
-        this.updateEnemyParameters(settings);
-    }
 
     // 敵のパラメータを更新
     updateEnemyParameters(settings) {

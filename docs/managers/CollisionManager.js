@@ -3,13 +3,99 @@
 export class CollisionManager {
     constructor() {}
 
-    checkPlayerEnemyCollision(player, enemy) {
-        return (
-            enemy.x < player.x + player.width / 2 &&
-            enemy.x + enemy.width > player.x - player.width / 2 &&
-            enemy.y < player.y + player.height / 2 &&
-            enemy.y + enemy.height > player.y - player.height / 2
+    // 線分と円の交差判定
+    checkLineCircleIntersection(x1, y1, x2, y2, cx, cy, radius) {
+        // 線分の方向ベクトル
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const len = Math.sqrt(dx * dx + dy * dy);
+        
+        if (len === 0) return false;
+        
+        // 正規化された方向ベクトル
+        const ux = dx / len;
+        const uy = dy / len;
+        
+        // 線分の始点から円の中心へのベクトル
+        const px = cx - x1;
+        const py = cy - y1;
+        
+        // 線分上の最近接点までの距離
+        const t = Math.max(0, Math.min(len, px * ux + py * uy));
+        
+        // 最近接点の座標
+        const closestX = x1 + ux * t;
+        const closestY = y1 + uy * t;
+        
+        // 最近接点から円の中心までの距離
+        const distToCenter = Math.sqrt(
+            (closestX - cx) * (closestX - cx) + 
+            (closestY - cy) * (closestY - cy)
         );
+        
+        return distToCenter <= radius;
+    }
+
+    // 高速移動時のプレイヤー-敵衝突判定
+    checkPlayerEnemyCollisionWithMovement(player, enemy, playerPrevX, playerPrevY) {
+        // 桃太郎と敵の中心座標を計算
+        const playerCenterX = player.x;
+        const playerCenterY = player.y;
+        const enemyCenterX = enemy.x + enemy.width / 2;
+        const enemyCenterY = enemy.y + enemy.height / 2;
+        
+        // 桃太郎の半径（設定可能なサイズ）
+        const playerHitboxSize = player.game.playerHitboxSize || 0.8;
+        const playerRadius = Math.min(player.width, player.height) / 2 * playerHitboxSize;
+        
+        // 敵の半径（より自然な当たり判定のため、大きめに設定）
+        const enemyRadius = Math.max(enemy.width, enemy.height) / 2;
+        
+        // デバッグ情報を出力
+        console.log('Player-Enemy collision debug:', {
+            playerX: player.x,
+            playerY: player.y,
+            playerWidth: player.width,
+            playerHeight: player.height,
+            playerRadius: playerRadius,
+            enemyX: enemy.x,
+            enemyY: enemy.y,
+            enemyWidth: enemy.width,
+            enemyHeight: enemy.height,
+            enemyRadius: enemyRadius,
+            enemyCenterX: enemyCenterX,
+            enemyCenterY: enemyCenterY,
+            distance: Math.sqrt((playerCenterX - enemyCenterX) ** 2 + (playerCenterY - enemyCenterY) ** 2),
+            collisionDistance: playerRadius + enemyRadius
+        });
+        
+        // 線分交差判定（高速移動時）
+        if (playerPrevX !== undefined && playerPrevY !== undefined) {
+            const moveDistance = Math.sqrt(
+                (player.x - playerPrevX) * (player.x - playerPrevX) + 
+                (player.y - playerPrevY) * (player.y - playerPrevY)
+            );
+            
+            if (moveDistance > 10) { // 高速移動時
+                return this.checkLineCircleIntersection(
+                    playerPrevX, playerPrevY, 
+                    player.x, player.y, 
+                    enemyCenterX, enemyCenterY, 
+                    playerRadius + enemyRadius
+                );
+            }
+        }
+        
+        // 通常の円形当たり判定
+        const dx = playerCenterX - enemyCenterX;
+        const dy = playerCenterY - enemyCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        return distance < (playerRadius + enemyRadius);
+    }
+
+    checkPlayerEnemyCollision(player, enemy) {
+        return this.checkPlayerEnemyCollisionWithMovement(player, enemy);
     }
 
     checkAttackCollision(attackX, attackY, attackRadius, enemy) {
@@ -34,6 +120,32 @@ export class CollisionManager {
         });
         
         return isHit;
+    }
+
+    // 高速移動時の攻撃判定
+    checkAttackCollisionWithMovement(attackStartX, attackStartY, attackEndX, attackEndY, attackRadius, enemy) {
+        const ex = enemy.x + enemy.width / 2;
+        const ey = enemy.y + enemy.height / 2;
+        const enemyRadius = Math.max(enemy.width, enemy.height) / 2 * 1.1;
+        
+        // 移動距離を計算
+        const moveDistance = Math.sqrt(
+            (attackEndX - attackStartX) * (attackEndX - attackStartX) + 
+            (attackEndY - attackStartY) * (attackEndY - attackStartY)
+        );
+        
+        if (moveDistance > 10) { // 高速移動時
+            return this.checkLineCircleIntersection(
+                attackStartX, attackStartY,
+                attackEndX, attackEndY,
+                ex, ey,
+                attackRadius + enemyRadius
+            );
+        } else {
+            // 通常の判定
+            const dist = distance(attackEndX, ex, attackEndY, ey);
+            return dist <= attackRadius + enemyRadius;
+        }
     }
 
     checkEnemyOverlap(enemy1, enemy2) {
