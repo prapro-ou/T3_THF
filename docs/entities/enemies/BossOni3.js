@@ -1,8 +1,8 @@
 import { BossOni } from './BossOni.js';
 
 export class BossOni3 extends BossOni {
-    constructor(game) {
-        super(game);
+    constructor(game, x = null, y = null) {
+        super(game, x, y);
         this.color = '#2ecc71'; // 緑系
         this._maxHP = 400;
         this._hp = 400;

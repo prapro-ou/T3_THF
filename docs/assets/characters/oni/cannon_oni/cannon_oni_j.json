@@ -1,20 +1,32 @@
-{"frames": [
-
 {
-	"filename": "cannon_oni.png",
-	"frame": {"x":0,"y":0,"w":400,"h":400},
-	"rotated": false,
-	"trimmed": false,
-	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":400},
-	"sourceSize": {"w":400,"h":400}
-}],
-"meta": {
-	"app": "https://www.codeandweb.com/texturepacker",
-	"version": "1.0",
-	"image": "cannon_oni_j.png",
-	"format": "RGBA8888",
-	"size": {"w":400,"h":400},
-	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:ccebe654a0fa58f2e74b886eb968f948:aabb68fac0cff336442ed016697f2866:3f003d98c53dd075ab150671603457f7$"
-}
+  "frames": {
+    "cannon_oni": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 400
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 400
+      },
+      "sourceSize": {
+        "w": 400,
+        "h": 400
+      }
+    }
+  },
+  "meta": {
+    "image": "cannon_oni.png",
+    "size": {
+      "w": 400,
+      "h": 400
+    },
+    "scale": "1"
+  }
 }

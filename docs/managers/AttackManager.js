@@ -95,30 +95,54 @@ export class AttackManager {
 
     processAttack(attackX, attackY, attackRadius) {
         let hitCount = 0;
+        const player = this.game.player;
         
         this.game.enemyManager.getEnemies().forEach(enemy => {
-            // より確実な判定: プレイヤー中心からの距離ベース
-            const playerToEnemyDist = Math.sqrt(
-                Math.pow(this.game.player.x - (enemy.x + enemy.width / 2), 2) +
-                Math.pow(this.game.player.y - (enemy.y + enemy.height / 2), 2)
-            );
+            let isHit = false;
             
-            // 攻撃位置からの距離も計算
-            const attackToEnemyDist = Math.sqrt(
-                Math.pow(attackX - (enemy.x + enemy.width / 2), 2) +
-                Math.pow(attackY - (enemy.y + enemy.height / 2), 2)
-            );
-            
-            // どちらかの距離が攻撃半径内なら当たり
-            const isHit = playerToEnemyDist <= attackRadius || attackToEnemyDist <= attackRadius;
+            // 高速移動時の攻撃判定
+            if (player) {
+                const playerPos = player.getPreviousPosition();
+                const moveDistance = Math.sqrt(
+                    (player.x - playerPos.x) * (player.x - playerPos.x) + 
+                    (player.y - playerPos.y) * (player.y - playerPos.y)
+                );
+                
+                if (moveDistance > 10) { // 高速移動時
+                    // 線分交差判定を使用
+                    isHit = this.collisionManager.checkAttackCollisionWithMovement(
+                        playerPos.x, playerPos.y,
+                        player.x, player.y,
+                        attackRadius, enemy
+                    );
+                } else {
+                    // 通常の判定
+                    const playerToEnemyDist = Math.sqrt(
+                        Math.pow(player.x - (enemy.x + enemy.width / 2), 2) +
+                        Math.pow(player.y - (enemy.y + enemy.height / 2), 2)
+                    );
+                    
+                    const attackToEnemyDist = Math.sqrt(
+                        Math.pow(attackX - (enemy.x + enemy.width / 2), 2) +
+                        Math.pow(attackY - (enemy.y + enemy.height / 2), 2)
+                    );
+                    
+                    isHit = playerToEnemyDist <= attackRadius || attackToEnemyDist <= attackRadius;
+                }
+            } else {
+                // プレイヤー情報がない場合の通常判定
+                const attackToEnemyDist = Math.sqrt(
+                    Math.pow(attackX - (enemy.x + enemy.width / 2), 2) +
+                    Math.pow(attackY - (enemy.y + enemy.height / 2), 2)
+                );
+                isHit = attackToEnemyDist <= attackRadius;
+            }
             
             console.log('Enemy Attack Check:', {
                 enemyX: enemy.x,
                 enemyY: enemy.y,
                 enemyCenterX: enemy.x + enemy.width / 2,
                 enemyCenterY: enemy.y + enemy.height / 2,
-                playerToEnemyDist: playerToEnemyDist,
-                attackToEnemyDist: attackToEnemyDist,
                 attackRadius: attackRadius,
                 isHit: isHit,
                 enemyHealth: enemy.health

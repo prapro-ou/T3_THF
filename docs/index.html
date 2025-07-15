@@ -173,6 +173,57 @@
                     <input type="number" id="ammoRecoveryTime" min="0.5" max="10" step="0.1" value="3">
                 </div>
             </div>
+            <div class="debug-section">
+                <h4>当たり判定表示</h4>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showPlayerHitbox"> プレイヤー当たり判定を表示</label>
+                </div>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showEnemyHitbox"> 敵当たり判定を表示</label>
+                </div>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showProjectileHitbox"> 弾当たり判定を表示</label>
+                </div>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showAttackRange"> 攻撃範囲を表示</label>
+                </div>
+            </div>
+            <div class="debug-section">
+                <h4>高速移動設定</h4>
+                <div class="debug-control">
+                    <label>高速移動判定閾値:</label>
+                    <input type="number" id="highSpeedThreshold" min="1" max="50" value="10">
+                </div>
+                <div class="debug-control">
+                    <label>サブフレーム最大ステップ:</label>
+                    <input type="number" id="maxSubframeSteps" min="1" max="20" value="10">
+                </div>
+                <div class="debug-control">
+                    <label>線分交差判定:</label>
+                    <input type="checkbox" id="enableLineIntersection" checked>
+                </div>
+            </div>
+            <div class="debug-section">
+                <h4>ボス設定</h4>
+                <div class="debug-control">
+                    <label>ボス鬼1弾速度:</label>
+                    <input type="number" id="bossOni1ProjectileSpeed" min="1" max="10" step="0.5" value="3">
+                </div>
+                <div class="debug-control">
+                    <label>ボス鬼1弾ダメージ:</label>
+                    <input type="number" id="bossOni1ProjectileDamage" min="1" max="50" value="15">
+                </div>
+            </div>
+            <div class="debug-section">
+                <h4>当たり判定詳細</h4>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showCollisionDebug"> 当たり判定デバッグ情報を表示</label>
+                </div>
+                <div class="debug-control">
+                    <label>プレイヤー当たり判定サイズ:</label>
+                    <input type="number" id="playerHitboxSize" min="0.1" max="2.0" step="0.1" value="0.8">
+                </div>
+            </div>
             <div class="debug-actions">
                 <button id="applyDebugSettings" class="debug-btn">設定を適用</button>
                 <button id="resetDebugSettings" class="debug-btn">設定をリセット</button>

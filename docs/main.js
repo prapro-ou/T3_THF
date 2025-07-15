@@ -1,6 +1,6 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
-import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet } from './components/EnemyRenderer.js';
+import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet } from './components/EnemyRenderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -125,10 +125,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (window.redOniSpriteSheetLoaded) {
                         preloadEnemySpriteSheet('blue', () => {
                             preloadEnemySpriteSheet('black', () => {
-                                assetsLoaded = true;
-                                startButton.disabled = false;
-                                startButton.textContent = 'ゲームスタート';
-                                loadingScreen.style.display = 'none';
+                                preloadCannonOniSpriteSheet(() => {
+                                    assetsLoaded = true;
+                                    startButton.disabled = false;
+                                    startButton.textContent = 'ゲームスタート';
+                                    loadingScreen.style.display = 'none';
+                                });
                             });
                         });
                     } else if (retryCount < 10) {
@@ -283,8 +285,37 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxAmmo = parseInt(document.getElementById('maxAmmo').value);
         const ammoRecoveryTime = parseFloat(document.getElementById('ammoRecoveryTime').value);
         
+        // 当たり判定表示設定を適用
+        const showPlayerHitbox = document.getElementById('showPlayerHitbox').checked;
+        const showEnemyHitbox = document.getElementById('showEnemyHitbox').checked;
+        const showProjectileHitbox = document.getElementById('showProjectileHitbox').checked;
+        const showAttackRange = document.getElementById('showAttackRange').checked;
+        
+        // 高速移動設定を適用
+        const highSpeedThreshold = parseInt(document.getElementById('highSpeedThreshold').value);
+        const maxSubframeSteps = parseInt(document.getElementById('maxSubframeSteps').value);
+        const enableLineIntersection = document.getElementById('enableLineIntersection').checked;
+        
+        // ボス設定を適用
+        const bossOni1ProjectileSpeed = parseFloat(document.getElementById('bossOni1ProjectileSpeed').value);
+        const bossOni1ProjectileDamage = parseInt(document.getElementById('bossOni1ProjectileDamage').value);
+        
+        // 当たり判定詳細設定を適用
+        const showCollisionDebug = document.getElementById('showCollisionDebug').checked;
+        const playerHitboxSize = parseFloat(document.getElementById('playerHitboxSize').value);
+        
+        // デバッグ情報を出力
+        console.log('UI values from debug panel:', {
+            showPlayerHitbox,
+            showEnemyHitbox,
+            showProjectileHitbox,
+            showAttackRange,
+            showCollisionDebug,
+            playerHitboxSize
+        });
+        
         // 設定を適用
-        game.applyDebugSettings({
+        const settings = {
             enemySpawnInterval,
             maxEnemies,
             redOniHP,
@@ -296,8 +327,22 @@ document.addEventListener('DOMContentLoaded', () => {
             playerHP,
             playerSpeed,
             maxAmmo,
-            ammoRecoveryTime
-        });
+            ammoRecoveryTime,
+            showPlayerHitbox,
+            showEnemyHitbox,
+            showProjectileHitbox,
+            showAttackRange,
+            highSpeedThreshold,
+            maxSubframeSteps,
+            enableLineIntersection,
+            bossOni1ProjectileSpeed,
+            bossOni1ProjectileDamage,
+            showCollisionDebug,
+            playerHitboxSize
+        };
+        
+        console.log('Applying settings to game:', settings);
+        game.applyDebugSettings(settings);
         
         debugPanel.classList.add('hidden');
     });
@@ -316,6 +361,26 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('playerSpeed').value = 3.5;
         document.getElementById('maxAmmo').value = 10;
         document.getElementById('ammoRecoveryTime').value = 3;
+        
+        // 当たり判定表示設定をデフォルトにリセット
+        document.getElementById('showPlayerHitbox').checked = false;
+        document.getElementById('showEnemyHitbox').checked = false;
+        document.getElementById('showProjectileHitbox').checked = false;
+        document.getElementById('showAttackRange').checked = false;
+        document.getElementById('showCollisionDebug').checked = false; // デバッグ情報もOFF
+        
+        // 高速移動設定をデフォルトにリセット
+        document.getElementById('highSpeedThreshold').value = 10;
+        document.getElementById('maxSubframeSteps').value = 10;
+        document.getElementById('enableLineIntersection').checked = true;
+        
+        // ボス設定をデフォルトにリセット
+        document.getElementById('bossOni1ProjectileSpeed').value = 3;
+        document.getElementById('bossOni1ProjectileDamage').value = 15;
+        
+        // 当たり判定詳細設定をデフォルトにリセット
+        document.getElementById('showCollisionDebug').checked = true;
+        document.getElementById('playerHitboxSize').value = 0.8;
     });
 
     // F12キーでデバッグパネルを開く
@@ -378,6 +443,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // ゲーム開始
                 game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType);
+                // cannon_ballのスプライトシートも読み込み
+                if (game && game.projectileManager) {
+                    game.projectileManager.preloadCannonBallSpriteSheet(() => {
+                        // アセット読み込み完了後の処理
+                    });
+                }
             });
         });
     });
