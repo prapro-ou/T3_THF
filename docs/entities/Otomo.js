@@ -7,7 +7,7 @@ import { ChargeOtomoBehavior } from './OtomoFile/chargeOtomo.js';
 export class Otomo extends Character {
     constructor(game, x, y) {
         super(game, x, y, 20, 20, '#8B4513', 20);
-        this.speed = 100;
+        this.speed = 140;
         this.wanderRadius = 200;
         this.canShoot = true;
 
@@ -25,6 +25,8 @@ export class Otomo extends Character {
     }
 
     updateBehavior(player, deltaTime) {
+        // オトモの速度倍率を反映
+        this.speed = 140 * (this.game.otomoSpeedMultiplier || 1);
         this.behavior.update(player, deltaTime);
     }
 
@@ -39,8 +41,12 @@ export class Otomo extends Character {
         const dist = Math.hypot(dx, dy);
         if (dist === 0) return;
 
-        const speed = 5;
-        const projectile = new Projectile(this.game, this.x, this.y, target, speed, 10);
+        const speed = 5 * 1.2; // 弾速1.2倍
+        // レベル・倍率に応じて攻撃力上昇
+        const level = this.game.otomoLevel || 1;
+        const base = 10 + (level - 1) * 5;
+        const damage = base * (this.game.otomoAttackMultiplier || 1);
+        const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
         this.game.projectileManager.addProjectile(projectile);
     }
 
@@ -86,4 +92,15 @@ export class Otomo extends Character {
 
         return closest;
     }
-} 
+
+    // momotaro専用：自身の近くの敵をProjectileで攻撃
+    attackNearbyEnemy(range = 150, cooldown = 1000) {
+        if (!this.canShoot) return;
+        const target = this.findEnemyNearSelf(range);
+        if (target) {
+            this.shootAt(target);
+            this.canShoot = false;
+            setTimeout(() => this.canShoot = true, cooldown);
+        }
+    }
+}

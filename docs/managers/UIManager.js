@@ -16,8 +16,14 @@
         this.livesDisplay.textContent = `残弾数: ${ammo}/${maxAmmo}`;
     }
 
-    updateTimer(formattedTime) {
-        this.timerDisplay.textContent = `残り時間: ${formattedTime}`;
+    updateTimer(formattedTime, phase = 'normal') {
+        if (phase === 'normal') {
+            this.timerDisplay.textContent = `ボス出現まで: ${formattedTime}`;
+        } else if (phase === 'boss') {
+            this.timerDisplay.textContent = `ボス攻略残り: ${formattedTime}`;
+        } else {
+            this.timerDisplay.textContent = formattedTime;
+        }
     }
 
     showGameOver(message = 'ゲームオーバー') {
@@ -75,4 +81,17 @@
             cutIn.classList.add('hidden');
         }
     }
-} 
+
+    updateOtomoLevel(level, exp, expToLevelUp) {
+        const levelDisplay = document.getElementById('otomoLevelDisplay');
+        const levelValue = document.getElementById('otomoLevelValue');
+        const expValue = document.getElementById('otomoExpValue');
+        const expToLevelUpValue = document.getElementById('otomoExpToLevelUpValue');
+        if (levelDisplay && levelValue && expValue && expToLevelUpValue) {
+            levelDisplay.classList.remove('hidden');
+            levelValue.textContent = level;
+            expValue.textContent = exp;
+            expToLevelUpValue.textContent = expToLevelUp;
+        }
+    }
+}

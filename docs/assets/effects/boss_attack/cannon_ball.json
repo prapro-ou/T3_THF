@@ -1,0 +1,32 @@
+{
+  "frames": {
+    "cannon_ball": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 200
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 200,
+        "h": 200
+      },
+      "sourceSize": {
+        "w": 200,
+        "h": 200
+      }
+    }
+  },
+  "meta": {
+    "image": "cannon_ball.png",
+    "size": {
+      "w": 200,
+      "h": 200
+    },
+    "scale": "1"
+  }
+}

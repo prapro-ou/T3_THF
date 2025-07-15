@@ -1,0 +1,32 @@
+{
+  "frames": {
+    "cannon_oni": {
+      "frame": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 400
+      },
+      "rotated": false,
+      "trimmed": false,
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 400,
+        "h": 400
+      },
+      "sourceSize": {
+        "w": 400,
+        "h": 400
+      }
+    }
+  },
+  "meta": {
+    "image": "cannon_oni.png",
+    "size": {
+      "w": 400,
+      "h": 400
+    },
+    "scale": "1"
+  }
+}

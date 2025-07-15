@@ -1,4 +1,5 @@
 ﻿import { RedOni, BlueOni, BlackOni, BossOni, BossOni1, BossOni2, BossOni3, BossOni4, BossOni5 } from '../entities/enemies/index.js';
+import { Enemy } from '../entities/base/Enemy.js';
 import { CollisionManager } from './CollisionManager.js';
 import { EnemyRenderer } from '../components/EnemyRenderer.js';
 
@@ -37,6 +38,21 @@ export class EnemyManager {
             enemy.update();
         });
 
+        // 高速移動時のプレイヤー-敵衝突判定
+        const player = this.game.player;
+        if (player) {
+            const playerPos = player.getPreviousPosition();
+            this.enemies.forEach(enemy => {
+                if (this.collisionManager.checkPlayerEnemyCollisionWithMovement(
+                    player, enemy, playerPos.x, playerPos.y
+                )) {
+                    if (typeof player.takeDamage === 'function') {
+                        player.takeDamage(enemy.damage || 10);
+                    }
+                }
+            });
+        }
+
         // 削除マークされた敵を削除
         this.enemies = this.enemies.filter(enemy => !enemy.markedForDeletion);
 
@@ -64,27 +80,76 @@ export class EnemyManager {
     spawnEnemy() {
         const enemyTypes = [RedOni, BlueOni, BlackOni];
         const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
-        const enemy = new randomType(this.game);
+        
+        // デバッグ設定がある場合は適用
+        let enemy;
+        if (this.game.enemyBaseHP && this.game.enemyBaseSpeed) {
+            // デバッグ設定を使用して敵を生成
+            enemy = this.spawnEnemyWithDebugSettings(randomType);
+        } else {
+            // 通常の敵生成
+            enemy = new randomType(this.game);
+        }
+        
         this.enemies.push(enemy);
     }
 
+    spawnEnemyWithDebugSettings(EnemyClass) {
+        // 敵の種類に応じてHPを設定
+        let maxHP;
+        if (EnemyClass === RedOni) {
+            maxHP = this.game.enemyBaseHP.red;
+        } else if (EnemyClass === BlueOni) {
+            maxHP = this.game.enemyBaseHP.blue;
+        } else if (EnemyClass === BlackOni) {
+            maxHP = this.game.enemyBaseHP.black;
+        } else {
+            maxHP = Enemy.BASE_HP;
+        }
+        
+        // 敵を生成
+        const enemy = new EnemyClass(this.game, undefined, maxHP);
+        
+        // デバッグ設定の速度を適用
+        if (this.game.enemyBaseSpeed) {
+            enemy.speed = this.game.enemyBaseSpeed + Math.random();
+        }
+        
+        return enemy;
+    }
+
     spawnBoss(bossType = 0) {
+        console.log('ボス生成開始:', { bossType });
+        
+        // マップ中央の位置を計算
+        const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
+        const centerX = mapWidth / 2;
+        const centerY = mapHeight / 2;
+        
         let boss;
         switch (bossType) {
             case 1:
-                boss = new BossOni1(this.game); break;
+                boss = new BossOni1(this.game, centerX, centerY); break;
             case 2:
-                boss = new BossOni2(this.game); break;
+                boss = new BossOni2(this.game, centerX, centerY); break;
             case 3:
-                boss = new BossOni3(this.game); break;
+                boss = new BossOni3(this.game, centerX, centerY); break;
             case 4:
-                boss = new BossOni4(this.game); break;
+                boss = new BossOni4(this.game, centerX, centerY); break;
             case 5:
-                boss = new BossOni5(this.game); break;
+                boss = new BossOni5(this.game, centerX, centerY); break;
             default:
-                boss = new BossOni(this.game); break;
+                boss = new BossOni(this.game, centerX, centerY); break;
         }
+        console.log('ボス生成完了:', { 
+            bossType, 
+            bossClass: boss.constructor.name,
+            bossExists: !!boss,
+            enemyCount: this.enemies.length,
+            position: { x: centerX, y: centerY }
+        });
         this.enemies.push(boss);
+        console.log('ボス追加後敵数:', this.enemies.length);
     }
 
     getEnemies() {
