@@ -599,8 +599,8 @@ let momotaroSpriteSheetLoaded = false;
 export function preloadMomotaroSpriteSheet(callback) {
     if (momotaroSpriteSheetLoaded) return callback();
     const img = new Image();
-    img.src = 'assets/characters/players/momotaro/momotaro_spritesheet.png';
-    fetch('assets/characters/players/momotaro/momotaro_spritesheet.json')
+    img.src = 'docs/assets/characters/players/momotaro/momotaro_spritesheet.png';
+    fetch('docs/assets/characters/players/momotaro/momotaro_spritesheet.json')
         .then(res => res.json())
         .then(json => {
             img.onload = () => {
