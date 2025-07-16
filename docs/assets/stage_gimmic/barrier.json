@@ -1,0 +1,20 @@
+{"frames": [
+
+{
+	"filename": "barrier.png",
+	"frame": {"x":0,"y":0,"w":100,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":80},
+	"sourceSize": {"w":100,"h":80}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "barrier.png",
+	"format": "RGBA8888",
+	"size": {"w":100,"h":80},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:bdf52d9c773a3a889d9b060c19957802:4a724d37fb81292f82c6894e607dba9e:3145f674de70e5fa71d64e9a00894621$"
+}
+}
