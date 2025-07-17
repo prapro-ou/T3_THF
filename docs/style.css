@@ -1,7 +1,8 @@
 /* ===== 桃太郎ゲーム スタイルシート ===== */
 
 /* ===== 基本レイアウト ===== */
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -9,14 +10,14 @@ body, html {
     overflow: hidden;
     overflow-x: hidden;
     min-height: 100vh;
-    
+
     /* レイアウト */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    
+
     /* デザイン */
     background: linear-gradient(120deg, #181818 0%, #232323 100%);
     color: #f7f7f7;
@@ -60,7 +61,8 @@ canvas {
     pointer-events: none;
 }
 
-.shoji-left, .shoji-right {
+.shoji-left,
+.shoji-right {
     position: absolute;
     top: 0;
     width: 50vw;
@@ -100,13 +102,14 @@ canvas {
 }
 
 /* ふすまの木枠装飾 */
-.shoji-left::before, .shoji-right::before {
+.shoji-left::before,
+.shoji-right::before {
     content: '';
     position: absolute;
     top: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         linear-gradient(90deg, rgba(139, 69, 19, 0.4) 0%, transparent 3%, transparent 97%, rgba(139, 69, 19, 0.4) 100%),
         linear-gradient(0deg, rgba(139, 69, 19, 0.4) 0%, transparent 3%, transparent 97%, rgba(139, 69, 19, 0.4) 100%),
         linear-gradient(90deg, rgba(139, 69, 19, 0.2) 0%, transparent 1%, transparent 99%, rgba(139, 69, 19, 0.2) 100%),
@@ -115,13 +118,14 @@ canvas {
 }
 
 /* ふすまの格子模様 */
-.shoji-left::after, .shoji-right::after {
+.shoji-left::after,
+.shoji-right::after {
     content: '';
     position: absolute;
     top: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         linear-gradient(rgba(139, 69, 19, 0.15) 1px, transparent 1px),
         linear-gradient(90deg, rgba(139, 69, 19, 0.15) 1px, transparent 1px);
     background-size: 60px 60px;
@@ -140,7 +144,7 @@ canvas {
     border: 3px solid #654321;
     border-radius: 50%;
     transform: translateY(-50%);
-    box-shadow: 
+    box-shadow:
         inset 2px 2px 4px rgba(255, 255, 255, 0.3),
         inset -2px -2px 4px rgba(0, 0, 0, 0.3),
         0 4px 8px rgba(0, 0, 0, 0.3);
@@ -158,7 +162,7 @@ canvas {
     border: 3px solid #654321;
     border-radius: 50%;
     transform: translateY(-50%);
-    box-shadow: 
+    box-shadow:
         inset 2px 2px 4px rgba(255, 255, 255, 0.3),
         inset -2px -2px 4px rgba(0, 0, 0, 0.3),
         0 4px 8px rgba(0, 0, 0, 0.3);
@@ -214,7 +218,13 @@ h1 {
     margin-bottom: 20px;
 }
 
-.wafu-title, h1, h2, h3, h4, h5, h6 {
+.wafu-title,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: #C1272D;
     font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
     font-weight: 700;
@@ -229,7 +239,13 @@ h1 {
 }
 
 /* ===== ボタン ===== */
-button, .wafu-btn, #startButton, #help, .ui-btn, #restartButton, #closeHelp {
+button,
+.wafu-btn,
+#startButton,
+#help,
+.ui-btn,
+#restartButton,
+#closeHelp {
     background: #2a2a2a;
     color: #fff;
     border: 2px solid #C1272D;
@@ -244,7 +260,11 @@ button, .wafu-btn, #startButton, #help, .ui-btn, #restartButton, #closeHelp {
     outline: none;
 }
 
-button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
+button:hover,
+.wafu-btn:hover,
+#startButton:hover,
+#help:hover,
+.ui-btn:hover {
     background: #C1272D;
     color: #fff;
     border: 2px solid #C1272D;
@@ -253,7 +273,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* 特殊ボタンスタイル */
-#startButton, #help {
+#startButton,
+#help {
     display: inline-block;
     margin: 0 auto;
     min-width: 180px;
@@ -264,7 +285,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     padding: 0.7em 2.5em;
 }
 
-#startButton:hover, #help:hover {
+#startButton:hover,
+#help:hover {
     background: linear-gradient(90deg, #e6b422 60%, #fffbe7 100%);
     color: #fffbe7;
     box-shadow: 0 0 16px #e6b42288;
@@ -301,7 +323,14 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ===== UIパネル ===== */
-.ui-panel, #score, #ammo, #timer, #helpPanel, .hud, .hud-panel, .wafu-panel {
+.ui-panel,
+#score,
+#ammo,
+#timer,
+#helpPanel,
+.hud,
+.hud-panel,
+.wafu-panel {
     background: #2a2a2a;
     color: #fff;
     border: 2px solid #C1272D;
@@ -337,7 +366,9 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ===== ゲームHUD ===== */
-#scoreDisplay, #livesDisplay, #timerDisplay {
+#scoreDisplay,
+#livesDisplay,
+#timerDisplay {
     position: absolute;
     min-width: 60px;
     max-width: 120px;
@@ -368,7 +399,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     right: 12px;
 }
 
-#timer, #score {
+#timer,
+#score {
     color: #C1272D;
     font-weight: 700;
     font-size: 1.2em;
@@ -406,7 +438,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     user-select: none;
 }
 
-#helpPanel, #quickHelp {
+#helpPanel,
+#quickHelp {
     background: #2a2a2a;
     color: #fff;
     border: 2px solid #C1272D;
@@ -420,8 +453,11 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 /* ヘルプモーダル */
 #helpModal {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
     z-index: 150;
     display: flex;
     align-items: center;
@@ -464,7 +500,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ===== スタート画面 ===== */
-#startScreen, .dark-bg {
+#startScreen,
+.dark-bg {
     background: url('assets/UI/title1.png') center center no-repeat;
     background-size: contain;
     min-height: 100vh;
@@ -489,7 +526,11 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ===== ゲームオーバー・ポーズ・勝利画面 ===== */
-#gameOverMessage, #pauseMessage, #pausePanel, #gameOverPanel, #winPanel {
+#gameOverMessage,
+#pauseMessage,
+#pausePanel,
+#gameOverPanel,
+#winPanel {
     position: fixed;
     top: 0;
     left: 0;
@@ -541,13 +582,13 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 
 .game-over-text.wafu-title {
     font-size: 2.5em;
-  color: #C1272D;
-  font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
-  font-weight: 700;
+    color: #C1272D;
+    font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
+    font-weight: 700;
     margin-bottom: 1.5em;
     display: block;
     letter-spacing: 0.1em;
-  text-shadow: none;
+    text-shadow: none;
 }
 
 #gameOverMessage button {
@@ -556,19 +597,19 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     padding: 15px 30px;
     font-size: 1.2em;
     font-weight: 600;
-  border: 2px solid #C1272D;
-  border-radius: 12px;
+    border: 2px solid #C1272D;
+    border-radius: 12px;
     background: #2a2a2a;
     color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
-  font-family: 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
+    font-family: 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 #gameOverMessage button:hover {
-  background: #C1272D;
-  color: #fff;
+    background: #C1272D;
+    color: #fff;
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 4px 12px rgba(193, 39, 45, 0.4);
 }
@@ -590,7 +631,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
         flex-direction: row;
         gap: 20px;
     }
-    
+
     .game-over-buttons button {
         min-width: 180px;
     }
@@ -613,7 +654,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     margin: 0;
     border: none;
     border-radius: 0;
-  box-shadow: none;
+    box-shadow: none;
     backdrop-filter: blur(2px);
 }
 
@@ -661,7 +702,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
         flex-wrap: wrap;
         justify-content: center;
     }
-    
+
     .pause-buttons button {
         min-width: 160px;
     }
@@ -747,8 +788,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
         "boss1 empty1 boss2"
         "empty2 boss5 empty3"
         "boss3 empty4 boss4";
-    grid-template-columns: minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);
-    grid-template-rows: minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
     gap: clamp(1vw, 3vw, 32px);
     justify-items: center;
     align-items: center;
@@ -823,7 +864,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     min-height: 80px;
 }
 
-.boss-card.selected, .boss-card:hover {
+.boss-card.selected,
+.boss-card:hover {
     border: 4px solid #C1272D;
     color: #C1272D;
     background: #f7f7f7;
@@ -848,11 +890,25 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ボスカードグリッド配置 */
-.boss-card[data-boss="1"] { grid-area: boss1; }
-.boss-card[data-boss="2"] { grid-area: boss2; }
-.boss-card[data-boss="3"] { grid-area: boss3; }
-.boss-card[data-boss="4"] { grid-area: boss4; }
-.boss-card[data-boss="5"] { grid-area: boss5; }
+.boss-card[data-boss="1"] {
+    grid-area: boss1;
+}
+
+.boss-card[data-boss="2"] {
+    grid-area: boss2;
+}
+
+.boss-card[data-boss="3"] {
+    grid-area: boss3;
+}
+
+.boss-card[data-boss="4"] {
+    grid-area: boss4;
+}
+
+.boss-card[data-boss="5"] {
+    grid-area: boss5;
+}
 
 /* ===== ローディング画面 ===== */
 #loading-screen {
@@ -861,7 +917,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(255,255,255,0.95);
+    background: rgba(255, 255, 255, 0.95);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -896,88 +952,94 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ===== レスポンシブデザイン ===== */
 @media (max-width: 900px) {
-  #stageSelectArea {
-    min-height: 100vh;
-    max-height: 100vh;
-    padding: 0;
-  }
-    
-  .boss-cards {
-    gap: clamp(0.5vw, 1.5vw, 16px);
-  }
-    
-  .boss-card {
-    min-width: 80px;
-    max-width: min(28vw, 28vh, 180px);
-    width: 24vw;
-    min-height: 80px;
-    max-height: min(28vw, 28vh, 180px);
-    height: 24vw;
-    font-size: 0.95em;
-  }
-    
-  .boss-card[data-boss="5"] {
-    min-width: 100px;
-    max-width: min(36vw, 36vh, 220px);
-    width: 30vw;
-    min-height: 100px;
-    max-height: min(36vw, 36vh, 220px);
-    height: 30vw;
-    font-size: 1.1em;
-  }
+    #stageSelectArea {
+        min-height: 100vh;
+        max-height: 100vh;
+        padding: 0;
+    }
+
+    .boss-cards {
+        gap: clamp(0.5vw, 1.5vw, 16px);
+    }
+
+    .boss-card {
+        min-width: 80px;
+        max-width: min(28vw, 28vh, 180px);
+        width: 24vw;
+        min-height: 80px;
+        max-height: min(28vw, 28vh, 180px);
+        height: 24vw;
+        font-size: 0.95em;
+    }
+
+    .boss-card[data-boss="5"] {
+        min-width: 100px;
+        max-width: min(36vw, 36vh, 220px);
+        width: 30vw;
+        min-height: 100px;
+        max-height: min(36vw, 36vh, 220px);
+        height: 30vw;
+        font-size: 1.1em;
+    }
 }
 
 @media (max-width: 600px) {
-  #stageSelectArea {
-    min-height: 100vh;
-    max-height: 100vh;
-    padding: 0;
-  }
-    
-  .boss-cards {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: repeat(3, 1fr);
-    grid-template-areas:
-      "boss1 boss2"
-      "boss5 boss5"
-      "boss3 boss4";
-    gap: clamp(0.2vw, 0.7vw, 8px);
-  }
-    
-  .boss-card {
-    min-width: 60px;
-    max-width: min(44vw, 44vh, 100px);
-    width: 38vw;
-    min-height: 60px;
-    max-height: min(44vw, 44vh, 100px);
-    height: 38vw;
-    font-size: 0.85em;
-  }
-    
-  .boss-card[data-boss="5"] {
-    min-width: 80px;
-    max-width: min(60vw, 60vh, 140px);
-    width: 50vw;
-    min-height: 80px;
-    max-height: min(60vw, 60vh, 140px);
-    height: 50vw;
-    font-size: 1em;
-  }
+    #stageSelectArea {
+        min-height: 100vh;
+        max-height: 100vh;
+        padding: 0;
+    }
+
+    .boss-cards {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(3, 1fr);
+        grid-template-areas:
+            "boss1 boss2"
+            "boss5 boss5"
+            "boss3 boss4";
+        gap: clamp(0.2vw, 0.7vw, 8px);
+    }
+
+    .boss-card {
+        min-width: 60px;
+        max-width: min(44vw, 44vh, 100px);
+        width: 38vw;
+        min-height: 60px;
+        max-height: min(44vw, 44vh, 100px);
+        height: 38vw;
+        font-size: 0.85em;
+    }
+
+    .boss-card[data-boss="5"] {
+        min-width: 80px;
+        max-width: min(60vw, 60vh, 140px);
+        width: 50vw;
+        min-height: 80px;
+        max-height: min(60vw, 60vh, 140px);
+        height: 50vw;
+        font-size: 1em;
+    }
 }
 
 /* ===== その他 ===== */
-hr, .wafu-divider {
-  border: none;
-  border-top: 2px solid #C1272D;
-  margin: 2em 0;
-  width: 80%;
-  background: none;
+hr,
+.wafu-divider {
+    border: none;
+    border-top: 2px solid #C1272D;
+    margin: 2em 0;
+    width: 80%;
+    background: none;
 }
 
 /* ===== デバッグパネル ===== */
@@ -1119,23 +1181,23 @@ hr, .wafu-divider {
         max-width: 320px;
         max-height: calc(100vh - 20px);
     }
-    
+
     .debug-control {
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
     }
-    
+
     .debug-control input {
         width: 100%;
         max-width: 200px;
     }
-    
+
     .debug-actions {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .debug-btn {
         width: 100%;
         max-width: 200px;

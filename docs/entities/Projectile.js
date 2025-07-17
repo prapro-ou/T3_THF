@@ -7,8 +7,16 @@ export class Projectile {
         this.speed = speed;
         this.damage = damage;
         this.markedForDeletion = false;
+        this.width = 200; // cannon_ballのサイズ
+        this.height = 200;
         this.type = type; // 弾の種類（'normal' または 'cannon_ball'）
-        // width, height, radiusは基底クラスでは不要
+        
+        // 弾の種類に応じて当たり判定サイズを設定
+        if (type === 'cannon_ball') {
+            this.radius = 100; // cannon_ballの半径（直径200に合わせる）
+        } else {
+            this.radius = 5; // 通常の弾の半径
+        }
 
         // ターゲットが無効な場合は即削除
         if (!target || typeof target.x !== 'number' || typeof target.y !== 'number') {
@@ -16,17 +24,8 @@ export class Projectile {
             return;
         }
 
-        // ターゲットの中心座標を正しく計算
-        let targetCenterX, targetCenterY;
-        if (target.constructor && target.constructor.name === 'Player') {
-            targetCenterX = target.x;
-            targetCenterY = target.y;
-        } else {
-            targetCenterX = target.x + (target.width || 0) / 2;
-            targetCenterY = target.y + (target.height || 0) / 2;
-        }
-        const dx = targetCenterX - x;
-        const dy = targetCenterY - y;
+        const dx = target.x + (target.width || 0) / 2 - x;
+        const dy = target.y + (target.height || 0) / 2 - y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1; // 0除算防止
         this.vx = (dx / dist) * speed;
         this.vy = (dy / dist) * speed;
@@ -201,9 +200,8 @@ export class Projectile {
     }
 
     update() {
-        // サブフレーム更新をやめ、常に通常の位置更新と当たり判定のみ行う
-        this.updatePosition();
-        this.checkCollision();
+        // 高速移動時の精度向上のため、サブフレーム更新を使用
+        this.updateWithSubframes();
 
         // 画面外に出たら削除
         if (
@@ -259,38 +257,4 @@ export class Projectile {
             ctx.stroke();
         }
     }
-} 
-
-// お供の玉
-export class OtomoProjectile extends Projectile {
-    constructor(game, x, y, target, speed = 5, damage = 10) {
-        super(game, x, y, target, speed, damage, 'otomo');
-        // OtomoProjectile専用の初期化があればここに
-    }
-    // 必要ならupdateやcheckCollisionをオーバーライド
-}
-
-// ボスのキャノン玉
-export class CannonBallProjectile extends Projectile {
-    constructor(game, centerX, centerY, target, speed = 6, damage = 15, radius = 40, color = '#ff0') {
-        super(game, centerX, centerY, target, speed, damage, 'cannon_ball');
-        this.radius = radius;
-        this.color = color;
-    }
-
-    draw(ctx, scrollX, scrollY) {
-        ctx.beginPath();
-        ctx.arc(this.x - scrollX, this.y - scrollY, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.fill();
-        ctx.strokeStyle = '#000';
-        ctx.stroke();
-
-        // デバッグ用中心点
-        ctx.beginPath();
-        ctx.arc(this.x - scrollX, this.y - scrollY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
-        ctx.fill();
-    }
-    // 必要ならcheckCollisionやupdateもオーバーライド可能
 } 

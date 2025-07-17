@@ -1,4 +1,4 @@
-import { Projectile, OtomoProjectile, CannonBallProjectile } from '../entities/Projectile.js';
+import { Projectile } from '../entities/Projectile.js';
 import { SpriteSheet } from '../utils/SpriteSheet.js';
 
 export class ProjectileManager {
@@ -85,17 +85,11 @@ export class ProjectileManager {
         this.projectiles.push(proj);
     }
 
-    spawnCannonBallProjectile(x, y, target, speed = 6, damage = 15, radius = 40, color = '#ff0') {
+    spawnCannonBallProjectile(x, y, target, speed = 6, damage = 15) {
         // cannon_ballタイプの弾（ターゲットはプレイヤー）
         console.log("Creating cannon ball projectile at:", x, y);
-        const proj = new CannonBallProjectile(this.game, x, y, target, speed, damage, radius, color);
+        const proj = new Projectile(this.game, x, y, target, speed, damage, 'cannon_ball');
         console.log("Cannon ball projectile created with type:", proj.type);
-        this.projectiles.push(proj);
-    }
-
-    spawnOtomoProjectile(x, y, target, speed = 6, damage = 10) {
-        // お供の弾
-        const proj = new OtomoProjectile(this.game, x, y, target, speed, damage);
         this.projectiles.push(proj);
     }
 } 

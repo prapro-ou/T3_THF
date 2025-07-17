@@ -285,7 +285,7 @@ export class Game {
 
         // 描画処理を各Managerに委譲（単一責任の原則）
         this.renderer.clear();
-        this.renderer.drawBackground(scrollX, scrollY);
+        this.renderer.drawBackground(scrollX, scrollY, this.selectedBossType, this.bossAppeared);
         this.renderer.drawAttackCircle(this.attackManager.getAttackCircle(), scrollX, scrollY);
 
         // プレイヤー更新・描画
@@ -378,12 +378,12 @@ export class Game {
             ctx.strokeStyle = '#00ff00';
             ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
-
-            // ロジック上の中心をそのまま使う
+            
+            // プレイヤーの実際の中心座標（描画位置ではなく実際の座標）
             const playerCenterX = this.player.x - scrollX;
             const playerCenterY = this.player.y - scrollY;
             const playerRadius = Math.min(this.player.width, this.player.height) / 2 * (this.playerHitboxSize || 0.8);
-
+            
             ctx.beginPath();
             ctx.arc(playerCenterX, playerCenterY, playerRadius, 0, Math.PI * 2);
             ctx.stroke();
