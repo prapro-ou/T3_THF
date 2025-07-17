@@ -1,0 +1,28 @@
+{"frames": [
+
+{
+	"filename": "bike_oni_left.png",
+	"frame": {"x":0,"y":0,"w":400,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":400},
+	"sourceSize": {"w":400,"h":400}
+},
+{
+	"filename": "bike_oni_right.png",
+	"frame": {"x":400,"y":0,"w":400,"h":400},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":400,"h":400},
+	"sourceSize": {"w":400,"h":400}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "bike_oni.png",
+	"format": "RGBA8888",
+	"size": {"w":800,"h":400},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:98a4513411c80677de8837e2f3c47c11:d8afee2b1b535daa25498e5380f85132:c78597cc466f68fcb24c6ce3ad7b15ea$"
+}
+}
