@@ -12,28 +12,42 @@
         this.ctx.clearRect(0, 0, this.VIEW_W, this.VIEW_H);
     }
 
-    drawBackground(scrollX, scrollY) {
-        this.ctx.fillStyle = '#333';
-        this.ctx.fillRect(0, 0, this.VIEW_W, this.VIEW_H);
+    drawBackground(scrollX, scrollY, selectedBossType = 0, isBossSpawned = false) {
+        // BOSS出現時は全ステージMAP5、それ以外はステージごと
+        let mapSrc;
+        if (isBossSpawned) {
+            mapSrc = 'assets/UI/MAP/momoGOmap5.jpeg';
+        } else {
+            mapSrc = (selectedBossType === 5)
+                ? 'assets/UI/MAP/momoGOmap6.jpeg'
+                : 'assets/UI/MAP/momoGOmap4.jpeg';
+        }
+        // 毎フレームmapSrcが変わったら新しくImage生成（BOSS出現時も即切り替え）
+        if (!this.mapImage || this._lastMapSrc !== mapSrc) {
+            this.mapImage = new window.Image();
+            this.mapImageLoaded = false;
+            this.mapImage.onload = () => {
+                this.mapImageLoaded = true;
+            };
+            this.mapImage.src = mapSrc;
+            this._lastMapSrc = mapSrc;
+        }
+        if (this.mapImageLoaded && this.mapImage.width > 0 && this.mapImage.height > 0) {
+            this.ctx.drawImage(
+                this.mapImage,
+                scrollX * (this.mapImage.width / this.MAP_W),
+                scrollY * (this.mapImage.height / this.MAP_H),
+                this.mapImage.width * (this.VIEW_W / this.MAP_W),
+                this.mapImage.height * (this.VIEW_H / this.MAP_H),
+                0, 0, this.VIEW_W, this.VIEW_H
+            );
+        } else {
+            // ロード前はグレー背景
+            this.ctx.fillStyle = '#333';
+            this.ctx.fillRect(0, 0, this.VIEW_W, this.VIEW_H);
+        }
         this.ctx.save();
         this.ctx.translate(-scrollX, -scrollY);
-        this.ctx.strokeStyle = '#444';
-        this.ctx.lineWidth = 1;
-        
-        // グリッド描画
-        for (let x = 0; x <= this.MAP_W; x += 80) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(x, 0);
-            this.ctx.lineTo(x, this.MAP_H);
-            this.ctx.stroke();
-        }
-        for (let y = 0; y <= this.MAP_H; y += 80) {
-            this.ctx.beginPath();
-            this.ctx.moveTo(0, y);
-            this.ctx.lineTo(this.MAP_W, y);
-            this.ctx.stroke();
-        }
-        
         // マップの縁取りを赤に
         this.ctx.strokeStyle = '#f00';
         this.ctx.lineWidth = 4;

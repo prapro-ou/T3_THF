@@ -91,9 +91,5 @@ export class Player extends Character {
             this.moveFrame = 0;
         }
     }
-
-    // プレイヤーの中心座標はx, yそのもの
-    get centerX() { return this.x; }
-    get centerY() { return this.y; }
 }
 //test

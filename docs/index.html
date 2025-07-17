@@ -1,20 +1,23 @@
 ﻿<!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>キビ弾GO</title>
     <link rel="stylesheet" href="style.css">
     <!-- 和風Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Serif+JP:wght@700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- 障子風アニメーション用コンテナ -->
     <div class="shoji-container hidden">
         <div class="shoji-left"></div>
         <div class="shoji-right"></div>
     </div>
-    
+
     <div id="loading-screen">
         <h2>ロード中...</h2>
         <div class="loader"></div>
@@ -24,35 +27,35 @@
         <button id="help" class="wafu-btn">操作説明</button>
     </div>
     <div id="stageSelectArea" class="hidden">
-      <button id="backToStartButton" class="back-arrow-btn" title="スタート画面に戻る">←</button>
-      <h2 class="wafu-title">ステージ選択</h2>
-      <div class="boss-cards">
-        <div class="boss-card" data-boss="1">
-          <div class="boss-placeholder">四天王1</div>
-          <div class="boss-name">四天王1：でかいボス</div>
-          <div class="boss-desc">動かず高耐久。弾を撃つ。</div>
+        <button id="backToStartButton" class="back-arrow-btn" title="スタート画面に戻る">←</button>
+        <h2 class="wafu-title">ステージ選択</h2>
+        <div class="boss-cards">
+            <div class="boss-card" data-boss="1">
+                <div class="boss-placeholder">四天王1</div>
+                <div class="boss-name">四天王1：でかいボス</div>
+                <div class="boss-desc">動かず高耐久。弾を撃つ。</div>
+            </div>
+            <div class="boss-card" data-boss="2">
+                <div class="boss-placeholder">四天王2</div>
+                <div class="boss-name">四天王2：はやいボス</div>
+                <div class="boss-desc">急加速と停止を繰り返す。</div>
+            </div>
+            <div class="boss-card" data-boss="3">
+                <div class="boss-placeholder">四天王3</div>
+                <div class="boss-name">四天王3：ワープボス</div>
+                <div class="boss-desc">ワープで逃げ、鬼を呼ぶ。</div>
+            </div>
+            <div class="boss-card" data-boss="4">
+                <div class="boss-placeholder">四天王4</div>
+                <div class="boss-name">四天王4：2体1組ボス</div>
+                <div class="boss-desc">2体で異なる能力。</div>
+            </div>
+            <div class="boss-card" data-boss="5">
+                <div class="boss-placeholder">ラスボス</div>
+                <div class="boss-name">ラスボス（いいとこどり）</div>
+                <div class="boss-desc">四天王の力を併せ持つ。</div>
+            </div>
         </div>
-        <div class="boss-card" data-boss="2">
-          <div class="boss-placeholder">四天王2</div>
-          <div class="boss-name">四天王2：はやいボス</div>
-          <div class="boss-desc">急加速と停止を繰り返す。</div>
-        </div>
-        <div class="boss-card" data-boss="3">
-          <div class="boss-placeholder">四天王3</div>
-          <div class="boss-name">四天王3：ワープボス</div>
-          <div class="boss-desc">ワープで逃げ、鬼を呼ぶ。</div>
-        </div>
-        <div class="boss-card" data-boss="4">
-          <div class="boss-placeholder">四天王4</div>
-          <div class="boss-name">四天王4：2体1組ボス</div>
-          <div class="boss-desc">2体で異なる能力。</div>
-        </div>
-        <div class="boss-card" data-boss="5">
-          <div class="boss-placeholder">ラスボス</div>
-          <div class="boss-name">ラスボス（いいとこどり）</div>
-          <div class="boss-desc">四天王の力を併せ持つ。</div>
-        </div>
-      </div>
     </div>
     <div id="helpModal" class="hidden">
         <div class="help-content">
@@ -72,21 +75,25 @@
     </div>
 
     <div class="game-container">
-    <canvas id="gameCanvas" width="800" height="600" class="hidden"></canvas>
-    <div id="scoreDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">スコア</span>: <span id="scoreValue">0</span></div>
-    <div id="livesDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残弾数</span>: <span id="livesValue">10</span></div>
-    <div id="timerDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残り時間</span>: <span id="timerValue">05:00</span></div>
-    <!-- ゲーム中の簡易操作説明-->
-    <div id="quickHelp" class="hidden wafu-panel wafu-shadow">
-        <b>操作</b>
-        <br> WASD : 移動
-        <br> 左クリック : 攻撃
-        <br> P : ポーズ
+        <canvas id="gameCanvas" width="800" height="600" class="hidden"></canvas>
+        <div id="scoreDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">スコア</span>: <span
+                id="scoreValue">0</span></div>
+        <div id="livesDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残弾数</span>: <span
+                id="livesValue">10</span></div>
+        <div id="timerDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残り時間</span>: <span
+                id="timerValue">05:00</span></div>
+        <!-- ゲーム中の簡易操作説明-->
+        <div id="quickHelp" class="hidden wafu-panel wafu-shadow">
+            <b>操作</b>
+            <br> WASD : 移動
+            <br> 左クリック : 攻撃
+            <br> P : ポーズ
+        </div>
     </div>
-</div>
 
     <!-- ボス出現演出用カットイン -->
-    <div id="bossCutIn" class="hidden" style="position:fixed;top:30%;left:0;width:100%;text-align:center;font-size:2.5em;color:#fff;text-shadow:2px 2px 8px #000;z-index:1000;background:rgba(0,0,0,0.5);padding:1em 0;pointer-events:none;">
+    <div id="bossCutIn" class="hidden"
+        style="position:fixed;top:30%;left:0;width:100%;text-align:center;font-size:2.5em;color:#fff;text-shadow:2px 2px 8px #000;z-index:1000;background:rgba(0,0,0,0.5);padding:1em 0;pointer-events:none;">
         ボス鬼出現！！
     </div>
 
@@ -110,8 +117,10 @@
             </div>
         </div>
     </div>
-    <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
-    
+    <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span
+            id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span
+            id="otomoExpToLevelUpValue">10</span></div>
+
     <!-- デバッグパネル -->
     <div id="debugPanel" class="hidden debug-panel">
         <div class="debug-header">
@@ -230,7 +239,8 @@
             </div>
         </div>
     </div>
-    
-    <script type="module" src="main.js"></script>  
+
+    <script type="module" src="main.js"></script>
 </body>
+
 </html>

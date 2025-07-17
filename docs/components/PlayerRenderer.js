@@ -61,17 +61,16 @@ export class PlayerRenderer {
     }
 
     drawPlayer(player, ctx, scrollX, scrollY) {
-        // プレイヤーのロジック上の中心を常に画像の中心にする
-        const centerX = player.x - scrollX;
-        const centerY = player.y - scrollY;
-        const drawX = centerX - player.width / 2;
-        const drawY = centerY - player.height / 2;
-
-        // 中心点の可視化（ロジック上の中心）
-        ctx.beginPath();
-        ctx.arc(player.x - scrollX, player.y - scrollY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
-        ctx.fill();
+        const { width: viewWidth, height: viewHeight } = this.renderer.getViewDimensions();
+        const { width: mapWidth, height: mapHeight } = this.renderer.getMapDimensions();
+        
+        // プレイヤーは画面中央に描画
+        let drawX = viewWidth / 2 - player.width / 2;
+        let drawY = viewHeight / 2 - player.height / 2;
+        if (player.x < viewWidth / 2) drawX = player.x - scrollX - player.width / 2;
+        if (player.x > mapWidth - viewWidth / 2) drawX = player.x - scrollX - player.width / 2;
+        if (player.y < viewHeight / 2) drawY = player.y - scrollY - player.height / 2;
+        if (player.y > mapHeight - viewHeight / 2) drawY = player.y - scrollY - player.height / 2;
 
         // momotaroスプライトシートがロード済みならアニメーション描画
         if (momotaroSpriteSheetLoaded && momotaroSpriteSheet) {
@@ -103,6 +102,7 @@ export class PlayerRenderer {
         // HPバー・ゲージ描画
         const barWidth = player.width;
         const barHeight = 10;
+        console.log('PlayerRenderer - player.health:', player.health, 'player.maxHP:', player.maxHP); // デバッグログ
         const healthBar = new HealthBar(drawX, drawY - barHeight - 4, barWidth, barHeight, player.health, player.maxHP);
         healthBar.draw(ctx, 0, 0);
 
