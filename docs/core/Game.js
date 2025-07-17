@@ -378,12 +378,12 @@ export class Game {
             ctx.strokeStyle = '#00ff00';
             ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
-            
-            // プレイヤーの実際の中心座標（描画位置ではなく実際の座標）
+
+            // ロジック上の中心をそのまま使う
             const playerCenterX = this.player.x - scrollX;
             const playerCenterY = this.player.y - scrollY;
             const playerRadius = Math.min(this.player.width, this.player.height) / 2 * (this.playerHitboxSize || 0.8);
-            
+
             ctx.beginPath();
             ctx.arc(playerCenterX, playerCenterY, playerRadius, 0, Math.PI * 2);
             ctx.stroke();
