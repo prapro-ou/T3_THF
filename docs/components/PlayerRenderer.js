@@ -61,6 +61,11 @@ export class PlayerRenderer {
     }
 
     drawPlayer(player, ctx, scrollX, scrollY) {
+        ctx.save();
+        // 無敵時間中は点滅（globalAlphaを交互に切り替え）
+        if (player.invincibleTimer > 0) {
+            ctx.globalAlpha = (Math.floor(player.invincibleTimer * 10) % 2 === 0) ? 0.2 : 1.0;
+        }
         const { width: viewWidth, height: viewHeight } = this.renderer.getViewDimensions();
         const { width: mapWidth, height: mapHeight } = this.renderer.getMapDimensions();
         
@@ -114,5 +119,6 @@ export class PlayerRenderer {
             const ratio = player.ammoRecoveryTimer / player.ammoRecoveryTime;
             this.renderer.drawAmmoGauge(drawX, gaugeY, gaugeWidth, gaugeHeight, ratio);
         }
+        ctx.restore();
     }
 }
