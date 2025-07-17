@@ -300,7 +300,9 @@ export class Game {
 
         // 敵更新・描画（EnemyManagerに委譲）
         if (this.bossAppeared && !this.bossDefeated) {
-            // ボスのみ更新・描画
+            // markedForDeletionな敵の削除だけは必ず行う
+            this.enemyManager.enemies = this.enemyManager.enemies.filter(enemy => !enemy.markedForDeletion);
+            // ボスだけupdate
             this.enemyManager.getEnemies().forEach(enemy => {
                 if (this.isBossEnemy(enemy)) enemy.update();
             });
