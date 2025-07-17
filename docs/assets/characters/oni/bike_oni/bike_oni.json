@@ -19,10 +19,10 @@
 "meta": {
 	"app": "https://www.codeandweb.com/texturepacker",
 	"version": "1.0",
-	"image": "bike_oni_sprite.png",
+	"image": "bike_oni.png",
 	"format": "RGBA8888",
 	"size": {"w":800,"h":400},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:608e848158761419362cca5f68e6e557:d8afee2b1b535daa25498e5380f85132:beefd83b7b88e8e925e3e22ab61be342$"
+	"smartupdate": "$TexturePacker:SmartUpdate:98a4513411c80677de8837e2f3c47c11:d8afee2b1b535daa25498e5380f85132:c78597cc466f68fcb24c6ce3ad7b15ea$"
 }
 }

@@ -1,0 +1,20 @@
+{"frames": [
+
+{
+	"filename": "wood.png",
+	"frame": {"x":0,"y":0,"w":100,"h":50},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":50},
+	"sourceSize": {"w":100,"h":50}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "wood.png",
+	"format": "RGBA8888",
+	"size": {"w":100,"h":50},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:e12b0c6b36fce3a71d394eef585f08f8:01ff9e1a90aacc3c1245e1d9ca71c471:f25efcec0d996575d4a89b4a2525a662$"
+}
+}

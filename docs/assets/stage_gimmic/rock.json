@@ -1,0 +1,20 @@
+{"frames": [
+
+{
+	"filename": "rock.png",
+	"frame": {"x":0,"y":0,"w":100,"h":100},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":100,"h":100},
+	"sourceSize": {"w":100,"h":100}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "rock.png",
+	"format": "RGBA8888",
+	"size": {"w":100,"h":100},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:bdbf4fa2c8d34e4445028d142b443813:8fd1b506bff7e514328d36909af00708:936b2f0ef876fe993b907de9e132dd63$"
+}
+}

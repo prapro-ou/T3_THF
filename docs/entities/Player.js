@@ -12,7 +12,7 @@ export class Player extends Character {
     static SPEED = 3.5; // クラス定数として定義
     
     constructor(game, x, y, controller) {
-        super(game, x, y, 80, 80, 'pink', 100);
+        super(game, x, y, 80, 80, '#ffb347', 100);
         this.attackRadius = 80;
         this.controller = controller;
         this.renderer = new PlayerRenderer(game.renderer);
@@ -27,6 +27,7 @@ export class Player extends Character {
         
         // ammoManager初期化後にmaxAmmoを設定
         this.maxAmmo = 10;
+        this.invincibleTimer = 0; // 無敵時間（秒）
     }
 
     // カプセル化: プロパティへのアクセスを制御
@@ -48,6 +49,10 @@ export class Player extends Character {
         this.controller.updatePlayerMovement(this, deltaTime);
         this.ammoManager.update(deltaTime);
         this.updateMovementState();
+        if (this.invincibleTimer > 0) {
+            this.invincibleTimer -= deltaTime;
+            if (this.invincibleTimer < 0) this.invincibleTimer = 0;
+        }
     }
 
     draw(ctx, scrollX, scrollY) {
@@ -89,6 +94,15 @@ export class Player extends Character {
             this.moveFrame++;
         } else {
             this.moveFrame = 0;
+        }
+    }
+
+    takeDamage(amount) {
+        if (this.invincibleTimer > 0) return; // 無敵中はダメージ無効
+        this.health -= amount;
+        this.invincibleTimer = 1.0; // 1秒間無敵
+        if (!this.isAlive) {
+            this.onDeath();
         }
     }
 }

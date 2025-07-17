@@ -285,7 +285,7 @@ export class Game {
 
         // 描画処理を各Managerに委譲（単一責任の原則）
         this.renderer.clear();
-        this.renderer.drawBackground(scrollX, scrollY);
+        this.renderer.drawBackground(scrollX, scrollY, this.selectedBossType, this.bossAppeared);
         this.renderer.drawAttackCircle(this.attackManager.getAttackCircle(), scrollX, scrollY);
 
         // プレイヤー更新・描画
@@ -300,7 +300,9 @@ export class Game {
 
         // 敵更新・描画（EnemyManagerに委譲）
         if (this.bossAppeared && !this.bossDefeated) {
-            // ボスのみ更新・描画
+            // markedForDeletionな敵の削除だけは必ず行う
+            this.enemyManager.enemies = this.enemyManager.enemies.filter(enemy => !enemy.markedForDeletion);
+            // ボスだけupdate
             this.enemyManager.getEnemies().forEach(enemy => {
                 if (this.isBossEnemy(enemy)) enemy.update();
             });
@@ -316,14 +318,8 @@ export class Game {
                 if (!enemy.markedForDeletion) {
                     // ボス鬼の場合はダメージを増加
                     const damage = this.isBossEnemy(enemy) ? 40 : 20;
-                    this.player.health -= damage;
-                    if (this.player.health < 0) this.player.health = 0;
-                    enemy.markedForDeletion = true;
-                    this.particleManager.createExplosion(
-                        enemy.x + enemy.width / 2, 
-                        enemy.y + enemy.height / 2, 
-                        enemy.color
-                    );
+                    this.player.takeDamage(damage);
+                    // パーティクル生成はonDeathで行うのでここでは削除
                 }
             }
         });
