@@ -59,9 +59,19 @@ export class Otomo extends Character {
         for (const enemy of enemies) {
             if (enemy.markedForDeletion) continue;
 
-            const dx = enemy.x - player.x;
-            const dy = enemy.y - player.y;
-            const dist = Math.hypot(dx, dy);
+            let dist;
+            // BossOni系は矩形同士の最短距離で判定
+            if (enemy.constructor && enemy.constructor.name.startsWith('BossOni')) {
+                const cx = player.x + player.width / 2;
+                const cy = player.y + player.height / 2;
+                const ex = Math.max(enemy.x, Math.min(cx, enemy.x + enemy.width));
+                const ey = Math.max(enemy.y, Math.min(cy, enemy.y + enemy.height));
+                dist = Math.hypot(cx - ex, cy - ey);
+            } else {
+                const dx = enemy.x - player.x;
+                const dy = enemy.y - player.y;
+                dist = Math.hypot(dx, dy);
+            }
 
             if (dist <= range && dist < minDist) {
                 closest = enemy;
@@ -80,9 +90,19 @@ export class Otomo extends Character {
         for (const enemy of enemies) {
             if (enemy.markedForDeletion) continue;
 
-            const dx = enemy.x - this.x;
-            const dy = enemy.y - this.y;
-            const dist = Math.hypot(dx, dy);
+            let dist;
+            // BossOni系は矩形同士の最短距離で判定
+            if (enemy.constructor && enemy.constructor.name.startsWith('BossOni')) {
+                const cx = this.x + this.width / 2;
+                const cy = this.y + this.height / 2;
+                const ex = Math.max(enemy.x, Math.min(cx, enemy.x + enemy.width));
+                const ey = Math.max(enemy.y, Math.min(cy, enemy.y + enemy.height));
+                dist = Math.hypot(cx - ex, cy - ey);
+            } else {
+                const dx = enemy.x - this.x;
+                const dy = enemy.y - this.y;
+                dist = Math.hypot(dx, dy);
+            }
 
             if (dist <= range && dist < minDist) {
                 closest = enemy;
@@ -94,7 +114,12 @@ export class Otomo extends Character {
     }
 
     // momotaro専用：自身の近くの敵をProjectileで攻撃
-    attackNearbyEnemy(range = 150, cooldown = 1000) {
+    //canShootは外部から制御する
+    // rangeはデフォルトで1050、cooldownは1000ms
+    // これにより、オトモが近くの敵を自動で攻撃する
+    // ただし、canShootがfalseの場合は何もしない
+    // cooldownが経過するまで再度攻撃しない
+    attackNearEnemy(range = 1050, cooldown = 1000) {
         if (!this.canShoot) return;
         const target = this.findEnemyNearSelf(range);
         if (target) {
