@@ -318,14 +318,8 @@ export class Game {
                 if (!enemy.markedForDeletion) {
                     // ボス鬼の場合はダメージを増加
                     const damage = this.isBossEnemy(enemy) ? 40 : 20;
-                    this.player.health -= damage;
-                    if (this.player.health < 0) this.player.health = 0;
-                    enemy.markedForDeletion = true;
-                    this.particleManager.createExplosion(
-                        enemy.x + enemy.width / 2, 
-                        enemy.y + enemy.height / 2, 
-                        enemy.color
-                    );
+                    this.player.takeDamage(damage);
+                    // パーティクル生成はonDeathで行うのでここでは削除
                 }
             }
         });
