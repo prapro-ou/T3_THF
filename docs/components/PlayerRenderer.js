@@ -107,7 +107,6 @@ export class PlayerRenderer {
         // HPバー・ゲージ描画
         const barWidth = player.width;
         const barHeight = 10;
-        console.log('PlayerRenderer - player.health:', player.health, 'player.maxHP:', player.maxHP); // デバッグログ
         const healthBar = new HealthBar(drawX, drawY - barHeight - 4, barWidth, barHeight, player.health, player.maxHP);
         healthBar.draw(ctx, 0, 0);
 
