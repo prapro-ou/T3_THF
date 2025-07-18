@@ -3,7 +3,7 @@ import { MovableEntity } from './MovableEntity.js';
 
 /**
  * 敵の基底クラス
- * 単一責任: 敵の基本行動と状態管理
+ * 単一責任: 敵の基本行動と状態管理.
  * 継承: CharacterとMovableEntityの機能を組み合わせ
  */
 export class Enemy extends Character {

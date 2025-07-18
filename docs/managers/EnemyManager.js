@@ -23,7 +23,7 @@ export class EnemyManager {
         this.maxEnemies = 20;
         
         // 単一責任の原則: 描画責任を統合
-        this.renderer = new EnemyRenderer(game.renderer);
+        this.renderer = new EnemyRenderer(game);
     }
 
     update() {
@@ -129,16 +129,22 @@ export class EnemyManager {
         let boss;
         switch (bossType) {
             case 1:
+                console.log('BossOni1を生成中...');
                 boss = new BossOni1(this.game, centerX, centerY); break;
             case 2:
+                console.log('BossOni2を生成中...');
                 boss = new BossOni2(this.game, centerX, centerY); break;
             case 3:
+                console.log('BossOni3を生成中...');
                 boss = new BossOni3(this.game, centerX, centerY); break;
             case 4:
+                console.log('BossOni4を生成中...');
                 boss = new BossOni4(this.game, centerX, centerY); break;
             case 5:
+                console.log('BossOni5を生成中...');
                 boss = new BossOni5(this.game, centerX, centerY); break;
             default:
+                console.log('デフォルトボスを生成中...');
                 boss = new BossOni(this.game, centerX, centerY); break;
         }
         console.log('ボス生成完了:', { 

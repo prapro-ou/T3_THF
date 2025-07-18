@@ -10,9 +10,10 @@ export class BossOni1 extends BossOni {
         this.shootInterval = 90; // 1.5秒ごとに弾発射（60FPS想定）
         this.shootTimer = 0;
         
-        // cannon_oniのスプライトシートに合わせてサイズ調整
-        this.width = 400;
-        this.height = 400;
+        // 視覚的サイズを設定
+        this.setSize(400, 400);
+        // 円形当たり判定の半径を設定
+        this.setCircularCollision(150);
     }
 
     update() {
@@ -47,5 +48,11 @@ export class BossOni1 extends BossOni {
         
         console.log("BossOni1 shooting cannon ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
         this.game.projectileManager.spawnCannonBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+    }
+
+    // サイズ変更メソッド（将来的な拡張用）
+    changeSize(newWidth, newHeight) {
+        this.setSize(newWidth, newHeight);
+        console.log(`BossOni1: Size changed to ${newWidth}x${newHeight}`);
     }
 } 

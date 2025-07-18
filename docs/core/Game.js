@@ -16,6 +16,8 @@ import { ProjectileManager } from '../managers/ProjectileManager.js';
 
 export class Game {
     constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0) {
+        console.log('Game constructor called with selectedBossType:', selectedBossType);
+        
         this.canvas = canvas;
         this.ctx = ctx;
 
@@ -49,6 +51,7 @@ export class Game {
         this.bossStartTime = null;
 
         this.selectedBossType = selectedBossType;
+        console.log('Game constructor - selectedBossType set to:', this.selectedBossType);
 
         // Otomoのレベル・経験値
         this.otomoLevel = 1;
@@ -59,6 +62,9 @@ export class Game {
         this.playerAttackMultiplier = 1;
         this.otomoAttackMultiplier = 1;
 
+        // デバッグモード設定
+        this.debugMode = false;
+        
         // 当たり判定表示設定
         this.debugSettings = {
             showPlayerHitbox: false,
@@ -124,6 +130,15 @@ export class Game {
                 case '3':
                     this.otomo.setMode('charge');
                     break;
+            }
+        });
+
+        // デバッグモード切替（F1キー）
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'F1') {
+                e.preventDefault();
+                this.debugMode = !this.debugMode;
+                console.log(`Debug mode: ${this.debugMode ? 'ON' : 'OFF'}`);
             }
         });
 
@@ -204,6 +219,7 @@ export class Game {
             this.bossCutInStartTime = Date.now();
             this.uiManager.showBossCutIn();
             this.enemyManager.clearEnemies(); // 通常敵を一掃（任意）
+            console.log('ボス生成を開始します。selectedBossType:', this.selectedBossType);
             this.enemyManager.spawnBoss(this.selectedBossType);
             console.log('ボス生成完了、敵数:', this.enemyManager.getEnemies().length);
             this.bossStartTime = Date.now();

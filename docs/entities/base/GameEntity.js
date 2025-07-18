@@ -10,6 +10,14 @@ export class GameEntity {
         this.width = width;
         this.height = height;
         this.color = color;
+        
+        // 当たり判定サイズを初期化（デフォルトは描画サイズと同じ）
+        this.collisionWidth = width;
+        this.collisionHeight = height;
+        
+        // 円形当たり判定の設定
+        this.collisionRadius = Math.min(width, height) / 2; // デフォルトは短辺の半分
+        this.useCircularCollision = false; // デフォルトは矩形当たり判定
     }
 
     // カプセル化: プロパティへのアクセスを制御
@@ -22,6 +30,19 @@ export class GameEntity {
             right: this.x + this.width,
             top: this.y,
             bottom: this.y + this.height
+        };
+    }
+
+    // 当たり判定用のgetter
+    get collisionCenterX() { return this.x + this.collisionWidth / 2; }
+    get collisionCenterY() { return this.y + this.collisionHeight / 2; }
+    
+    get collisionBounds() {
+        return {
+            left: this.x,
+            right: this.x + this.collisionWidth,
+            top: this.y,
+            bottom: this.y + this.collisionHeight
         };
     }
 
@@ -43,14 +64,32 @@ export class GameEntity {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    // 衝突判定
+    // 衝突判定（円形当たり判定のみ使用）
     collidesWith(other) {
-        return (
-            this.x < other.x + other.width &&
-            this.x + this.width > other.x &&
-            this.y < other.y + other.height &&
-            this.y + this.height > other.y
-        );
+        return this.collidesWithCircular(other);
+    }
+
+    // 円形当たり判定
+    collidesWithCircular(other) {
+        // 視覚的サイズを基準に半径と中心位置を計算
+        const thisVisualWidth = this.visualWidth || this.width;
+        const thisVisualHeight = this.visualHeight || this.height;
+        const otherVisualWidth = other.visualWidth || other.width;
+        const otherVisualHeight = other.visualHeight || other.height;
+        
+        const thisRadius = this.collisionRadius || Math.min(thisVisualWidth, thisVisualHeight) / 2;
+        const otherRadius = other.collisionRadius || Math.min(otherVisualWidth, otherVisualHeight) / 2;
+        
+        const thisCenterX = this.x + thisVisualWidth / 2;
+        const thisCenterY = this.y + thisVisualHeight / 2;
+        const otherCenterX = other.x + otherVisualWidth / 2;
+        const otherCenterY = other.y + otherVisualHeight / 2;
+        
+        const dx = thisCenterX - otherCenterX;
+        const dy = thisCenterY - otherCenterY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        return distance < (thisRadius + otherRadius);
     }
 
     reset(x, y) {

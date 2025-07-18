@@ -51,24 +51,6 @@ export class CollisionManager {
         // 敵の半径（より自然な当たり判定のため、大きめに設定）
         const enemyRadius = Math.max(enemy.width, enemy.height) / 2;
         
-        // デバッグ情報を出力
-        console.log('Player-Enemy collision debug:', {
-            playerX: player.x,
-            playerY: player.y,
-            playerWidth: player.width,
-            playerHeight: player.height,
-            playerRadius: playerRadius,
-            enemyX: enemy.x,
-            enemyY: enemy.y,
-            enemyWidth: enemy.width,
-            enemyHeight: enemy.height,
-            enemyRadius: enemyRadius,
-            enemyCenterX: enemyCenterX,
-            enemyCenterY: enemyCenterY,
-            distance: Math.sqrt((playerCenterX - enemyCenterX) ** 2 + (playerCenterY - enemyCenterY) ** 2),
-            collisionDistance: playerRadius + enemyRadius
-        });
-        
         // 線分交差判定（高速移動時）
         if (playerPrevX !== undefined && playerPrevY !== undefined) {
             const moveDistance = Math.sqrt(
@@ -104,20 +86,6 @@ export class CollisionManager {
         const enemyRadius = Math.max(enemy.width, enemy.height) / 2 * 1.1;
         const dist = distance(attackX, ex, attackY, ey);
         const isHit = dist <= attackRadius + enemyRadius;
-        
-        // デバッグ情報をコンソールに出力
-        console.log('Collision Debug:', {
-            attackX: attackX,
-            attackY: attackY,
-            attackRadius: attackRadius,
-            enemyX: enemy.x,
-            enemyY: enemy.y,
-            enemyCenterX: ex,
-            enemyCenterY: ey,
-            enemyRadius: enemyRadius,
-            distance: dist,
-            isHit: isHit
-        });
         
         return isHit;
     }
