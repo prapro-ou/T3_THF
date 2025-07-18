@@ -83,7 +83,7 @@ export class CollisionManager {
     checkAttackCollision(attackX, attackY, attackRadius, enemy) {
         const ex = enemy.x + enemy.width / 2;
         const ey = enemy.y + enemy.height / 2;
-        const enemyRadius = Math.max(enemy.width, enemy.height) / 2 * 1.1;
+        const enemyRadius = enemy.collisionRadius || Math.max(enemy.width, enemy.height) / 2 * 1.1;
         const dist = distance(attackX, ex, attackY, ey);
         const isHit = dist <= attackRadius + enemyRadius;
         
@@ -94,7 +94,7 @@ export class CollisionManager {
     checkAttackCollisionWithMovement(attackStartX, attackStartY, attackEndX, attackEndY, attackRadius, enemy) {
         const ex = enemy.x + enemy.width / 2;
         const ey = enemy.y + enemy.height / 2;
-        const enemyRadius = Math.max(enemy.width, enemy.height) / 2 * 1.1;
+        const enemyRadius = enemy.collisionRadius || Math.max(enemy.width, enemy.height) / 2 * 1.1;
         
         // 移動距離を計算
         const moveDistance = Math.sqrt(
