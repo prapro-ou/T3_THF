@@ -338,6 +338,25 @@ button:hover,
     margin: 5px;
 }
 
+/* ボス選択画像ボタン用スタイル */
+.boss-select-btn {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    object-fit: contain;
+    border-radius: 0 !important;
+}
+
+.boss-select-btn:hover {
+    transform: scale(1.05);
+    filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
 #restartButton {
     background-color: #4CAF50;
     color: white;
@@ -846,12 +865,12 @@ button:hover,
 }
 
 .boss-card {
-    min-width: 250px;
-    max-width: min(22vw, 22vh, 320px);
-    width: 18vw;
-    min-height: 250px;
-    max-height: min(22vw, 22vh, 320px);
-    height: 18vw;
+    min-width: 350px;
+    max-width: min(30vw, 30vh, 450px);
+    width: 26vw;
+    min-height: 350px;
+    max-height: min(30vw, 30vh, 450px);
+    height: 26vw;
     font-size: 1.1em;
     z-index: 1;
     position: relative;
@@ -860,14 +879,15 @@ button:hover,
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    background: #fff;
-    border: 3px solid #C1272D;
-    border-radius: 18px;
-    transition: border 0.2s, box-shadow 0.2s, transform 0.15s;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    transition: transform 0.15s;
     color: #2d1a1a;
     font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
     font-weight: 600;
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
 .boss-card[data-boss="5"] {
@@ -879,7 +899,7 @@ button:hover,
     height: 22vw;
     font-size: 1.3em;
     z-index: 2;
-    border-width: 4px;
+    border: none !important;
 }
 
 .boss-card img {
@@ -911,11 +931,12 @@ button:hover,
 
 .boss-card.selected,
 .boss-card:hover {
-    border: 4px solid #C1272D;
+    border: none !important;
     color: #C1272D;
-    background: #f7f7f7;
+    background: none !important;
+    background-color: transparent !important;
     transform: scale(1.07) rotate(-1deg);
-    box-shadow: 0 0 0 2px #C1272D33;
+    box-shadow: none !important;
 }
 
 .boss-name {
