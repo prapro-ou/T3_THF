@@ -288,9 +288,54 @@ button:hover,
 #startButton:hover,
 #help:hover {
     background: linear-gradient(90deg, #e6b422 60%, #fffbe7 100%);
-    color: #fffbe7;
-    box-shadow: 0 0 16px #e6b42288;
-    transform: scale(1.05);
+}
+
+/* 画像ボタン用スタイル */
+.image-btn {
+    border: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    padding: 0 !important;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    max-width: 300px;
+    height: auto;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    display: inline-block;
+}
+
+.image-btn:hover {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    transform: translateY(-2px) scale(1.04);
+    filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    box-shadow: none !important;
+}
+
+/* 小さい画像ボタン用スタイル */
+#backToStartButton.image-btn,
+#closeHelp.image-btn {
+    max-width: 150px;
+}
+
+/* 戻るボタンの位置調整 */
+#backToStartButton.image-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    max-width: 120px;
+}
+
+/* ボタンコンテナのスタイル調整 */
+.pause-buttons .image-btn,
+.game-over-buttons .image-btn {
+    max-width: 200px;
+    margin: 5px;
 }
 
 #restartButton {
