@@ -3,7 +3,7 @@ import { MovableEntity } from './MovableEntity.js';
 
 /**
  * 敵の基底クラス
- * 単一責任: 敵の基本行動と状態管理
+ * 単一責任: 敵の基本行動と状態管理.
  * 継承: CharacterとMovableEntityの機能を組み合わせ
  */
 export class Enemy extends Character {
@@ -27,6 +27,15 @@ export class Enemy extends Character {
         this._markedForDeletion = false;
         
         console.log('Enemy constructor finished - _maxHP:', this._maxHP, '_hp:', this._hp); // デバッグログ
+    }
+
+    // 統一的なHPアクセサがない場合は追加
+    get hp() {
+        return this._hp !== undefined ? this._hp : this.health;
+    }
+    
+    get maxHP() {
+        return this._maxHP !== undefined ? this._maxHP : this.maxHealth;
     }
 
     // カプセル化: 移動関連のプロパティへのアクセスを制御
@@ -126,4 +135,4 @@ export class Enemy extends Character {
                 };
         }
     }
-} 
+}

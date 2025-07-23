@@ -8,29 +8,23 @@ import { GameEntity } from './GameEntity.js';
 export class Character extends GameEntity {
     constructor(game, x, y, width, height, color, maxHP) {
         super(game, x, y, width, height, color);
-        console.log('Character constructor - maxHP:', maxHP); // デバッグログ
         this._maxHP = maxHP;
         this._hp = maxHP;
-        console.log('Character constructor - _maxHP:', this._maxHP, '_hp:', this._hp); // デバッグログ
     }
 
     // カプセル化: HP関連のプロパティへのアクセスを制御
     get maxHP() { 
-        console.log('maxHP getter called, returning:', this._maxHP); // デバッグログ
         return this._maxHP; 
     }
     set maxHP(value) { 
-        console.log('maxHP setter called with:', value); // デバッグログ
         this._maxHP = Math.max(1, value);
         this._hp = Math.min(this._hp, this._maxHP);
     }
     
     get health() { 
-        console.log('health getter called, returning:', this._hp); // デバッグログ
         return this._hp; 
     }
     set health(value) { 
-        console.log('health setter called with:', value); // デバッグログ
         this._hp = Math.max(0, Math.min(value, this._maxHP)); 
     }
     

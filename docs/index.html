@@ -23,37 +23,27 @@
         <div class="loader"></div>
     </div>
     <div id="startScreen" class="dark-bg">
-        <button id="startButton" class="wafu-btn">ゲームスタート</button>
-        <button id="help" class="wafu-btn">操作説明</button>
+        <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
+        <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
     </div>
     <div id="stageSelectArea" class="hidden">
-        <button id="backToStartButton" class="back-arrow-btn" title="スタート画面に戻る">←</button>
+        <img id="backToStartButton" src="assets/UI/UI/button/modoru_button_UI.png" alt="スタート画面に戻る" class="image-btn" title="スタート画面に戻る">
         <h2 class="wafu-title">ステージ選択</h2>
         <div class="boss-cards">
             <div class="boss-card" data-boss="1">
-                <div class="boss-placeholder">四天王1</div>
-                <div class="boss-name">四天王1：でかいボス</div>
-                <div class="boss-desc">動かず高耐久。弾を撃つ。</div>
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/cannon_oni_select_button_UI.png" alt="四天王1">
             </div>
             <div class="boss-card" data-boss="2">
-                <div class="boss-placeholder">四天王2</div>
-                <div class="boss-name">四天王2：はやいボス</div>
-                <div class="boss-desc">急加速と停止を繰り返す。</div>
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/bike_oni_select_button_UI.png" alt="四天王2">
             </div>
             <div class="boss-card" data-boss="3">
-                <div class="boss-placeholder">四天王3</div>
-                <div class="boss-name">四天王3：ワープボス</div>
-                <div class="boss-desc">ワープで逃げ、鬼を呼ぶ。</div>
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/warp_oni_select_button_UI.png" alt="四天王3">
             </div>
             <div class="boss-card" data-boss="4">
-                <div class="boss-placeholder">四天王4</div>
-                <div class="boss-name">四天王4：2体1組ボス</div>
-                <div class="boss-desc">2体で異なる能力。</div>
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/fuzin_raizin_select_button_UI.png" alt="四天王4">
             </div>
             <div class="boss-card" data-boss="5">
                 <div class="boss-placeholder">ラスボス</div>
-                <div class="boss-name">ラスボス（いいとこどり）</div>
-                <div class="boss-desc">四天王の力を併せ持つ。</div>
             </div>
         </div>
     </div>
@@ -70,7 +60,7 @@
                 <li><b>Pキー</b> ゲームの一時中断/再開</li>
                 <li><b>F12キー</b> 開発者ツール（ゲーム中のみ）</li>
             </ul>
-            <button id="closeHelp">閉じる</button>
+            <img id="closeHelp" src="assets/UI/UI/button/modoru_button_UI.png" alt="閉じる" class="image-btn">
         </div>
     </div>
 
@@ -101,9 +91,9 @@
         <div class="pause-content">
             <span class="pause-text wafu-title">ポーズ</span>
             <div class="pause-buttons">
-                <button id="resumeButton" class="wafu-btn">ゲーム再開</button>
-                <button id="pauseHelpButton" class="wafu-btn">操作説明</button>
-                <button id="pauseBackToStartButton" class="wafu-btn">スタート画面へ戻る</button>
+                <img id="resumeButton" src="assets/UI/UI/button/restart_button_UI.png" alt="ゲーム再開" class="image-btn">
+                <img id="pauseHelpButton" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
+                <img id="pauseBackToStartButton" src="assets/UI/UI/button/kikan_button_UI.png" alt="スタート画面へ戻る" class="image-btn">
             </div>
         </div>
     </div>
@@ -112,8 +102,8 @@
         <div class="game-over-content">
             <span class="game-over-text wafu-title">ゲームオーバー</span>
             <div class="game-over-buttons">
-                <button id="restartButton" class="wafu-btn">もう一度プレイ</button>
-                <button class="backToStart wafu-btn">スタート画面へ戻る</button>
+                <img id="restartButton" src="assets/UI/UI/retry_button_UI.png" alt="もう一度プレイ" class="image-btn">
+                <img class="backToStart image-btn" src="assets/UI/UI/button/kikan_button_UI.png" alt="スタート画面へ戻る">
             </div>
         </div>
     </div>

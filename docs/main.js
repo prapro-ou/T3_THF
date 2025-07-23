@@ -1,6 +1,6 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
-import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet } from './components/EnemyRenderer.js';
+import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet } from './components/EnemyRenderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -111,11 +111,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let game = null;
     let assetsLoaded = false;
+    let selectedBossType = 0; // 選択されたボスの種類
 
     // 1. ゲーム開始ボタンを一時的に無効化
     startButton.disabled = true;
     startButton.textContent = 'ロード中...';
     loadingScreen.style.display = '';
+
+    // ボス選択機能を追加
+    const bossCardElements = document.querySelectorAll('.boss-card');
+    console.log('ボスカード要素数:', bossCardElements.length);
+    bossCardElements.forEach((card, index) => {
+        console.log(`ボスカード${index + 1}:`, card.dataset.boss);
+        card.addEventListener('click', () => {
+            console.log('ボスカードがクリックされました:', card.dataset.boss);
+            // 他のカードの選択状態を解除
+            bossCardElements.forEach(c => c.classList.remove('selected'));
+            // このカードを選択状態にする
+            card.classList.add('selected');
+            // 選択されたボスの種類を記録
+            selectedBossType = parseInt(card.dataset.boss, 10);
+            console.log('ボス選択完了:', selectedBossType);
+        });
+    });
 
     // リトライ付きプリロード
     function tryPreload(retryCount = 0) {
@@ -126,10 +144,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         preloadEnemySpriteSheet('blue', () => {
                             preloadEnemySpriteSheet('black', () => {
                                 preloadCannonOniSpriteSheet(() => {
-                                    assetsLoaded = true;
-                                    startButton.disabled = false;
-                                    startButton.textContent = 'ゲームスタート';
-                                    loadingScreen.style.display = 'none';
+                                    // BossOni2の画像プリロードを追加
+                                    preloadBossOni2SpriteSheet(() => {
+                                        assetsLoaded = true;
+                                        startButton.disabled = false;
+                                        startButton.textContent = 'ゲームスタート';
+                                        loadingScreen.style.display = 'none';
+                                    });
                                 });
                             });
                         });
@@ -167,13 +188,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // リスタート時もゲーム画面を維持
     restartButton.addEventListener('click', () => {
+        console.log('リスタートボタンがクリックされました');
+        console.log('現在のselectedBossType:', selectedBossType);
+        
         gameCanvas.classList.remove('hidden');
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
         timerDisplay.classList.remove('hidden'); // タイマー表示を維持
         quickHelp.classList.remove('hidden'); // リスタート時も表示
-        // ステージ選択値を取得
-        const selectedBossType = parseInt(stageSelect.value, 10);
+        // 選択されたボスの種類を使用
+        console.log('ゲーム開始、選択されたボス:', selectedBossType);
         game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType);
     });
 

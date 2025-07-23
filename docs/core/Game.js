@@ -16,6 +16,8 @@ import { ProjectileManager } from '../managers/ProjectileManager.js';
 
 export class Game {
     constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0) {
+        console.log('Game constructor called with selectedBossType:', selectedBossType);
+        
         this.canvas = canvas;
         this.ctx = ctx;
 
@@ -49,6 +51,7 @@ export class Game {
         this.bossStartTime = null;
 
         this.selectedBossType = selectedBossType;
+        console.log('Game constructor - selectedBossType set to:', this.selectedBossType);
 
         // Otomoのレベル・経験値
         this.otomoLevel = 1;
@@ -59,6 +62,9 @@ export class Game {
         this.playerAttackMultiplier = 1;
         this.otomoAttackMultiplier = 1;
 
+        // デバッグモード設定
+        this.debugMode = false;
+        
         // 当たり判定表示設定
         this.debugSettings = {
             showPlayerHitbox: false,
@@ -124,6 +130,15 @@ export class Game {
                 case '3':
                     this.otomo.setMode('charge');
                     break;
+            }
+        });
+
+        // デバッグモード切替（F1キー）
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'F1') {
+                e.preventDefault();
+                this.debugMode = !this.debugMode;
+                console.log(`Debug mode: ${this.debugMode ? 'ON' : 'OFF'}`);
             }
         });
 
@@ -195,22 +210,20 @@ export class Game {
             this.uiManager.updateTimer(`${minutes}:${seconds}`, 'boss');
         }
         
-        // ボス未出現かつ経過時間が設定された時間になったらボス演出＋出現
+        // --- ボス出現・撃破などのギミック管理 ---
         const elapsedTime = this.timer.getElapsedTime(); // 経過時間を取得
         const bossSpawnTime = this.bossSpawnTime || 180; // デフォルト180秒
         if (!this.bossAppeared && elapsedTime >= bossSpawnTime) {
-            console.log('ボス出現条件達成:', { elapsedTime, bossSpawnTime, selectedBossType: this.selectedBossType });
+            // ボス出現処理
             this.bossAppeared = true;
             this.bossCutInStartTime = Date.now();
             this.uiManager.showBossCutIn();
-            this.enemyManager.clearEnemies(); // 通常敵を一掃（任意）
+            this.enemyManager.clearEnemies(); // 通常敵を一掃
             this.enemyManager.spawnBoss(this.selectedBossType);
-            console.log('ボス生成完了、敵数:', this.enemyManager.getEnemies().length);
             this.bossStartTime = Date.now();
-            this.bossSpawnFrame = this.enemyManager.frame; // ボス出現時のフレームを記録
-            this.bossSpawnComplete = false; // ボス生成完了フラグをリセット
+            this.bossSpawnFrame = this.enemyManager.frame;
+            this.bossSpawnComplete = false;
         }
-        // カットインの非表示処理
         if (this.bossCutInStartTime) {
             const cutInElapsed = Date.now() - this.bossCutInStartTime;
             if (cutInElapsed >= 1500) {
@@ -218,54 +231,26 @@ export class Game {
                 this.bossCutInStartTime = null;
             }
         }
-
-        // ボス出現中の処理
         if (this.bossAppeared && !this.bossDefeated) {
             // ボス生成完了フラグの確認
             if (!this.bossSpawnComplete) {
                 const enemies = this.enemyManager.getEnemies();
                 const boss = enemies.find(e => this.isBossEnemy(e));
                 if (boss) {
-                    console.log('ボス生成完了を確認:', { 
-                        bossClass: boss.constructor.name,
-                        enemyCount: enemies.length,
-                        currentFrame: this.enemyManager.frame
-                    });
                     this.bossSpawnComplete = true;
-                } else {
-                    console.log('ボス生成待機中:', { 
-                        currentFrame: this.enemyManager.frame,
-                        spawnFrame: this.bossSpawnFrame,
-                        enemyCount: enemies.length
-                    });
                 }
             }
-            
-            // ボス生成完了後にのみ判定を実行
+            // ボス撃破判定
             if (this.bossSpawnComplete) {
-                // ボス鬼が生きているか判定
                 const enemies = this.enemyManager.getEnemies();
                 const boss = enemies.find(e => this.isBossEnemy(e));
-                console.log('ボス判定:', { 
-                    bossExists: !!boss, 
-                    enemyCount: enemies.length,
-                    enemyTypes: enemies.map(e => e.constructor.name),
-                    currentFrame: this.enemyManager.frame,
-                    spawnFrame: this.bossSpawnFrame,
-                    bossClass: boss ? boss.constructor.name : 'none'
-                });
-                
-                // ボスが存在しない場合の処理
                 if (!boss) {
-                    // ボスがいない＝倒した
-                    console.log('ボスが存在しないためクリア画面を表示');
                     this.bossDefeated = true;
                     this.gameState.setGameOver();
                     this.uiManager.showGameOver('クリア！ボス鬼を倒した！');
                     return;
                 }
             }
-            
             // ボス用タイマー
             const elapsed = Math.floor((Date.now() - this.bossStartTime) / 1000);
             if (elapsed >= this.bossTimer) {
@@ -274,13 +259,13 @@ export class Game {
                 return;
             }
         }
-        // 通常の時間切れはボス未出現時のみ
         if (!this.bossAppeared && this.timer.isTimeUp()) {
             this.gameState.setGameOver();
             this.uiManager.showGameOver('時間切れでゲームオーバー');
             return;
         }
 
+        // --- バトル処理は常に共通 ---
         const { scrollX, scrollY } = this.calcScroll();
 
         // 描画処理を各Managerに委譲（単一責任の原則）
@@ -302,24 +287,22 @@ export class Game {
         if (this.bossAppeared && !this.bossDefeated) {
             // markedForDeletionな敵の削除だけは必ず行う
             this.enemyManager.enemies = this.enemyManager.enemies.filter(enemy => !enemy.markedForDeletion);
-            // ボスだけupdate
+            // 全ての敵をupdate
             this.enemyManager.getEnemies().forEach(enemy => {
-                if (this.isBossEnemy(enemy)) enemy.update();
+                enemy.update();
             });
             this.enemyManager.draw(this.ctx, scrollX, scrollY);
         } else {
             this.enemyManager.update();
             this.enemyManager.draw(this.ctx, scrollX, scrollY);
         }
-        
+
         // プレイヤーとの衝突判定
         this.enemyManager.getEnemies().forEach(enemy => {
             if (this.collisionManager.checkPlayerEnemyCollision(this.player, enemy)) {
                 if (!enemy.markedForDeletion) {
-                    // ボス鬼の場合はダメージを増加
                     const damage = this.isBossEnemy(enemy) ? 40 : 20;
                     this.player.takeDamage(damage);
-                    // パーティクル生成はonDeathで行うのでここでは削除
                 }
             }
         });
@@ -333,14 +316,12 @@ export class Game {
             this.gameState.setGameOver();
         }
 
+        // 攻撃判定（プレイヤー・オトモの攻撃）
         this.attackManager.updateAttackCircle();
-        
         // 弾の描画を先に実行
         this.projectileManager.draw(this.ctx, scrollX, scrollY);
-        
         // 当たり判定の描画
         this.drawHitboxes(scrollX, scrollY);
-        
         // 弾の更新を描画後に実行（当たり判定チェック）
         this.projectileManager.update();
 
