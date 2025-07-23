@@ -71,24 +71,24 @@ export class GameEntity {
 
     // 円形当たり判定
     collidesWithCircular(other) {
-        // 視覚的サイズを基準に半径と中心位置を計算
+        // 雑魚鬼の挙動に合わせてcollisionRadius未設定ならMath.min(width, height)/2
         const thisVisualWidth = this.visualWidth || this.width;
         const thisVisualHeight = this.visualHeight || this.height;
         const otherVisualWidth = other.visualWidth || other.width;
         const otherVisualHeight = other.visualHeight || other.height;
-        
-        const thisRadius = this.collisionRadius || Math.min(thisVisualWidth, thisVisualHeight) / 2;
-        const otherRadius = other.collisionRadius || Math.min(otherVisualWidth, otherVisualHeight) / 2;
-        
+
+        const thisRadius = (typeof this.collisionRadius === 'number' ? this.collisionRadius : Math.min(thisVisualWidth, thisVisualHeight) / 2);
+        const otherRadius = (typeof other.collisionRadius === 'number' ? other.collisionRadius : Math.min(otherVisualWidth, otherVisualHeight) / 2);
+
         const thisCenterX = this.x + thisVisualWidth / 2;
         const thisCenterY = this.y + thisVisualHeight / 2;
         const otherCenterX = other.x + otherVisualWidth / 2;
         const otherCenterY = other.y + otherVisualHeight / 2;
-        
+
         const dx = thisCenterX - otherCenterX;
         const dy = thisCenterY - otherCenterY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
+
         return distance < (thisRadius + otherRadius);
     }
 

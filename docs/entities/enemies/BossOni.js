@@ -7,7 +7,7 @@ import { Enemy } from '../base/Enemy.js';
  */
 export class BossOni extends Enemy {
     constructor(game, x = null, y = null) {
-        super(game, 'gold', 300);
+        super(game, x, y);
         this.width = 250;
         this.height = 250;
         this.speed -= 1;
@@ -128,4 +128,21 @@ export class BossOni extends Enemy {
     }
 
 
-} 
+    // HPプロパティへの統一アクセサを追加
+    get hp() {
+        return this._hp;
+    }
+    
+    get maxHP() {
+        return this._maxHP;
+    }
+    
+    set hp(value) {
+        this._hp = value;
+    }
+    
+    set maxHP(value) {
+        this._maxHP = value;
+    }
+    
+}

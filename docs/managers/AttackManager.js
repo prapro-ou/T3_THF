@@ -117,25 +117,31 @@ export class AttackManager {
                     );
                 } else {
                     // 通常の判定
+                    const ex = (typeof enemy.centerX === 'number') ? enemy.centerX : (enemy.x + enemy.width / 2);
+                    const ey = (typeof enemy.centerY === 'number') ? enemy.centerY : (enemy.y + enemy.height / 2);
+                    const enemyRadius = (typeof enemy.collisionRadius === 'number') ? enemy.collisionRadius : Math.min(enemy.width, enemy.height) / 2;
                     const playerToEnemyDist = Math.sqrt(
-                        Math.pow(player.x - (enemy.x + enemy.width / 2), 2) +
-                        Math.pow(player.y - (enemy.y + enemy.height / 2), 2)
+                        Math.pow(player.x - ex, 2) +
+                        Math.pow(player.y - ey, 2)
                     );
                     
                     const attackToEnemyDist = Math.sqrt(
-                        Math.pow(attackX - (enemy.x + enemy.width / 2), 2) +
-                        Math.pow(attackY - (enemy.y + enemy.height / 2), 2)
+                        Math.pow(attackX - ex, 2) +
+                        Math.pow(attackY - ey, 2)
                     );
                     
-                    isHit = playerToEnemyDist <= attackRadius || attackToEnemyDist <= attackRadius;
+                    isHit = playerToEnemyDist <= attackRadius + enemyRadius || attackToEnemyDist <= attackRadius + enemyRadius;
                 }
             } else {
                 // プレイヤー情報がない場合の通常判定
+                const ex = (typeof enemy.centerX === 'number') ? enemy.centerX : (enemy.x + enemy.width / 2);
+                const ey = (typeof enemy.centerY === 'number') ? enemy.centerY : (enemy.y + enemy.height / 2);
+                const enemyRadius = (typeof enemy.collisionRadius === 'number') ? enemy.collisionRadius : Math.min(enemy.width, enemy.height) / 2;
                 const attackToEnemyDist = Math.sqrt(
-                    Math.pow(attackX - (enemy.x + enemy.width / 2), 2) +
-                    Math.pow(attackY - (enemy.y + enemy.height / 2), 2)
+                    Math.pow(attackX - ex, 2) +
+                    Math.pow(attackY - ey, 2)
                 );
-                isHit = attackToEnemyDist <= attackRadius;
+                isHit = attackToEnemyDist <= attackRadius + enemyRadius;
             }
             
             console.log('Enemy Attack Check:', {
