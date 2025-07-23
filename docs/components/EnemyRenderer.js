@@ -321,10 +321,79 @@ export class EnemyRenderer {
         }
 
         // HPバー描画
-        const visualWidth = enemy.visualWidth || enemy.width;
-        const barWidth = visualWidth;
-        const barHeight = 6;
-        const healthBar = new HealthBar(drawX, drawY - barHeight - 2, barWidth, barHeight, enemy.health, enemy.maxHP, '#f00');
-        healthBar.draw(ctx, 0, 0);
+        this.drawHealthBar(ctx, enemy, drawX, drawY);
     }
-} 
+
+    drawHealthBar(ctx, enemy, x, y) {
+        // より安全なHP値の取得方法
+        let currentHP, maxHP;
+        
+        // 複数の方法でHP値を取得を試行
+        if (typeof enemy.hp !== 'undefined') {
+            currentHP = enemy.hp;
+        } else if (typeof enemy._hp !== 'undefined') {
+            currentHP = enemy._hp;
+        } else {
+            console.warn(`HPが取得できません: ${enemy.constructor.name}`);
+            return;
+        }
+        
+        if (typeof enemy.maxHP !== 'undefined') {
+            maxHP = enemy.maxHP;
+        } else if (typeof enemy._maxHP !== 'undefined') {
+            maxHP = enemy._maxHP;
+        } else {
+            console.warn(`maxHPが取得できません: ${enemy.constructor.name}`);
+            return;
+        }
+        
+        // 値の妥当性チェック
+        if (currentHP < 0 || maxHP <= 0 || currentHP > maxHP) {
+            console.warn(`HP値が異常: ${enemy.constructor.name} HP=${currentHP}/${maxHP}`);
+            return;
+        }
+        
+        // HPバーのサイズと位置を計算
+        const barWidth = 40;
+        const barHeight = 6;
+        const hpRatio = currentHP / maxHP;
+        
+        // 敵の中心位置を計算
+        const visualWidth = enemy.visualWidth || enemy.width;
+        const visualHeight = enemy.visualHeight || enemy.height;
+        const centerX = x + visualWidth / 2;
+        
+        // HPバーのY位置を計算（radiusが未定義の場合の対処）
+        let barY;
+        if (typeof enemy.radius !== 'undefined') {
+            barY = y - enemy.radius - 15;
+        } else {
+            // radiusが未定義の場合は敵の上端から15ピクセル上に配置
+            barY = y - 15;
+        }
+        
+        // HPバーのX位置（中央揃え）
+        const barX = centerX - barWidth / 2;
+        
+        // 背景（赤）
+        ctx.fillStyle = '#ff0000';
+        ctx.fillRect(barX, barY, barWidth, barHeight);
+        
+        // HP（緑）
+        ctx.fillStyle = '#00ff00';
+        const currentBarWidth = barWidth * hpRatio;
+        ctx.fillRect(barX, barY, currentBarWidth, barHeight);
+        
+        // 枠線
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barX, barY, barWidth, barHeight);
+        
+        // デバッグ用：HP値を数値で表示
+        if (this.game.debugMode) {
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '10px Arial';
+            ctx.fillText(`${Math.floor(currentHP)}/${maxHP}`, barX, barY - 5);
+        }
+    }
+}
