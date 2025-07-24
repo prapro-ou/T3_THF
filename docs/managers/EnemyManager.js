@@ -182,4 +182,8 @@ export class EnemyManager {
         this.frame = 0;
         this.spawnTimer = 0;
     }
+
+    clearAllEnemies() {
+        this.enemies = [];
+    }
 } 

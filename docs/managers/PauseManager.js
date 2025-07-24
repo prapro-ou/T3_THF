@@ -3,15 +3,24 @@
         this.game = game;
         this.uiManager = uiManager;
         this.isPaused = false;
+        this.pauseKeyHandler = null;
+        this.visibilityChangeHandler = null;
         this.setupPauseKey();
     }
 
     setupPauseKey() {
-        window.addEventListener('keydown', (e) => {
+        this.pauseKeyHandler = (e) => {
             if (e.key.toLowerCase() === 'p') {
                 this.togglePause();
             }
-        });
+        };
+        
+        this.visibilityChangeHandler = () => {
+            this.handleVisibilityChange();
+        };
+        
+        window.addEventListener('keydown', this.pauseKeyHandler);
+        document.addEventListener('visibilitychange', this.visibilityChangeHandler);
     }
 
     togglePause() {
@@ -44,5 +53,21 @@
         if (document.hidden && !this.isPaused) {
             this.pause();
         }
+    }
+
+    destroy() {
+        // イベントリスナーを削除
+        if (this.pauseKeyHandler) {
+            window.removeEventListener('keydown', this.pauseKeyHandler);
+        }
+        if (this.visibilityChangeHandler) {
+            document.removeEventListener('visibilitychange', this.visibilityChangeHandler);
+        }
+        
+        // 参照をクリア
+        this.game = null;
+        this.uiManager = null;
+        this.pauseKeyHandler = null;
+        this.visibilityChangeHandler = null;
     }
 } 

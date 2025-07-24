@@ -96,4 +96,13 @@
     getMapDimensions() {
         return { width: this.MAP_W, height: this.MAP_H };
     }
+
+    // ミニマップ用に背景画像とロード状態を取得
+    getBackgroundForMinimap() {
+        return {
+            image: this.mapImage,
+            loaded: this.mapImageLoaded,
+            src: this._lastMapSrc
+        };
+    }
 } 
