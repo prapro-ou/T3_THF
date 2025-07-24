@@ -72,4 +72,9 @@
         
         return totalElapsed;
     }
+
+    stop() {
+        this.isPaused = true;
+        this.lastTimerResume = null;
+    }
 } 
