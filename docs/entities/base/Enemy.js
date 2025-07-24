@@ -29,6 +29,15 @@ export class Enemy extends Character {
         console.log('Enemy constructor finished - _maxHP:', this._maxHP, '_hp:', this._hp); // デバッグログ
     }
 
+    // 統一的なHPアクセサがない場合は追加
+    get hp() {
+        return this._hp !== undefined ? this._hp : this.health;
+    }
+    
+    get maxHP() {
+        return this._maxHP !== undefined ? this._maxHP : this.maxHealth;
+    }
+
     // カプセル化: 移動関連のプロパティへのアクセスを制御
     get speed() { return this._speed; }
     set speed(value) { this._speed = Math.max(0, value); }
@@ -126,4 +135,4 @@ export class Enemy extends Character {
                 };
         }
     }
-} 
+}

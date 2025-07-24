@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadingScreen = document.getElementById('loading-screen');
     const stageSelect = document.getElementById('stageSelect');
     const stageSelectArea = document.getElementById('stageSelectArea');
+    const minimapContainer = document.getElementById('minimapContainer');
     
     // デバッグパネルの要素
     const debugPanel = document.getElementById('debugPanel');
@@ -200,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
         timerDisplay.classList.remove('hidden'); // タイマー表示を維持
+        minimapContainer.classList.remove('hidden'); // ミニマップ表示
         quickHelp.classList.remove('hidden'); // リスタート時も表示
         // 選択されたボスの種類を使用
         console.log('ゲーム開始、選択されたボス:', selectedBossType);
@@ -232,13 +234,20 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreDisplay.classList.add('hidden');
         livesDisplay.classList.add('hidden');
         timerDisplay.classList.add('hidden');
+        minimapContainer.classList.add('hidden'); // ミニマップ非表示
         gameOverMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        
+        // otomoLevelDisplayも非表示にする
+        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+        if (otomoLevelDisplay) {
+            otomoLevelDisplay.classList.add('hidden');
+        }
         
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
             if (game) {
-                game.stop(); // ゲームを停止
+                game.destroy(); // ゲームを完全に破棄
                 game = null; // ゲームインスタンスをリセット
             }
             bgmManager.play('mainBgm');
@@ -272,13 +281,20 @@ document.addEventListener('DOMContentLoaded', () => {
         scoreDisplay.classList.add('hidden');
         livesDisplay.classList.add('hidden');
         timerDisplay.classList.add('hidden');
+        minimapContainer.classList.add('hidden'); // ミニマップ非表示
         pauseMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        
+        // otomoLevelDisplayも非表示にする
+        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+        if (otomoLevelDisplay) {
+            otomoLevelDisplay.classList.add('hidden');
+        }
         
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
             if (game) {
-                game.stop(); // ゲームを停止
+                game.destroy(); // ゲームを完全に破棄
                 game = null; // ゲームインスタンスをリセット
             }
             bgmManager.play('mainBgm');
@@ -470,6 +486,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 scoreDisplay.classList.remove('hidden');
                 livesDisplay.classList.remove('hidden');
                 timerDisplay.classList.remove('hidden');
+                minimapContainer.classList.remove('hidden'); // ミニマップ表示
                 quickHelp.classList.remove('hidden');
                 
                 // ゲーム開始
