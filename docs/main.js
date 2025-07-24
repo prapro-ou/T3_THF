@@ -1,6 +1,7 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
 import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet } from './components/EnemyRenderer.js';
+import { BgmManager } from './managers/BgmManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -34,6 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const pauseHelpButton = document.getElementById('pauseHelpButton');
     const pauseBackToStartButton = document.getElementById('pauseBackToStartButton');
     
+    // BGMの再生
+    const bgmManager = new BgmManager();
+    bgmManager.play('mainBgm');
+
     // 障子風アニメーション用の要素
     const shojiContainer = document.querySelector('.shoji-container');
 
@@ -175,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!assetsLoaded) return; // 念のため
         
         console.log('スタートボタンがクリックされました');
-        
+
         // 障子風アニメーションでボス選択画面へ（開く方向）
         switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
             console.log('障子アニメーション完了');
@@ -198,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         quickHelp.classList.remove('hidden'); // リスタート時も表示
         // 選択されたボスの種類を使用
         console.log('ゲーム開始、選択されたボス:', selectedBossType);
-        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType);
+        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
     });
 
     // 操作説明表示
@@ -236,6 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 game.stop(); // ゲームを停止
                 game = null; // ゲームインスタンスをリセット
             }
+            bgmManager.play('mainBgm');
         });
     });
 
@@ -275,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 game.stop(); // ゲームを停止
                 game = null; // ゲームインスタンスをリセット
             }
+            bgmManager.play('mainBgm');
         });
     });
     
@@ -466,7 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 quickHelp.classList.remove('hidden');
                 
                 // ゲーム開始
-                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType);
+                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
                 // cannon_ballのスプライトシートも読み込み
                 if (game && game.projectileManager) {
                     game.projectileManager.preloadCannonBallSpriteSheet(() => {
