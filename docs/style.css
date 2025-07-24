@@ -288,9 +288,73 @@ button:hover,
 #startButton:hover,
 #help:hover {
     background: linear-gradient(90deg, #e6b422 60%, #fffbe7 100%);
-    color: #fffbe7;
-    box-shadow: 0 0 16px #e6b42288;
+}
+
+/* 画像ボタン用スタイル */
+.image-btn {
+    border: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    padding: 0 !important;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    max-width: 300px;
+    height: auto;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    display: inline-block;
+}
+
+.image-btn:hover {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    transform: translateY(-2px) scale(1.04);
+    filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    box-shadow: none !important;
+}
+
+/* 小さい画像ボタン用スタイル */
+#backToStartButton.image-btn,
+#closeHelp.image-btn {
+    max-width: 150px;
+}
+
+/* 戻るボタンの位置調整 */
+#backToStartButton.image-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    max-width: 120px;
+}
+
+/* ボタンコンテナのスタイル調整 */
+.pause-buttons .image-btn,
+.game-over-buttons .image-btn {
+    max-width: 200px;
+    margin: 5px;
+}
+
+/* ボス選択画像ボタン用スタイル */
+.boss-select-btn {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    object-fit: contain;
+    border-radius: 0 !important;
+}
+
+.boss-select-btn:hover {
     transform: scale(1.05);
+    filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 #restartButton {
@@ -325,7 +389,6 @@ button:hover,
 /* ===== UIパネル ===== */
 .ui-panel,
 #score,
-#ammo,
 #timer,
 #helpPanel,
 .hud,
@@ -386,17 +449,73 @@ button:hover,
 #scoreDisplay {
     top: 8px;
     left: 12px;
+    color: #fff;
+    background: url('assets/UI/UI/score_UI.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 1em;
+    padding: 0.5em 1em;
+    box-shadow: none;
+    min-width: 200px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    position: absolute;
+    z-index: 10;
 }
 
 #livesDisplay {
     bottom: 12px;
     left: 12px;
     font-size: 0.92em;
+    color: #fff;
+    background: url('assets/UI/UI/bullet_gauge_UI.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    font-weight: 700;
+    padding: 0.5em 1em;
+    box-shadow: none;
+    min-width: 150px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    position: absolute;
+    z-index: 10;
+    padding-right: 20px;
 }
 
 #timerDisplay {
-    top: 8px;
-    right: 12px;
+    top: 0px;
+    right: 2px;
+    color: #fff;
+    background: url('assets/UI/UI/timer_UI.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 0.85em;
+    padding: 0.5em 1em;
+    box-shadow: none;
+    min-width: 200px;
+    min-height: 80px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: left;
+    position: absolute;
+    z-index: 10;
+    padding-left: 28px;
+    padding-top: 40px;
 }
 
 #timer,
@@ -406,48 +525,60 @@ button:hover,
     font-size: 1.2em;
 }
 
-#ammo {
-    color: #fff;
-    background: #2a2a2a;
-    border: 2px solid #C1272D;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1.1em;
-    padding: 0.2em 0.7em;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
 /* ===== ヘルプ・説明 ===== */
 #quickHelp {
     position: absolute;
-    bottom: 12px;
-    right: 12px;
-    min-width: 60px;
-    max-width: 120px;
-    font-size: 0.92em;
-    padding: 0.18em 0.5em;
+    bottom: 350px;
+    right: -180px;
+    min-width: 150px;
+    min-height: 120px;
+    font-size: 0.85em;
+    padding: 20px 15px;
     z-index: 10;
-    background: rgba(42, 42, 42, 0.95);
-    border: 3px solid #C1272D;
-    border-radius: 16px;
-    color: #fff;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 2px 12px rgba(0, 0, 0, 0.2);
-    text-align: left;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
     font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
     pointer-events: none;
     user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+    line-height: 1.2;
 }
 
-#helpPanel,
-#quickHelp {
-    background: #2a2a2a;
-    color: #fff;
-    border: 2px solid #C1272D;
-    border-radius: 12px;
+#otomoLevelDisplay {
+    position: absolute;
+    bottom: 320px;
+    right: 80px;
+    min-width: 200px;
+    min-height: 80px;
     font-size: 1em;
-    font-family: 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    padding: 1em 1.5em;
+    padding: 15px 20px;
+    z-index: 10;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+    line-height: 1.2;
 }
 
 /* ヘルプモーダル */
@@ -801,12 +932,12 @@ button:hover,
 }
 
 .boss-card {
-    min-width: 250px;
-    max-width: min(22vw, 22vh, 320px);
-    width: 18vw;
-    min-height: 250px;
-    max-height: min(22vw, 22vh, 320px);
-    height: 18vw;
+    min-width: 350px;
+    max-width: min(30vw, 30vh, 450px);
+    width: 26vw;
+    min-height: 350px;
+    max-height: min(30vw, 30vh, 450px);
+    height: 26vw;
     font-size: 1.1em;
     z-index: 1;
     position: relative;
@@ -815,14 +946,15 @@ button:hover,
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    background: #fff;
-    border: 3px solid #C1272D;
-    border-radius: 18px;
-    transition: border 0.2s, box-shadow 0.2s, transform 0.15s;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    transition: transform 0.15s;
     color: #2d1a1a;
     font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
     font-weight: 600;
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
 .boss-card[data-boss="5"] {
@@ -834,7 +966,7 @@ button:hover,
     height: 22vw;
     font-size: 1.3em;
     z-index: 2;
-    border-width: 4px;
+    border: none !important;
 }
 
 .boss-card img {
@@ -866,11 +998,12 @@ button:hover,
 
 .boss-card.selected,
 .boss-card:hover {
-    border: 4px solid #C1272D;
+    border: none !important;
     color: #C1272D;
-    background: #f7f7f7;
+    background: none !important;
+    background-color: transparent !important;
     transform: scale(1.07) rotate(-1deg);
-    box-shadow: 0 0 0 2px #C1272D33;
+    box-shadow: none !important;
 }
 
 .boss-name {
