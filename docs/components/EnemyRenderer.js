@@ -353,14 +353,26 @@ export class EnemyRenderer {
             return;
         }
         
-        // HPバーのサイズと位置を計算
-        const barWidth = 40;
-        const barHeight = 6;
+        // 敵の種類によってHPバーのサイズを調整
+        const visualWidth = enemy.visualWidth || enemy.width;
+        const visualHeight = enemy.visualHeight || enemy.height;
+        const isBossEnemy = enemy.constructor.name.startsWith('BossOni');
+        
+        // HPバーのサイズを敵の大きさに合わせて計算
+        let barWidth, barHeight;
+        if (isBossEnemy) {
+            // BOSS鬼の場合：幅を敵の幅の80%、高さは8px
+            barWidth = Math.max(60, visualWidth * 0.8); // 最小60px
+            barHeight = 8;
+        } else {
+            // 通常の敵の場合：従来の固定サイズ
+            barWidth = 40;
+            barHeight = 6;
+        }
+        
         const hpRatio = currentHP / maxHP;
         
         // 敵の中心位置を計算
-        const visualWidth = enemy.visualWidth || enemy.width;
-        const visualHeight = enemy.visualHeight || enemy.height;
         const centerX = x + visualWidth / 2;
         
         // HPバーのY位置を計算（radiusが未定義の場合の対処）
@@ -369,11 +381,22 @@ export class EnemyRenderer {
             barY = y - enemy.radius - 15;
         } else {
             // radiusが未定義の場合は敵の上端から15ピクセル上に配置
-            barY = y - 15;
+            // BOSS鬼の場合は少し上に配置
+            const offset = isBossEnemy ? 20 : 15;
+            barY = y - offset;
         }
         
         // HPバーのX位置（中央揃え）
         const barX = centerX - barWidth / 2;
+        
+        // BOSS鬼の場合は背景に少し透明度を追加
+        if (isBossEnemy) {
+            ctx.save();
+            ctx.globalAlpha = 0.9;
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(barX - 2, barY - 2, barWidth + 4, barHeight + 4);
+            ctx.restore();
+        }
         
         // 背景（赤）
         ctx.fillStyle = '#ff0000';
@@ -392,8 +415,10 @@ export class EnemyRenderer {
         // デバッグ用：HP値を数値で表示
         if (this.game.debugMode) {
             ctx.fillStyle = '#ffffff';
-            ctx.font = '10px Arial';
-            ctx.fillText(`${Math.floor(currentHP)}/${maxHP}`, barX, barY - 5);
+            ctx.font = isBossEnemy ? '12px Arial' : '10px Arial';
+            const text = `${Math.floor(currentHP)}/${maxHP}`;
+            const textWidth = ctx.measureText(text).width;
+            ctx.fillText(text, centerX - textWidth / 2, barY - 5);
         }
     }
 }

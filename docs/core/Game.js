@@ -96,13 +96,17 @@ export class Game {
     }
 
     setupEvents() {
+        // イベントハンドラーを保存してあとで削除できるようにする
+        this.eventHandlers = {};
+        
         // 右クリックを無効化
-        this.canvas.addEventListener('contextmenu', (e) => {
+        this.eventHandlers.contextmenu = (e) => {
             e.preventDefault();
-        });
+        };
+        this.canvas.addEventListener('contextmenu', this.eventHandlers.contextmenu);
 
         // 左クリック：playerの弾攻撃のみ
-        this.canvas.addEventListener('mousedown', (event) => {
+        this.eventHandlers.mousedown = (event) => {
             if (event.button !== 0) return;
             if (this.gameState.isGameOver()) return;
             if (this.pauseManager.isPaused) return;
@@ -115,10 +119,11 @@ export class Game {
             }
             this.player.ammoManager.consumeAmmo();
             this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
-        });
+        };
+        this.canvas.addEventListener('mousedown', this.eventHandlers.mousedown);
 
         // Otomoのモード切替（数字キー）
-        window.addEventListener('keydown', (e) => {
+        this.eventHandlers.otomoKeydown = (e) => {
             if (!this.otomo) return;
             switch (e.key) {
                 case '1':
@@ -131,25 +136,28 @@ export class Game {
                     this.otomo.setMode('charge');
                     break;
             }
-        });
+        };
+        window.addEventListener('keydown', this.eventHandlers.otomoKeydown);
 
         // デバッグモード切替（F1キー）
-        window.addEventListener('keydown', (e) => {
+        this.eventHandlers.debugKeydown = (e) => {
             if (e.key === 'F1') {
                 e.preventDefault();
                 this.debugMode = !this.debugMode;
                 console.log(`Debug mode: ${this.debugMode ? 'ON' : 'OFF'}`);
             }
-        });
+        };
+        window.addEventListener('keydown', this.eventHandlers.debugKeydown);
 
         this.uiManager.setRestartCallback(() => {
             this.initializeGame();
         });
 
         // ページの可視性変更時の処理
-        document.addEventListener('visibilitychange', () => {
+        this.eventHandlers.visibilitychange = () => {
             this.pauseManager.handleVisibilityChange();
-        });
+        };
+        document.addEventListener('visibilitychange', this.eventHandlers.visibilitychange);
     }
 
     initializeGame() {
@@ -329,6 +337,10 @@ export class Game {
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
         // オトモレベルUIを毎フレーム更新
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
+        
+        // ミニマップを更新（背景画像も含む）
+        const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
+        this.uiManager.updateMinimap(this.player, this.enemyManager.getEnemies(), mapWidth, mapHeight, scrollX, scrollY, this.renderer);
 
         this.enemyManager.incrementFrame();
 
@@ -514,6 +526,71 @@ export class Game {
         if (this.gameState.getAnimationId()) {
             cancelAnimationFrame(this.gameState.getAnimationId());
         }
+    }
+
+    // ゲームを完全に破棄する関数
+    destroy() {
+        console.log('Game destroy called');
+        
+        // アニメーションループを停止
+        if (this.gameState.getAnimationId()) {
+            cancelAnimationFrame(this.gameState.getAnimationId());
+            this.gameState.setAnimationId(null);
+        }
+        
+        // イベントリスナーを削除
+        if (this.eventHandlers) {
+            if (this.canvas && this.eventHandlers.contextmenu) {
+                this.canvas.removeEventListener('contextmenu', this.eventHandlers.contextmenu);
+            }
+            if (this.canvas && this.eventHandlers.mousedown) {
+                this.canvas.removeEventListener('mousedown', this.eventHandlers.mousedown);
+            }
+            if (this.eventHandlers.otomoKeydown) {
+                window.removeEventListener('keydown', this.eventHandlers.otomoKeydown);
+            }
+            if (this.eventHandlers.debugKeydown) {
+                window.removeEventListener('keydown', this.eventHandlers.debugKeydown);
+            }
+            if (this.eventHandlers.visibilitychange) {
+                document.removeEventListener('visibilitychange', this.eventHandlers.visibilitychange);
+            }
+            this.eventHandlers = null;
+        }
+        
+        // すべてのマネージャーをクリア
+        if (this.enemyManager) {
+            this.enemyManager.reset();
+            this.enemyManager.clearAllEnemies();
+        }
+        
+        if (this.particleManager) {
+            this.particleManager.clearParticles();
+        }
+        
+        if (this.projectileManager) {
+            this.projectileManager.reset();
+        }
+        
+        if (this.inputManager) {
+            this.inputManager.destroy();
+        }
+        
+        if (this.pauseManager) {
+            this.pauseManager.destroy();
+        }
+        
+        if (this.timer) {
+            this.timer.stop();
+        }
+        
+        // オブジェクト参照をクリア
+        this.player = null;
+        this.otomo = null;
+        this.canvas = null;
+        this.ctx = null;
+        
+        console.log('Game destroyed successfully');
     }
 
     togglePause() {
