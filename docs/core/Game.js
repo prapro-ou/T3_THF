@@ -13,13 +13,15 @@ import { CameraManager } from '../managers/CameraManager.js';
 import { PlayerController } from '../components/PlayerController.js';
 import { Otomo } from '../entities/Otomo.js';
 import { ProjectileManager } from '../managers/ProjectileManager.js';
+import { BgmManager } from '../managers/BgmManager.js';
 
 export class Game {
-    constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0) {
+    constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0, bgmManager = null) {
         console.log('Game constructor called with selectedBossType:', selectedBossType);
         
         this.canvas = canvas;
         this.ctx = ctx;
+        this.bgmManager = bgmManager;
 
         // 各マネージャーの初期化
         this.renderer = new RenderManager(canvas, ctx);
@@ -189,6 +191,10 @@ export class Game {
         this.bossSpawnComplete = false;
         
         this.animate();
+
+        if (this.bgmManager) {
+            this.bgmManager.play('battleBgm');
+        }
     }
 
     calcScroll() {
@@ -198,6 +204,9 @@ export class Game {
     animate() {
         if (this.gameState.isGameOver()) {
             this.uiManager.showGameOver();
+            if (this.bgmManager) {
+                this.bgmManager.stop();
+            }
             return;
         }
         
@@ -229,8 +238,17 @@ export class Game {
             this.enemyManager.clearEnemies(); // 通常敵を一掃
             this.enemyManager.spawnBoss(this.selectedBossType);
             this.bossStartTime = Date.now();
-            this.bossSpawnFrame = this.enemyManager.frame;
-            this.bossSpawnComplete = false;
+
+            this.bossSpawnFrame = this.enemyManager.frame; // ボス出現時のフレームを記録
+            this.bossSpawnComplete = false; // ボス生成完了フラグをリセット
+            if (this.bgmManager) {
+                if (this.selectedBossType === 5) {
+                    this.bgmManager.play('lastbossBgm');
+                }else {
+                    this.bgmManager.play('bossBgm');
+                }
+            }
+
         }
         if (this.bossCutInStartTime) {
             const cutInElapsed = Date.now() - this.bossCutInStartTime;
