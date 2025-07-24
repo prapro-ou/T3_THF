@@ -233,6 +233,12 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
         
+        // otomoLevelDisplayも非表示にする
+        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+        if (otomoLevelDisplay) {
+            otomoLevelDisplay.classList.add('hidden');
+        }
+        
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
             if (game) {
@@ -272,6 +278,12 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         pauseMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        
+        // otomoLevelDisplayも非表示にする
+        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+        if (otomoLevelDisplay) {
+            otomoLevelDisplay.classList.add('hidden');
+        }
         
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
