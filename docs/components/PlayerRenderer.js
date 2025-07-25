@@ -70,8 +70,8 @@ export class PlayerRenderer {
         const { width: mapWidth, height: mapHeight } = this.renderer.getMapDimensions();
         
         // プレイヤーは画面中央に描画
-        let drawX = viewWidth / 2 - player.width / 2;
-        let drawY = viewHeight / 2 - player.height / 2;
+        let drawX = viewWidth / 2 
+        let drawY = viewHeight / 2 
         if (player.x < viewWidth / 2) drawX = player.x - scrollX - player.width / 2;
         if (player.x > mapWidth - viewWidth / 2) drawX = player.x - scrollX - player.width / 2;
         if (player.y < viewHeight / 2) drawY = player.y - scrollY - player.height / 2;
