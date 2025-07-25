@@ -39,8 +39,8 @@ export class CollisionManager {
     // 高速移動時のプレイヤー-敵衝突判定
     checkPlayerEnemyCollisionWithMovement(player, enemy, playerPrevX, playerPrevY) {
         // 桃太郎と敵の中心座標を計算
-        const playerCenterX = player.x;
-        const playerCenterY = player.y;
+        const playerCenterX = player.x+ player.width / 2;
+        const playerCenterY = player.y + player.height / 2;
         const enemyCenterX = enemy.x + enemy.width / 2;
         const enemyCenterY = enemy.y + enemy.height / 2;
         
