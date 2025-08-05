@@ -86,9 +86,6 @@ export class BossOni extends Enemy {
     }
 
 
-
-
-
     // 円形当たり判定を設定
     setCircularCollision(radius) {
         this.useCircularCollision = true;

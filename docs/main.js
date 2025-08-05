@@ -1,6 +1,7 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
 import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet } from './components/EnemyRenderer.js';
+import { BgmManager } from './managers/BgmManager.js';
 
 document.addEventListener('DOMContentLoaded', async () => {
     // ふすま効果音のみ登録
@@ -61,6 +62,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resumeButton = document.getElementById('resumeButton');
     const pauseHelpButton = document.getElementById('pauseHelpButton');
     const pauseBackToStartButton = document.getElementById('pauseBackToStartButton');
+
+    // BGMの再生
+    const bgmManager = new BgmManager();
+    bgmManager.play('mainBgm');
 
     // 障子風アニメーション用の要素
     const shojiContainer = document.querySelector('.shoji-container');
@@ -229,7 +234,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         quickHelp.classList.remove('hidden'); // リスタート時も表示
         // 選択されたボスの種類を使用
         console.log('ゲーム開始、選択されたボス:', selectedBossType);
-        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType);
+        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType, bgmManager);
     });
 
     // 操作説明表示
@@ -274,6 +279,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 game.destroy(); // ゲームを完全に破棄
                 game = null; // ゲームインスタンスをリセット
             }
+            bgmManager.play('mainBgm');
         });
     });
 
@@ -320,6 +326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 game.destroy(); // ゲームを完全に破棄
                 game = null; // ゲームインスタンスをリセット
             }
+            bgmManager.play('mainBgm');
         });
     });
 
@@ -512,7 +519,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 quickHelp.classList.remove('hidden');
 
                 // ゲーム開始
-                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType);
+                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType, bgmManager);
                 // cannon_ballのスプライトシートも読み込み
                 if (game && game.projectileManager) {
                     game.projectileManager.preloadCannonBallSpriteSheet(() => {
