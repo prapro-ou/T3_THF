@@ -36,9 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const pauseHelpButton = document.getElementById('pauseHelpButton');
     const pauseBackToStartButton = document.getElementById('pauseBackToStartButton');
     
-    // BGMの再生
+    // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
     const bgmManager = new BgmManager();
-    bgmManager.play('mainBgm');
+    bgmManager.play('mainBgm'); // ユーザー操作後まで保留される
 
     // 障子風アニメーション用の要素
     const shojiContainer = document.querySelector('.shoji-container');
