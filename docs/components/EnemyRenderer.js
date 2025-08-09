@@ -9,7 +9,9 @@ const enemySpriteSheets = {
     black: { sheet: null, loaded: false },
     boss: { sheet: null, loaded: false },
     cannon: { sheet: null, loaded: false },
-    boss2: { sheet: null, loaded: false } // BossOni2用
+    boss2: { sheet: null, loaded: false }, // BossOni2用
+    fuzin: { sheet: null, loaded: false }, // BossOni4用（風神）
+    raizin: { sheet: null, loaded: false } // BossOni5用（雷神）
 };
 
 // 赤鬼のスプライトシート読み込み
@@ -194,6 +196,72 @@ export function preloadBossOni2SpriteSheet(callback) {
         });
 }
 
+// BossOni4（風神）のスプライトシート読み込み
+export function preloadFuzinSpriteSheet(callback) {
+    if (enemySpriteSheets.fuzin && enemySpriteSheets.fuzin.loaded) {
+        return callback();
+    }
+    fetch('assets/characters/oni/fuzin_raizin/fuzin.json')
+        .then(res => {
+            if (!res.ok) throw new Error('Fuzin JSON not found');
+            return res.json();
+        })
+        .then(json => {
+            let retryCount = 0;
+            const maxRetries = 10;
+            function tryLoadImage() {
+                const img = new Image();
+                img.src = `assets/characters/oni/fuzin_raizin/fuzin.png?${new Date().getTime()}`;
+                img.onload = () => {
+                    if (!enemySpriteSheets.fuzin) enemySpriteSheets.fuzin = { sheet: null, loaded: false };
+                    enemySpriteSheets.fuzin.sheet = new SpriteSheet(img, json);
+                    enemySpriteSheets.fuzin.loaded = true;
+                    callback();
+                };
+                img.onerror = () => {
+                    retryCount++;
+                    if (retryCount < maxRetries) setTimeout(tryLoadImage, 500);
+                    else callback();
+                };
+            }
+            tryLoadImage();
+        })
+        .catch(() => callback());
+}
+
+// BossOni5（雷神）のスプライトシート読み込み
+export function preloadRaizinSpriteSheet(callback) {
+    if (enemySpriteSheets.raizin && enemySpriteSheets.raizin.loaded) {
+        return callback();
+    }
+    fetch('assets/characters/oni/fuzin_raizin/raizin.json')
+        .then(res => {
+            if (!res.ok) throw new Error('Raizin JSON not found');
+            return res.json();
+        })
+        .then(json => {
+            let retryCount = 0;
+            const maxRetries = 10;
+            function tryLoadImage() {
+                const img = new Image();
+                img.src = `assets/characters/oni/fuzin_raizin/raizin.png?${new Date().getTime()}`;
+                img.onload = () => {
+                    if (!enemySpriteSheets.raizin) enemySpriteSheets.raizin = { sheet: null, loaded: false };
+                    enemySpriteSheets.raizin.sheet = new SpriteSheet(img, json);
+                    enemySpriteSheets.raizin.loaded = true;
+                    callback();
+                };
+                img.onerror = () => {
+                    retryCount++;
+                    if (retryCount < maxRetries) setTimeout(tryLoadImage, 500);
+                    else callback();
+                };
+            }
+            tryLoadImage();
+        })
+        .catch(() => callback());
+}
+
 export class EnemyRenderer {
     constructor(game) {
         this.game = game;
@@ -226,6 +294,10 @@ export class EnemyRenderer {
             enemyType = 'boss';
         } else if (enemy.constructor.name === 'BossOni2') {
             enemyType = 'boss2'; // BossOni2のスプライトシートを使用
+        } else if (enemy.constructor.name === 'BossOni4') {
+            enemyType = 'fuzin'; // 風神
+        } else if (enemy.constructor.name === 'BossOni5') {
+            enemyType = 'raizin'; // 雷神
         }
 
         // 移動方向を判定
@@ -256,6 +328,12 @@ export class EnemyRenderer {
                 } else {
                     frameName = 'bike_oni_right.png';
                 }
+            } else if (enemyType === 'fuzin') {
+                // 風神は単一フレーム
+                frameName = 'fuzin.png';
+            } else if (enemyType === 'raizin') {
+                // 雷神は単一フレーム
+                frameName = 'raizin.png';
             } else {
                 // 他の鬼は方向別フレーム
                 frameName = `${enemyType}_oni_${direction}`;

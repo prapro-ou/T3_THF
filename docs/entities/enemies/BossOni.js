@@ -67,8 +67,8 @@ export class BossOni extends Enemy {
             'BossOni1': { width: 400, height: 400 }, // cannon_oni
             'BossOni2': { width: 400, height: 400 }, // bike_oni
             'BossOni3': { width: 250, height: 250 },
-            'BossOni4': { width: 250, height: 250 },
-            'BossOni5': { width: 250, height: 250 }
+            'BossOni4': { width: 400, height: 400 }, // fuzin
+            'BossOni5': { width: 400, height: 400 }  // raizin
         };
 
         const bossType = this.constructor.name;

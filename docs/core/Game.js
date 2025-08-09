@@ -234,7 +234,8 @@ export class Game {
             // ボス出現処理
             this.bossAppeared = true;
             this.bossCutInStartTime = Date.now();
-            this.uiManager.showBossCutIn();
+            const cutInMsg = (this.selectedBossType === 4) ? '風神・雷神、参上！！' : 'ボス鬼出現！！';
+            this.uiManager.showBossCutIn(cutInMsg);
             this.enemyManager.clearEnemies(); // 通常敵を一掃
             this.enemyManager.spawnBoss(this.selectedBossType);
             this.bossStartTime = Date.now();
@@ -273,7 +274,10 @@ export class Game {
                 if (!boss) {
                     this.bossDefeated = true;
                     this.gameState.setGameOver();
-                    this.uiManager.showGameOver('クリア！ボス鬼を倒した！');
+                    const clearMsg = (this.selectedBossType === 4)
+                        ? 'クリア！風神・雷神を倒した！'
+                        : 'クリア！ボス鬼を倒した！';
+                    this.uiManager.showGameOver(clearMsg);
                     return;
                 }
             }
