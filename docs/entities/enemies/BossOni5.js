@@ -8,9 +8,9 @@ export class BossOni5 extends BossOni {
         this._hp = 500;
         this.name = 'BossOni5';
         // 視覚的サイズを設定
-        this.setSize(450, 450);
+        this.setSize(250, 250);
         // 円形当たり判定の半径を設定
-        this.setCircularCollision(180);
+        this.setCircularCollision(80);
     }
 
     update() {

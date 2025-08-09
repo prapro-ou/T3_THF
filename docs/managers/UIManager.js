@@ -73,9 +73,12 @@
         this.restartButton.addEventListener('click', callback);
     }
 
-    showBossCutIn() {
+    showBossCutIn(message = null) {
         const cutIn = document.getElementById('bossCutIn');
         if (cutIn) {
+            if (message) {
+                cutIn.textContent = message;
+            }
             cutIn.classList.remove('hidden');
         }
     }
