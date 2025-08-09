@@ -66,16 +66,11 @@ export class PlayerRenderer {
         if (player.invincibleTimer > 0) {
             ctx.globalAlpha = (Math.floor(player.invincibleTimer * 10) % 2 === 0) ? 0.2 : 1.0;
         }
-        const { width: viewWidth, height: viewHeight } = this.renderer.getViewDimensions();
-        const { width: mapWidth, height: mapHeight } = this.renderer.getMapDimensions();
         
-        // プレイヤーは画面中央に描画
-        let drawX = viewWidth / 2 
-        let drawY = viewHeight / 2 
-        if (player.x < viewWidth / 2) drawX = player.x - scrollX - player.width / 2;
-        if (player.x > mapWidth - viewWidth / 2) drawX = player.x - scrollX - player.width / 2;
-        if (player.y < viewHeight / 2) drawY = player.y - scrollY - player.height / 2;
-        if (player.y > mapHeight - viewHeight / 2) drawY = player.y - scrollY - player.height / 2;
+        // プレイヤーの描画位置を計算（当たり判定と一致させる）
+        // player.x, player.yは左上座標なので、そのままスクロールを適用
+        const drawX = player.x - scrollX;
+        const drawY = player.y - scrollY;
 
         // momotaroスプライトシートがロード済みならアニメーション描画
         if (momotaroSpriteSheetLoaded && momotaroSpriteSheet) {

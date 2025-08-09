@@ -197,6 +197,13 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('リスタートボタンがクリックされました');
         console.log('現在のselectedBossType:', selectedBossType);
         
+        // 既存のゲームインスタンスを破棄
+        if (game) {
+            console.log('既存のゲームインスタンスを破棄します');
+            game.destroy();
+            game = null;
+        }
+        
         gameCanvas.classList.remove('hidden');
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
@@ -204,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.remove('hidden'); // ミニマップ表示
         quickHelp.classList.remove('hidden'); // リスタート時も表示
         // 選択されたボスの種類を使用
-        console.log('ゲーム開始、選択されたボス:', selectedBossType);
+        console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
         game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
     });
 
@@ -470,6 +477,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ページ離脱時やウィンドウクローズ時にゲームを破棄
+    window.addEventListener('beforeunload', () => {
+        if (game) {
+            console.log('ページ離脱によるゲーム破棄');
+            game.destroy();
+            game = null;
+        }
+    });
+
+    // ページ非表示時にもゲームを破棄（モバイル対応）
+    document.addEventListener('visibilitychange', () => {
+        if (!game) return;
+        if (document.hidden && !game.isPaused) {
+            game.togglePause();
+        }
+        // ページが長時間非表示になった場合の処理
+        if (document.hidden) {
+            setTimeout(() => {
+                if (document.hidden && game) {
+                    console.log('ページ長時間非表示によるゲーム破棄');
+                    game.destroy();
+                    game = null;
+                }
+            }, 300000); // 5分後
+        }
+    });
+
     // ボスカード選択でゲーム開始
     const bossCards = document.querySelectorAll('.boss-card');
     bossCards.forEach(card => {
@@ -478,6 +512,13 @@ document.addEventListener('DOMContentLoaded', () => {
             card.classList.add('selected');
             // ボス種別取得
             const selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
+            
+            // 既存のゲームインスタンスがあれば破棄
+            if (game) {
+                console.log('既存のゲームインスタンスを破棄します（ボス選択）');
+                game.destroy();
+                game = null;
+            }
             
             // 障子風アニメーションでゲーム画面へ（開く方向）
             switchToScreenWithShojiOpen(stageSelectArea, null, () => {
@@ -489,7 +530,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 minimapContainer.classList.remove('hidden'); // ミニマップ表示
                 quickHelp.classList.remove('hidden');
                 
-                // ゲーム開始
+                // 新しいゲームインスタンスを作成
+                console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
                 game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
                 // cannon_ballのスプライトシートも読み込み
                 if (game && game.projectileManager) {
