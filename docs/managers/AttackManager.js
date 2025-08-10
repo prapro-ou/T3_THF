@@ -13,22 +13,15 @@ export class AttackManager {
     handleSwordAttack(event) {
         const { scrollX, scrollY } = this.game.calcScroll();
         const rect = this.game.canvas.getBoundingClientRect();
+        
+        // キャンバス内の座標を計算
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
-        const { width: viewWidth, height: viewHeight } = this.game.renderer.getViewDimensions();
-        const { width: mapWidth, height: mapHeight } = this.game.renderer.getMapDimensions();
-        let drawX = viewWidth / 2 - this.game.player.width / 2;
-        let drawY = viewHeight / 2 - this.game.player.height / 2;
-        if (this.game.player.x < viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.x > mapWidth - viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.y < viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        if (this.game.player.y > mapHeight - viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        const playerDrawCenterX = drawX + this.game.player.width / 2;
-        const playerDrawCenterY = drawY + this.game.player.height / 2;
-        const relativeX = canvasX - playerDrawCenterX;
-        const relativeY = canvasY - playerDrawCenterY;
-        const mouseX = this.game.player.x + relativeX;
-        const mouseY = this.game.player.y + relativeY;
+        
+        // キャンバス座標をワールド座標に変換
+        const mouseX = canvasX + scrollX;
+        const mouseY = canvasY + scrollY;
+        
         // 剣の攻撃半径（狭める: 80px）
         const attackRadius = 80;
         this.attackCircle = {
@@ -58,22 +51,15 @@ export class AttackManager {
     handleProjectileAttack(event) {
         const { scrollX, scrollY } = this.game.calcScroll();
         const rect = this.game.canvas.getBoundingClientRect();
+        
+        // キャンバス内の座標を計算
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
-        const { width: viewWidth, height: viewHeight } = this.game.renderer.getViewDimensions();
-        const { width: mapWidth, height: mapHeight } = this.game.renderer.getMapDimensions();
-        let drawX = viewWidth / 2 - this.game.player.width / 2;
-        let drawY = viewHeight / 2 - this.game.player.height / 2;
-        if (this.game.player.x < viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.x > mapWidth - viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.y < viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        if (this.game.player.y > mapHeight - viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        const playerDrawCenterX = drawX + this.game.player.width / 2;
-        const playerDrawCenterY = drawY + this.game.player.height / 2;
-        const relativeX = canvasX - playerDrawCenterX;
-        const relativeY = canvasY - playerDrawCenterY;
-        const mouseX = this.game.player.x + relativeX;
-        const mouseY = this.game.player.y + relativeY;
+        
+        // キャンバス座標をワールド座標に変換
+        const mouseX = canvasX + scrollX;
+        const mouseY = canvasY + scrollY;
+        
         const attackRadius = this.game.player.getAttackRadius();
         this.attackCircle = {
             x: mouseX,
