@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stageSelect = document.getElementById('stageSelect');
     const stageSelectArea = document.getElementById('stageSelectArea');
     const minimapContainer = document.getElementById('minimapContainer');
+    const crosshair = document.getElementById('crosshair');
     
     // デバッグパネルの要素
     const debugPanel = document.getElementById('debugPanel');
@@ -113,6 +114,39 @@ document.addEventListener('DOMContentLoaded', () => {
             shojiContainer.classList.remove('shoji-close');
             if (callback) callback();
         }, 900);
+    }
+
+    // 照準カーソルの機能
+    function updateCrosshair(e) {
+        if (crosshair && !crosshair.classList.contains('hidden')) {
+            // キャンバスの境界情報を取得
+            const rect = gameCanvas.getBoundingClientRect();
+            // キャンバス内の相対座標を計算
+            const canvasX = e.clientX - rect.left;
+            const canvasY = e.clientY - rect.top;
+            
+            // 照準の位置をキャンバス座標系で設定
+            crosshair.style.left = (rect.left + canvasX) + 'px';
+            crosshair.style.top = (rect.top + canvasY) + 'px';
+        }
+    }
+
+    function showCrosshair() {
+        if (crosshair) {
+            crosshair.classList.remove('hidden');
+            // ゲームキャンバスにマウス移動イベントを追加
+            gameCanvas.addEventListener('mousemove', updateCrosshair);
+            document.addEventListener('mousemove', updateCrosshair);
+        }
+    }
+
+    function hideCrosshair() {
+        if (crosshair) {
+            crosshair.classList.add('hidden');
+            // マウス移動イベントを削除
+            gameCanvas.removeEventListener('mousemove', updateCrosshair);
+            document.removeEventListener('mousemove', updateCrosshair);
+        }
     }
 
     let game = null;
@@ -215,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.classList.remove('hidden'); // タイマー表示を維持
         minimapContainer.classList.remove('hidden'); // ミニマップ表示
         quickHelp.classList.remove('hidden'); // リスタート時も表示
+        showCrosshair(); // 照準を表示
         // 選択されたボスの種類を使用
         console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
         game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
@@ -249,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         gameOverMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        hideCrosshair(); // 照準を非表示
         
         // otomoLevelDisplayも非表示にする
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
@@ -274,12 +310,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 helpModal.classList.remove('hidden');
             }
         }
+        
+        // Pキーでポーズ切り替え時の照準制御
+        if (e.key.toLowerCase() === 'p' && game) {
+            setTimeout(() => {
+                if (game.pauseManager.isPaused) {
+                    hideCrosshair(); // ポーズ時は照準を非表示
+                } else {
+                    showCrosshair(); // ポーズ解除時は照準を表示
+                }
+            }, 50); // 少し遅延させてポーズ状態の変更を待つ
+        }
     });
 
     // ポーズ画面のボタンイベントハンドラー
     resumeButton.addEventListener('click', () => {
         if (game) {
             game.togglePause();
+            // ポーズ解除時に照準を再表示
+            if (!game.pauseManager.isPaused) {
+                showCrosshair();
+            }
         }
     });
     
@@ -296,6 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         pauseMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        hideCrosshair(); // 照準を非表示
         
         // otomoLevelDisplayも非表示にする
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
@@ -534,6 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 timerDisplay.classList.remove('hidden');
                 minimapContainer.classList.remove('hidden'); // ミニマップ表示
                 quickHelp.classList.remove('hidden');
+                showCrosshair(); // 照準を表示
                 
                 // 新しいゲームインスタンスを作成
                 console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
