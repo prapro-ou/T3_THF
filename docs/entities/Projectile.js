@@ -59,6 +59,11 @@ export class Projectile {
             this.curveAngle = 0;
             this.curveSpeed = 0.05; // 赤い玉と同じ速度
             this.initialDirection = Math.atan2(this.vy, this.vx);
+        } else if (type === 'black_ball') {
+            // 黒い球用の追尾とライフタイム設定
+            this.lifeTime = 180; // 3秒間生存（60FPS想定）
+            this.currentLife = 0;
+            this.trackingSpeed = 0.1; // 追尾の強さ（0.1 = 10%ずつ方向を調整）
         }
     }
 
@@ -203,11 +208,52 @@ export class Projectile {
         } else if (this.type === 'yellow_ball') {
             // 黄色い玉も曲がる動き
             this.updateCurvingMovement();
+        } else if (this.type === 'black_ball') {
+            // 黒い球は追尾移動
+            this.updateTrackingMovement();
         } else {
             // その他の弾は直線移動
             this.x += this.vx;
             this.y += this.vy;
         }
+    }
+
+    // 追尾弾の移動更新
+    updateTrackingMovement() {
+        // ライフタイムを更新
+        this.currentLife++;
+        
+        // ライフタイムが尽きたら削除
+        if (this.currentLife >= this.lifeTime) {
+            this.markedForDeletion = true;
+            return;
+        }
+        
+        // プレイヤー方向を計算
+        if (this.target && !this.target.markedForDeletion) {
+            const dx = this.target.x + (this.target.width || 0) / 2 - this.x;
+            const dy = this.target.y + (this.target.height || 0) / 2 - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+            
+            // 目標方向の単位ベクトル
+            const targetVx = (dx / dist) * this.speed;
+            const targetVy = (dy / dist) * this.speed;
+            
+            // 現在の速度ベクトルを目標方向に徐々に調整（追尾）
+            this.vx += (targetVx - this.vx) * this.trackingSpeed;
+            this.vy += (targetVy - this.vy) * this.trackingSpeed;
+            
+            // 速度を正規化して一定の速度を保つ
+            const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+            if (currentSpeed > 0) {
+                this.vx = (this.vx / currentSpeed) * this.speed;
+                this.vy = (this.vy / currentSpeed) * this.speed;
+            }
+        }
+        
+        // 位置を更新
+        this.x += this.vx;
+        this.y += this.vy;
     }
 
     // 曲がる弾の移動更新
@@ -355,7 +401,12 @@ export class Projectile {
     }
 
     drawBlackBall(ctx, scrollX, scrollY) {
+        // ライフタイムに応じた透明度を計算
+        const lifeRatio = this.currentLife / this.lifeTime;
+        const alpha = Math.max(0.3, 1.0 - lifeRatio * 0.7); // 30%までフェードアウト
+        
         // 黒い玉: 小さめで黒い円
+        ctx.globalAlpha = alpha;
         ctx.beginPath();
         ctx.arc(this.x - scrollX, this.y - scrollY, this.radius, 0, Math.PI * 2);
         ctx.fillStyle = '#000';
@@ -369,6 +420,18 @@ export class Projectile {
         ctx.arc(this.x - scrollX - this.radius/3, this.y - scrollY - this.radius/3, this.radius/4, 0, Math.PI * 2);
         ctx.fillStyle = '#666';
         ctx.fill();
+        
+        // ライフタイムが少なくなった時の警告効果
+        if (lifeRatio > 0.7) {
+            ctx.beginPath();
+            ctx.arc(this.x - scrollX, this.y - scrollY, this.radius + 3, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(255, 0, 0, ${(lifeRatio - 0.7) * 3.33})`;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // 透明度をリセット
+        ctx.globalAlpha = 1.0;
     }
 
     drawRedBall(ctx, scrollX, scrollY) {

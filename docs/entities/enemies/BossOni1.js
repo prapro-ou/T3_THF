@@ -59,7 +59,7 @@ export class BossOni1 extends BossOni {
                 break;
                 
             case 'black_ball':
-                projectileSpeed = 8; // 高速
+                projectileSpeed = 4; // 8 → 6 に調整（追尾しやすくする）
                 projectileDamage = 10; // 低ダメージ
                 console.log("BossOni1 shooting black ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
                 this.game.projectileManager.spawnBlackBallProjectile(x, y, player, projectileSpeed, projectileDamage);
