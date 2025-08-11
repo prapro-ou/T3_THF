@@ -41,7 +41,8 @@ export class PlayerController {
 
     constrainPlayerToMap(player) {
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
-        player.x = Math.max(player.width / 2, Math.min(player.x, mapWidth - player.width / 2));
-        player.y = Math.max(player.height / 2, Math.min(player.y, mapHeight - player.height / 2));
+        // プレイヤーの左上座標を基準に制約を適用（中心ではなく実際の描画座標）
+        player.x = Math.max(0, Math.min(player.x, mapWidth - player.width));
+        player.y = Math.max(0, Math.min(player.y, mapHeight - player.height));
     }
 }

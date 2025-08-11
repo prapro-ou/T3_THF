@@ -45,6 +45,22 @@ canvas {
     display: none !important;
 }
 
+/* ===== 照準カーソル ===== */
+#crosshair {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 999;
+    transform: translate(-50%, -50%);
+}
+
+#crosshair img {
+    width: 192px;
+    height: 192px;
+    opacity: 0.8;
+}
+
 /* ===== 障子風画面切り替えアニメーション ===== */
 .screen-transition {
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;

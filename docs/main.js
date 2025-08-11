@@ -1,6 +1,6 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
-import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet } from './components/EnemyRenderer.js';
+import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet, preloadFuzinSpriteSheet, preloadRaizinSpriteSheet } from './components/EnemyRenderer.js';
 import { BgmManager } from './managers/BgmManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stageSelect = document.getElementById('stageSelect');
     const stageSelectArea = document.getElementById('stageSelectArea');
     const minimapContainer = document.getElementById('minimapContainer');
+    const crosshair = document.getElementById('crosshair');
     
     // デバッグパネルの要素
     const debugPanel = document.getElementById('debugPanel');
@@ -115,6 +116,39 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 900);
     }
 
+    // 照準カーソルの機能
+    function updateCrosshair(e) {
+        if (crosshair && !crosshair.classList.contains('hidden')) {
+            // キャンバスの境界情報を取得
+            const rect = gameCanvas.getBoundingClientRect();
+            // キャンバス内の相対座標を計算
+            const canvasX = e.clientX - rect.left;
+            const canvasY = e.clientY - rect.top;
+            
+            // 照準の位置をキャンバス座標系で設定
+            crosshair.style.left = (rect.left + canvasX) + 'px';
+            crosshair.style.top = (rect.top + canvasY) + 'px';
+        }
+    }
+
+    function showCrosshair() {
+        if (crosshair) {
+            crosshair.classList.remove('hidden');
+            // ゲームキャンバスにマウス移動イベントを追加
+            gameCanvas.addEventListener('mousemove', updateCrosshair);
+            document.addEventListener('mousemove', updateCrosshair);
+        }
+    }
+
+    function hideCrosshair() {
+        if (crosshair) {
+            crosshair.classList.add('hidden');
+            // マウス移動イベントを削除
+            gameCanvas.removeEventListener('mousemove', updateCrosshair);
+            document.removeEventListener('mousemove', updateCrosshair);
+        }
+    }
+
     let game = null;
     let assetsLoaded = false;
     let selectedBossType = 0; // 選択されたボスの種類
@@ -152,10 +186,15 @@ document.addEventListener('DOMContentLoaded', () => {
                                 preloadCannonOniSpriteSheet(() => {
                                     // BossOni2の画像プリロードを追加
                                     preloadBossOni2SpriteSheet(() => {
-                                        assetsLoaded = true;
-                                        startButton.disabled = false;
-                                        startButton.textContent = 'ゲームスタート';
-                                        loadingScreen.style.display = 'none';
+                                        // ステージ4の風神・雷神もプリロード
+                                        preloadFuzinSpriteSheet(() => {
+                                            preloadRaizinSpriteSheet(() => {
+                                                assetsLoaded = true;
+                                                startButton.disabled = false;
+                                                startButton.textContent = 'ゲームスタート';
+                                                loadingScreen.style.display = 'none';
+                                            });
+                                        });
                                     });
                                 });
                             });
@@ -197,14 +236,22 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('リスタートボタンがクリックされました');
         console.log('現在のselectedBossType:', selectedBossType);
         
+        // 既存のゲームインスタンスを破棄
+        if (game) {
+            console.log('既存のゲームインスタンスを破棄します');
+            game.destroy();
+            game = null;
+        }
+        
         gameCanvas.classList.remove('hidden');
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
         timerDisplay.classList.remove('hidden'); // タイマー表示を維持
         minimapContainer.classList.remove('hidden'); // ミニマップ表示
         quickHelp.classList.remove('hidden'); // リスタート時も表示
+        showCrosshair(); // 照準を表示
         // 選択されたボスの種類を使用
-        console.log('ゲーム開始、選択されたボス:', selectedBossType);
+        console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
         game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
     });
 
@@ -237,6 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         gameOverMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        hideCrosshair(); // 照準を非表示
         
         // otomoLevelDisplayも非表示にする
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
@@ -262,12 +310,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 helpModal.classList.remove('hidden');
             }
         }
+        
+        // Pキーでポーズ切り替え時の照準制御
+        if (e.key.toLowerCase() === 'p' && game) {
+            setTimeout(() => {
+                if (game.pauseManager.isPaused) {
+                    hideCrosshair(); // ポーズ時は照準を非表示
+                } else {
+                    showCrosshair(); // ポーズ解除時は照準を表示
+                }
+            }, 50); // 少し遅延させてポーズ状態の変更を待つ
+        }
     });
 
     // ポーズ画面のボタンイベントハンドラー
     resumeButton.addEventListener('click', () => {
         if (game) {
             game.togglePause();
+            // ポーズ解除時に照準を再表示
+            if (!game.pauseManager.isPaused) {
+                showCrosshair();
+            }
         }
     });
     
@@ -284,6 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         pauseMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        hideCrosshair(); // 照準を非表示
         
         // otomoLevelDisplayも非表示にする
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
@@ -470,6 +534,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ページ離脱時やウィンドウクローズ時にゲームを破棄
+    window.addEventListener('beforeunload', () => {
+        if (game) {
+            console.log('ページ離脱によるゲーム破棄');
+            game.destroy();
+            game = null;
+        }
+    });
+
+    // ページ非表示時にもゲームを破棄（モバイル対応）
+    document.addEventListener('visibilitychange', () => {
+        if (!game) return;
+        if (document.hidden && !game.isPaused) {
+            game.togglePause();
+        }
+        // ページが長時間非表示になった場合の処理
+        if (document.hidden) {
+            setTimeout(() => {
+                if (document.hidden && game) {
+                    console.log('ページ長時間非表示によるゲーム破棄');
+                    game.destroy();
+                    game = null;
+                }
+            }, 300000); // 5分後
+        }
+    });
+
     // ボスカード選択でゲーム開始
     const bossCards = document.querySelectorAll('.boss-card');
     bossCards.forEach(card => {
@@ -478,6 +569,13 @@ document.addEventListener('DOMContentLoaded', () => {
             card.classList.add('selected');
             // ボス種別取得
             const selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
+            
+            // 既存のゲームインスタンスがあれば破棄
+            if (game) {
+                console.log('既存のゲームインスタンスを破棄します（ボス選択）');
+                game.destroy();
+                game = null;
+            }
             
             // 障子風アニメーションでゲーム画面へ（開く方向）
             switchToScreenWithShojiOpen(stageSelectArea, null, () => {
@@ -488,8 +586,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 timerDisplay.classList.remove('hidden');
                 minimapContainer.classList.remove('hidden'); // ミニマップ表示
                 quickHelp.classList.remove('hidden');
+                showCrosshair(); // 照準を表示
                 
-                // ゲーム開始
+                // 新しいゲームインスタンスを作成
+                console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
                 game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
                 // cannon_ballのスプライトシートも読み込み
                 if (game && game.projectileManager) {

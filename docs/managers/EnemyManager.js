@@ -138,11 +138,41 @@ export class EnemyManager {
                 console.log('BossOni3を生成中...');
                 boss = new BossOni3(this.game, centerX, centerY); break;
             case 4:
-                console.log('BossOni4を生成中...');
-                boss = new BossOni4(this.game, centerX, centerY); break;
+                // ステージ4: 風神(4)と雷神(5)を同時出現
+                console.log('BossOni4/BossOni5(風神・雷神)を同時生成中...');
+                const offset = 300;
+                const fuzinX = centerX - offset;
+                const raizinX = centerX + offset;
+                const fuzin = new BossOni4(this.game, fuzinX, centerY);
+                const raizin = new BossOni5(this.game, raizinX, centerY);
+                // 登場ギミック（簡易演出）
+                this.game.particleManager.createExplosion(fuzinX, centerY, '#7ed6df'); // 風: 淡い青
+                this.game.particleManager.createExplosion(raizinX, centerY, '#f9ca24'); // 雷: 黄
+                this.enemies.push(fuzin, raizin);
+                console.log('風神・雷神を追加後敵数:', this.enemies.length);
+                return; // ここで終了（以降の単体ボス処理は不要）
             case 5:
-                console.log('BossOni5を生成中...');
-                boss = new BossOni5(this.game, centerX, centerY); break;
+                // ラスボスステージ: BossOni1〜5を同時出現
+                console.log('ラスボスステージ: BossOni1〜5を同時生成中...');
+                {
+                    const positions = [
+                        { Cls: BossOni1, x: centerX,         y: centerY         },
+                        { Cls: BossOni2, x: centerX - 350,   y: centerY         },
+                        { Cls: BossOni3, x: centerX + 350,   y: centerY         },
+                        { Cls: BossOni4, x: centerX,         y: centerY - 300   },
+                        { Cls: BossOni5, x: centerX,         y: centerY + 300   }
+                    ];
+                    const colors = ['#e74c3c', '#3498db', '#9b59b6', '#7ed6df', '#f9ca24'];
+                    positions.forEach((p, idx) => {
+                        const b = new p.Cls(this.game, p.x, p.y);
+                        this.enemies.push(b);
+                        // それぞれの登場に演出を付与
+                        const color = colors[idx % colors.length];
+                        this.game.particleManager.createExplosion(p.x, p.y, color);
+                    });
+                    console.log('ラスボス5体追加後敵数:', this.enemies.length);
+                    return; // ここで終了（以降の単体ボス処理は不要）
+                }
             default:
                 console.log('デフォルトボスを生成中...');
                 boss = new BossOni(this.game, centerX, centerY); break;

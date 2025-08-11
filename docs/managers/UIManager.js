@@ -73,9 +73,12 @@
         this.restartButton.addEventListener('click', callback);
     }
 
-    showBossCutIn() {
+    showBossCutIn(message = null) {
         const cutIn = document.getElementById('bossCutIn');
         if (cutIn) {
+            if (message) {
+                cutIn.textContent = message;
+            }
             cutIn.classList.remove('hidden');
         }
     }
@@ -149,8 +152,9 @@
         }
         
         // 現在の画面範囲を描画（半透明の四角形）
-        const viewportWidth = 800; // ゲーム画面の幅
-        const viewportHeight = 600; // ゲーム画面の高さ
+        // 実際の画面サイズを取得
+        const viewportWidth = renderer ? renderer.getViewDimensions().width : 800;
+        const viewportHeight = renderer ? renderer.getViewDimensions().height : 600;
         const viewX = scrollX * scaleX;
         const viewY = scrollY * scaleY;
         const viewW = viewportWidth * scaleX;

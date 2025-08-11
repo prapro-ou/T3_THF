@@ -234,7 +234,8 @@ export class Game {
             // ボス出現処理
             this.bossAppeared = true;
             this.bossCutInStartTime = Date.now();
-            this.uiManager.showBossCutIn();
+            const cutInMsg = (this.selectedBossType === 4) ? '風神・雷神、参上！！' : 'ボス鬼出現！！';
+            this.uiManager.showBossCutIn(cutInMsg);
             this.enemyManager.clearEnemies(); // 通常敵を一掃
             this.enemyManager.spawnBoss(this.selectedBossType);
             this.bossStartTime = Date.now();
@@ -273,7 +274,10 @@ export class Game {
                 if (!boss) {
                     this.bossDefeated = true;
                     this.gameState.setGameOver();
-                    this.uiManager.showGameOver('クリア！ボス鬼を倒した！');
+                    const clearMsg = (this.selectedBossType === 4)
+                        ? 'クリア！風神・雷神を倒した！'
+                        : 'クリア！ボス鬼を倒した！';
+                    this.uiManager.showGameOver(clearMsg);
                     return;
                 }
             }
@@ -386,14 +390,21 @@ export class Game {
             ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
             
-            // プレイヤーの実際の中心座標（描画位置ではなく実際の座標）
-            const playerCenterX = this.player.x - scrollX;
-            const playerCenterY = this.player.y - scrollY;
+            // プレイヤーの実際の中心座標（プレイヤーの位置 + width/2, height/2を中心とする）
+            const playerCenterX = this.player.x + this.player.width / 2 - scrollX;
+            const playerCenterY = this.player.y + this.player.height / 2 - scrollY;
             const playerRadius = Math.min(this.player.width, this.player.height) / 2 * (this.playerHitboxSize || 0.8);
             
+            // 当たり判定円を描画
             ctx.beginPath();
             ctx.arc(playerCenterX, playerCenterY, playerRadius, 0, Math.PI * 2);
             ctx.stroke();
+            
+            // プレイヤーの実際の描画範囲も表示（デバッグ用）
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 2]);
+            ctx.strokeRect(this.player.x - scrollX, this.player.y - scrollY, this.player.width, this.player.height);
         }
         
         // 敵の当たり判定
@@ -556,6 +567,11 @@ export class Game {
             this.gameState.setAnimationId(null);
         }
         
+        // BGMを停止
+        if (this.bgmManager) {
+            this.bgmManager.stop();
+        }
+        
         // イベントリスナーを削除
         if (this.eventHandlers) {
             if (this.canvas && this.eventHandlers.contextmenu) {
@@ -602,11 +618,36 @@ export class Game {
             this.timer.stop();
         }
         
+        if (this.attackManager) {
+            this.attackManager.reset();
+        }
+        
+        // UIの状態もリセット
+        if (this.uiManager) {
+            this.uiManager.hideGameOver();
+            this.uiManager.hidePauseMessage();
+            this.uiManager.hideBossCutIn();
+            this.uiManager.hideMinimap();
+        }
+        
         // オブジェクト参照をクリア
         this.player = null;
         this.otomo = null;
         this.canvas = null;
         this.ctx = null;
+        this.enemyManager = null;
+        this.particleManager = null;
+        this.projectileManager = null;
+        this.inputManager = null;
+        this.pauseManager = null;
+        this.timer = null;
+        this.attackManager = null;
+        this.uiManager = null;
+        this.cameraManager = null;
+        this.renderer = null;
+        this.collisionManager = null;
+        this.gameState = null;
+        this.bgmManager = null;
         
         console.log('Game destroyed successfully');
     }

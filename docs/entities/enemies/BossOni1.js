@@ -9,6 +9,8 @@ export class BossOni1 extends BossOni {
         this.name = 'BossOni1';
         this.shootInterval = 90; // 1.5秒ごとに弾発射（60FPS想定）
         this.shootTimer = 0;
+        this.projectileTypeIndex = 0; // 弾の種類を管理
+        this.projectileTypes = ['cannon_ball', 'black_ball', 'red_ball', 'yellow_ball']; // 4種類の弾
         
         // 視覚的サイズを設定
         this.setSize(400, 400);
@@ -38,16 +40,48 @@ export class BossOni1 extends BossOni {
     shootAtPlayer() {
         const player = this.game.player;
         if (!player) return;
-        // プレイヤー方向にcannon_ballタイプの弾を撃つ
+        
         const x = this.x + this.width / 2;
         const y = this.y + this.height / 2;
         
-        // ゲーム設定から弾の速度とダメージを取得
-        const projectileSpeed = this.game.bossOni1ProjectileSpeed || 3;
-        const projectileDamage = this.game.bossOni1ProjectileDamage || 15;
+        // 現在の弾の種類を取得
+        const currentProjectileType = this.projectileTypes[this.projectileTypeIndex];
         
-        console.log("BossOni1 shooting cannon ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
-        this.game.projectileManager.spawnCannonBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+        // 弾の種類に応じて速度とダメージを設定
+        let projectileSpeed, projectileDamage;
+        
+        switch (currentProjectileType) {
+            case 'cannon_ball':
+                projectileSpeed = this.game.bossOni1ProjectileSpeed || 3;
+                projectileDamage = this.game.bossOni1ProjectileDamage || 15;
+                console.log("BossOni1 shooting cannon ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
+                this.game.projectileManager.spawnCannonBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+                break;
+                
+            case 'black_ball':
+                projectileSpeed = 4; // 8 → 6 に調整（追尾しやすくする）
+                projectileDamage = 10; // 低ダメージ
+                console.log("BossOni1 shooting black ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
+                this.game.projectileManager.spawnBlackBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+                break;
+                
+            case 'red_ball':
+                projectileSpeed = 5; // 中程度の速度
+                projectileDamage = 12; // 中程度のダメージ
+                console.log("BossOni1 shooting red ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
+                this.game.projectileManager.spawnRedBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+                break;
+                
+            case 'yellow_ball':
+                projectileSpeed = 5; // 中程度の速度
+                projectileDamage = 12; // 中程度のダメージ
+                console.log("BossOni1 shooting yellow ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
+                this.game.projectileManager.spawnYellowBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+                break;
+        }
+        
+        // 次の弾の種類に進む
+        this.projectileTypeIndex = (this.projectileTypeIndex + 1) % this.projectileTypes.length;
     }
 
     // サイズ変更メソッド（将来的な拡張用）
