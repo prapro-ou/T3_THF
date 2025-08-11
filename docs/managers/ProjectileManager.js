@@ -108,4 +108,12 @@ export class ProjectileManager {
         console.log("Red ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }
+
+    spawnYellowBallProjectile(x, y, target, speed = 5, damage = 12) {
+        // 黄色い玉（反対方向に曲がる弾）
+        console.log("Creating yellow ball projectile at:", x, y);
+        const proj = new Projectile(this.game, x, y, target, speed, damage, 'yellow_ball');
+        console.log("Yellow ball projectile created with type:", proj.type);
+        this.projectiles.push(proj);
+    }
 } 

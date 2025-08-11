@@ -22,6 +22,10 @@ export class Projectile {
             this.width = 60;
             this.height = 60;
             this.radius = 30;
+        } else if (type === 'yellow_ball') {
+            this.width = 60;
+            this.height = 60;
+            this.radius = 30;
         } else {
             this.width = 10;
             this.height = 10;
@@ -38,6 +42,9 @@ export class Projectile {
         if (type === 'red_ball') {
             // 赤い玉は曲がる弾として実装
             this.setupCurvingProjectile();
+        } else if (type === 'yellow_ball') {
+            // 黄色い玉も曲がる弾として実装（赤い玉と反対方向）
+            this.setupCurvingProjectile();
         } else {
             // その他の弾は直線的に移動
             this.setupLinearProjectile();
@@ -46,7 +53,11 @@ export class Projectile {
         // 曲がる弾用の追加プロパティ
         if (type === 'red_ball') {
             this.curveAngle = 0;
-            this.curveSpeed = 0.1;
+            this.curveSpeed = 0.05; // 0.1 → 0.15 に増加（曲がりが速くなる）
+            this.initialDirection = Math.atan2(this.vy, this.vx);
+        } else if (type === 'yellow_ball') {
+            this.curveAngle = 0;
+            this.curveSpeed = 0.05; // 赤い玉と同じ速度
             this.initialDirection = Math.atan2(this.vy, this.vx);
         }
     }
@@ -189,6 +200,9 @@ export class Projectile {
         if (this.type === 'red_ball') {
             // 赤い玉は曲がる動き
             this.updateCurvingMovement();
+        } else if (this.type === 'yellow_ball') {
+            // 黄色い玉も曲がる動き
+            this.updateCurvingMovement();
         } else {
             // その他の弾は直線移動
             this.x += this.vx;
@@ -204,8 +218,25 @@ export class Projectile {
         // 基本速度ベクトルを取得
         const baseSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
         
-        // 曲がり角度を適用した新しい方向を計算
-        const newAngle = this.initialDirection + Math.sin(this.curveAngle) * 0.5;
+        let totalCurve;
+        
+        if (this.type === 'yellow_ball') {
+            // 黄色い玉: 赤い玉と反対方向に曲がる
+            const curve1 = Math.sin(this.curveAngle) * -1.5; // メインの曲がり（負の値で反対方向）
+            const curve2 = Math.sin(this.curveAngle * 2) * -0.8; // 2倍の周波数で小さな曲がり（負の値）
+            const curve3 = Math.sin(this.curveAngle * 0.5) * -0.8; // 0.5倍の周波数でゆっくりした曲がり（負の値）
+            
+            totalCurve = curve1 + curve2 + curve3;
+        } else {
+            // 赤い玉: 通常の曲がり
+            const curve1 = Math.sin(this.curveAngle) * 1.5; // メインの曲がり
+            const curve2 = Math.sin(this.curveAngle * 2) * 0.8; // 2倍の周波数で小さな曲がり
+            const curve3 = Math.sin(this.curveAngle * 0.5) * 0.8; // 0.5倍の周波数でゆっくりした曲がり
+            
+            totalCurve = curve1 + curve2 + curve3;
+        }
+        
+        const newAngle = this.initialDirection + totalCurve;
         
         // 新しい速度ベクトルを設定
         this.vx = Math.cos(newAngle) * baseSpeed;
@@ -286,6 +317,8 @@ export class Projectile {
             this.drawBlackBall(ctx, scrollX, scrollY);
         } else if (this.type === 'red_ball') {
             this.drawRedBall(ctx, scrollX, scrollY);
+        } else if (this.type === 'yellow_ball') {
+            this.drawYellowBall(ctx, scrollX, scrollY);
         } else {
             this.drawNormalProjectile(ctx, scrollX, scrollY);
         }
@@ -358,6 +391,30 @@ export class Projectile {
         ctx.beginPath();
         ctx.arc(this.x - scrollX, this.y - scrollY, this.radius + 5, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(231, 76, 60, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+    }
+
+    drawYellowBall(ctx, scrollX, scrollY) {
+        // 黄色い玉: 曲がる弾（赤い玉と反対方向）
+        ctx.beginPath();
+        ctx.arc(this.x - scrollX, this.y - scrollY, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = '#f1c40f';
+        ctx.fill();
+        ctx.strokeStyle = '#f39c12';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+        
+        // 光沢効果
+        ctx.beginPath();
+        ctx.arc(this.x - scrollX - this.radius/3, this.y - scrollY - this.radius/3, this.radius/4, 0, Math.PI * 2);
+        ctx.fillStyle = '#f9e79f';
+        ctx.fill();
+        
+        // 軌跡効果（曲がる弾らしさを演出）
+        ctx.beginPath();
+        ctx.arc(this.x - scrollX, this.y - scrollY, this.radius + 5, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(241, 196, 15, 0.3)';
         ctx.lineWidth = 2;
         ctx.stroke();
     }
