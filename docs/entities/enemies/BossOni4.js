@@ -8,9 +8,9 @@ export class BossOni4 extends BossOni {
         this._hp = 400;
         this.name = 'BossOni4';
         // 視覚的サイズを設定
-        this.setSize(350, 350);
+        this.setSize(250, 250);
         // 円形当たり判定の半径を設定
-        this.setCircularCollision(140);
+        this.setCircularCollision(80);
 
         // 風範囲攻撃パラメータ
         this.windRange = 520;           // 風の到達距離
