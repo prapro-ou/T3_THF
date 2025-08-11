@@ -92,4 +92,20 @@ export class ProjectileManager {
         console.log("Cannon ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }
+
+    spawnBlackBallProjectile(x, y, target, speed = 8, damage = 10) {
+        // 黒い玉（小さめで速い球）
+        console.log("Creating black ball projectile at:", x, y);
+        const proj = new Projectile(this.game, x, y, target, speed, damage, 'black_ball');
+        console.log("Black ball projectile created with type:", proj.type);
+        this.projectiles.push(proj);
+    }
+
+    spawnRedBallProjectile(x, y, target, speed = 5, damage = 12) {
+        // 赤い玉（曲がる弾）
+        console.log("Creating red ball projectile at:", x, y);
+        const proj = new Projectile(this.game, x, y, target, speed, damage, 'red_ball');
+        console.log("Red ball projectile created with type:", proj.type);
+        this.projectiles.push(proj);
+    }
 } 
