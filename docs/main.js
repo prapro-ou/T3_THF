@@ -149,6 +149,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ゲーム状態を監視して照準の表示/非表示を制御
+    function monitorGameState() {
+        if (!game || !game.gameState) return;
+        
+        // ゲームオーバー状態になったら照準を非表示
+        if (game.gameState.isGameOver() && !crosshair.classList.contains('hidden')) {
+            hideCrosshair();
+        }
+    }
+
     let game = null;
     let assetsLoaded = false;
     let selectedBossType = 0; // 選択されたボスの種類
@@ -253,6 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
         // 選択されたボスの種類を使用
         console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
         game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
+        
+        // ゲーム状態監視を開始
+        const gameStateInterval = setInterval(() => {
+            if (game) {
+                monitorGameState();
+            } else {
+                clearInterval(gameStateInterval);
+            }
+        }, 100); // 100ms間隔で監視
     });
 
     // 操作説明表示
@@ -591,6 +610,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 新しいゲームインスタンスを作成
                 console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
                 game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
+                
+                // ゲーム状態監視を開始
+                const gameStateInterval = setInterval(() => {
+                    if (game) {
+                        monitorGameState();
+                    } else {
+                        clearInterval(gameStateInterval);
+                    }
+                }, 100); // 100ms間隔で監視
+                
                 // cannon_ballのスプライトシートも読み込み
                 if (game && game.projectileManager) {
                     game.projectileManager.preloadCannonBallSpriteSheet(() => {

@@ -72,6 +72,7 @@ export class BossOni2 extends BossOni {
             
             // 新機能: 難易度調整
             this.difficulty = this.game.difficulty || 'normal';
+            this.knockbackStrength = 18; // デフォルトのノックバック強度
             this.adjustDifficulty();
             
             // 怒りモードの初期化
@@ -100,12 +101,14 @@ export class BossOni2 extends BossOni {
                 this._maxHP = 300;
                 this._hp = 300;
                 this.specialAttackMaxCooldown = 240;
+                this.knockbackStrength = 15; // 弱いノックバック
                 break;
             case 'normal':
                 this.dashSpeed = 18;
                 this._maxHP = 400;
                 this._hp = 400;
                 this.specialAttackMaxCooldown = 180;
+                this.knockbackStrength = 18; // 通常のノックバック
                 break;
             case 'hard':
                 this.dashSpeed = 22;
@@ -113,6 +116,7 @@ export class BossOni2 extends BossOni {
                 this._hp = 500;
                 this.specialAttackMaxCooldown = 120;
                 this.predictionLevel = 0.9;
+                this.knockbackStrength = 22; // 強いノックバック
                 break;
             case 'extreme':
                 this.dashSpeed = 26;
@@ -121,6 +125,7 @@ export class BossOni2 extends BossOni {
                 this.specialAttackMaxCooldown = 90;
                 this.predictionLevel = 1.0;
                 this.rageModeThreshold = 0.5; // HP50%以下で怒りモード
+                this.knockbackStrength = 28; // 非常に強いノックバック
                 break;
         }
     }
@@ -468,9 +473,113 @@ export class BossOni2 extends BossOni {
             }
             this.hasHitPlayerThisDash = true;
             
+            // ノックバック効果を適用
+            this.applyKnockback(player);
+            
+            // ノックバックエフェクト
+            this.createKnockbackEffect(player);
+            
             // ヒットエフェクト
             this.createHitEffect();
         }
+    }
+
+    applyKnockback(player) {
+        // ノックバックの方向と強度を計算
+        let knockbackStrength = this.knockbackStrength;
+        if (this.isRageMode) {
+            knockbackStrength *= 1.4; // 怒りモード時は40%増加
+        }
+        
+        // プレイヤーからバイクへの方向ベクトルを計算
+        const dx = player.centerX - this.centerX;
+        const dy = player.centerY - this.centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > 0) {
+            // 正規化された方向ベクトル
+            const normalizedDx = dx / distance;
+            const normalizedDy = dy / distance;
+            
+            // ノックバック速度を設定
+            const knockbackVx = normalizedDx * knockbackStrength;
+            const knockbackVy = normalizedDy * knockbackStrength;
+            
+            console.log(`BossOni2: Applying knockback - Strength: ${knockbackStrength}, Direction: (${knockbackVx.toFixed(2)}, ${knockbackVy.toFixed(2)})`);
+            
+            // プレイヤーにノックバックを適用
+            if (typeof player.applyKnockback === 'function') {
+                player.applyKnockback(knockbackVx, knockbackVy);
+            } else {
+                // プレイヤーにノックバックメソッドがない場合は直接座標を変更
+                this.applyDirectKnockback(player, knockbackVx, knockbackVy);
+            }
+        }
+    }
+
+    applyDirectKnockback(player, knockbackVx, knockbackVy) {
+        // プレイヤーの現在位置を保存
+        const originalX = player.x;
+        const originalY = player.y;
+        
+        // ノックバック位置を計算
+        const newX = player.x + knockbackVx;
+        const newY = player.y + knockbackVy;
+        
+        // 画面内に収まるように調整
+        const map = this.game.cameraManager.getMapDimensions();
+        const clampedX = Math.max(0, Math.min(newX, map.width - player.width));
+        const clampedY = Math.max(0, Math.min(newY, map.height - player.height));
+        
+        // プレイヤーの位置を更新
+        player.x = clampedX;
+        player.y = clampedY;
+        
+        // ノックバックアニメーション用の一時的な速度を設定
+        if (typeof player.setVelocity === 'function') {
+            player.setVelocity(knockbackVx * 0.5, knockbackVy * 0.5);
+        }
+        
+        console.log(`BossOni2: Direct knockback applied - From: (${originalX}, ${originalY}) To: (${clampedX}, ${clampedY})`);
+    }
+
+    createKnockbackEffect(player) {
+        // ノックバック時の視覚効果
+        console.log('BossOni2: Creating knockback effect');
+        
+        // ノックバック方向を示すパーティクル
+        const knockbackDirection = {
+            x: player.centerX - this.centerX,
+            y: player.centerY - this.centerY
+        };
+        const distance = Math.sqrt(knockbackDirection.x * knockbackDirection.x + knockbackDirection.y * knockbackDirection.y);
+        
+        if (distance > 0) {
+            const normalizedDx = knockbackDirection.x / distance;
+            const normalizedDy = knockbackDirection.y / distance;
+            
+            // ノックバック方向に沿ったパーティクルを生成
+            for (let i = 0; i < 12; i++) {
+                const offset = i * 8; // パーティクルを線状に配置
+                const particleX = player.centerX + normalizedDx * offset;
+                const particleY = player.centerY + normalizedDy * offset;
+                
+                this.dashParticles.push({
+                    x: particleX,
+                    y: particleY,
+                    vx: normalizedDx * 3 + (Math.random() - 0.5) * 2,
+                    vy: normalizedDy * 3 + (Math.random() - 0.5) * 2,
+                    life: 40,
+                    maxLife: 40,
+                    size: Math.random() * 6 + 3,
+                    alpha: 1.0,
+                    color: '#ff6b6b' // ノックバック専用の色
+                });
+            }
+        }
+        
+        // 画面シェイク効果を強化
+        this.screenShake = Math.max(this.screenShake, 15);
     }
 
     createHitEffect() {
