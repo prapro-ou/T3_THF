@@ -9,20 +9,20 @@ export class BossOni5 extends BossOni {
         this._hp = 500;
         this.name = 'BossOni5';
         // 視覚的サイズを設定
-        this.setSize(350, 350);
+        this.setSize(250, 250);
         // 円形当たり判定の半径を設定
-        this.setCircularCollision(140);
+        this.setCircularCollision(80);
 
         // 雷範囲攻撃（周辺ランダム落雷）パラメータ
         this.attackCooldownFrames = 210; // 攻撃クールダウン（約3.5秒）
         this.attackDurationFrames = 75;  // 落雷連打の稼働時間（約1.25秒）
-        this.strikeEveryFrames = 15;     // 何フレームごとに次の落雷を予約するか
+        this.strikeEveryFrames = 40;     // 何フレームごとに次の落雷を予約するか
         this.strikesPerWave = 6;         // 1回の攻撃での落雷回数の上限
         this.strikeRadius = 90;          // 落雷の有効半径
         this.damagePerStrike = 18;       // 1発のダメージ
-        this.strikeOffsetMin = 80;       // プレイヤー周囲に生成する最小距離
+        this.strikeOffsetMin = 40;       // プレイヤー周囲に生成する最小距離
         this.strikeOffsetMax = 320;      // プレイヤー周囲に生成する最大距離
-        this.telegraphLeadFrames = 12;   // 予兆から着弾までのフレーム数
+        this.telegraphLeadFrames = 36;   // 予兆から着弾までのフレーム数
 
         this._isAttacking = false;
         this._attackTimer = 0;
@@ -159,7 +159,7 @@ export class BossOni5 extends BossOni {
                 const t = i / (segments - 1);
                 const x = cx + jitterX + (Math.random() - 0.5) * 10;
                 const y = cy - 280 + t * 300 + (Math.random() - 0.5) * 10;
-                this.game.particleManager.createParticle(x, y, i % 2 === 0 ? '#fff59d' : '#f9ca24');
+                this.game.particleManager.createParticle(x, y, i % 2 === 0 ? '#fff59d' : '#fd9f14');
             }
         }
         // 着弾点にも強いフラッシュ
