@@ -1,5 +1,6 @@
 import { BossOni } from './BossOni.js';
 import { RedOni } from './RedOni.js'; // 例: 雑魚鬼
+import { playSE } from '../../managers/KoukaonManager.js'; // 効果音をインポート
 
 export class BossOni3 extends BossOni {
     constructor(game, x = null, y = null) {
@@ -7,24 +8,24 @@ export class BossOni3 extends BossOni {
             console.log('BossOni3: Constructor called');
             super(game, x, y);
             console.log('BossOni3: Super constructor completed');
-            
+
             this.color = '#9b59b6'; // 紫系（ワープのイメージ）
             this._maxHP = 400;
             this._hp = 400;
             this.name = 'BossOni3';
-            
+
             // warp_oni画像のサイズに合わせて調整
             this.setSize(100, 100); // 視覚的サイズ
             this.setCircularCollision(20); // 当たり判定半径
-            
+
             // スプライト画像の設定
             this.spriteSheet = new Image();
             this.spriteSheet.src = './assets/characters/oni/warp_oni/warp_oni.png';
-            
+
             // 雑魚召喚の管理
             this.summonTimer = 0;
             this.summonInterval = 300; // 5秒ごとに召喚（60fps想定）
-            
+
             console.log('BossOni3: Constructor completed successfully');
         } catch (error) {
             console.error('BossOni3 constructor error:', error);
@@ -34,7 +35,7 @@ export class BossOni3 extends BossOni {
 
     update() {
         super.update();
-        
+
         // 雑魚召喚処理
         this.summonTimer++;
         if (this.summonTimer >= this.summonInterval) {
@@ -49,7 +50,7 @@ export class BossOni3 extends BossOni {
             this._dy = 0;
             return;
         }
-        
+
         const player = this.game.player;
         if (!player) return;
 
@@ -66,7 +67,7 @@ export class BossOni3 extends BossOni {
             this._dx = 0;
             this._dy = 0;
         }
-        
+
         // 移動実行
         this.x += this._dx;
         this.y += this._dy;
@@ -91,8 +92,9 @@ export class BossOni3 extends BossOni {
         // 召喚位置を設定
         minion.x = this.x + this.width / 2 - minion.width / 2;
         minion.y = this.y + this.height / 2 - minion.height / 2;
-        
+
         this.game.enemyManager.enemies.push(minion);
+        playSE("syoukan-syutugen"); // ← 雑魚鬼召喚時に効果音
         console.log("BossOni3 summoned a weak minion with HP:", minion._hp);
     }
 
@@ -107,6 +109,7 @@ export class BossOni3 extends BossOni {
         ); // 近すぎる場合は再抽選
         this.x = newX;
         this.y = newY;
+        playSE("warp"); // ← ワープ時に効果音
         // ワープ演出フック（エフェクト等）をここに追加可
         console.log('BossOni3 warped to:', newX, newY);
     }
@@ -114,17 +117,17 @@ export class BossOni3 extends BossOni {
     draw(ctx, scrollX, scrollY) {
         const screenX = this.centerX - scrollX;
         const screenY = this.centerY - scrollY;
-        
+
         // ワープ中の透明度効果
         if (this.isWarping) {
             ctx.globalAlpha = this.warpAlpha;
         }
-        
+
         // warp_oni画像を描画
         if (this.spriteSheet && this.spriteSheet.complete) {
             ctx.save();
             ctx.translate(screenX, screenY);
-            
+
             // プレイヤーの方向を向くように画像を反転
             const player = this.game.player;
             if (player) {
@@ -134,7 +137,7 @@ export class BossOni3 extends BossOni {
                     ctx.scale(-1, 1);
                 }
             }
-            
+
             ctx.drawImage(
                 this.spriteSheet,
                 -this.width / 2,
@@ -142,7 +145,7 @@ export class BossOni3 extends BossOni {
                 this.width,
                 this.height
             );
-            
+
             ctx.restore();
         } else {
             // フォールバック: 紫の円
@@ -151,12 +154,12 @@ export class BossOni3 extends BossOni {
             ctx.arc(screenX, screenY, this.width / 2, 0, Math.PI * 2);
             ctx.fill();
         }
-        
+
         // 透明度をリセット
         if (this.isWarping) {
             ctx.globalAlpha = 1.0;
         }
-        
+
         // HPバーとデバッグ情報を描画
         super.draw(ctx, scrollX, scrollY);
     }
