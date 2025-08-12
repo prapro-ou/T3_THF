@@ -1,4 +1,5 @@
 import { Enemy } from '../base/Enemy.js';
+import { playSE } from '../../managers/KoukaonManager.js'; // 追加
 
 /**
  * 青鬼クラス
@@ -21,6 +22,7 @@ export class BlueOni extends Enemy {
     }
 
     onDeath() {
+        playSE("enemy-death"); // 死亡時に効果音
         if (this.game && typeof this.game.addOtomoExp === 'function') {
             this.game.addOtomoExp(2);
         }

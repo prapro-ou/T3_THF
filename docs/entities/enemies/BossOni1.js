@@ -1,4 +1,5 @@
 import { BossOni } from './BossOni.js';
+import { playSE } from '../../managers/KoukaonManager.js'; // 追加
 
 export class BossOni1 extends BossOni {
     constructor(game, x = null, y = null) {
@@ -9,6 +10,7 @@ export class BossOni1 extends BossOni {
         this.name = 'BossOni1';
         this.shootInterval = 90; // 1.5秒ごとに弾発射（60FPS想定）
         this.shootTimer = 0;
+
         this.projectileTypeIndex = 0; // 弾の種類を管理
         this.projectileTypes = ['cannon_ball', 'black_ball', 'red_ball', 'yellow_ball']; // 4種類の弾
         
@@ -21,7 +23,7 @@ export class BossOni1 extends BossOni {
     update() {
         // 親クラスの更新処理を呼び出し
         super.update();
-        
+
         // 弾発射ロジック
         this.shootTimer++;
         if (this.shootTimer >= this.shootInterval) {
@@ -43,6 +45,15 @@ export class BossOni1 extends BossOni {
         
         const x = this.x + this.width / 2;
         const y = this.y + this.height / 2;
+
+        // ゲーム設定から弾の速度とダメージを取得
+        const projectileSpeed = this.game.bossOni1ProjectileSpeed || 3;
+        const projectileDamage = this.game.bossOni1ProjectileDamage || 15;
+
+        console.log("BossOni1 shooting cannon ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
+        this.game.projectileManager.spawnCannonBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+
+        playSE("taihou"); // ← ここで効果音を鳴らす
         
         // 現在の弾の種類を取得
         const currentProjectileType = this.projectileTypes[this.projectileTypeIndex];
@@ -89,4 +100,4 @@ export class BossOni1 extends BossOni {
         this.setSize(newWidth, newHeight);
         console.log(`BossOni1: Size changed to ${newWidth}x${newHeight}`);
     }
-} 
+}
