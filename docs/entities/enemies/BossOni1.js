@@ -45,15 +45,6 @@ export class BossOni1 extends BossOni {
         
         const x = this.x + this.width / 2;
         const y = this.y + this.height / 2;
-
-        // ゲーム設定から弾の速度とダメージを取得
-        const projectileSpeed = this.game.bossOni1ProjectileSpeed || 3;
-        const projectileDamage = this.game.bossOni1ProjectileDamage || 15;
-
-        console.log("BossOni1 shooting cannon ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
-        this.game.projectileManager.spawnCannonBallProjectile(x, y, player, projectileSpeed, projectileDamage);
-
-        playSE("taihou"); // ← ここで効果音を鳴らす
         
         // 現在の弾の種類を取得
         const currentProjectileType = this.projectileTypes[this.projectileTypeIndex];
@@ -67,6 +58,7 @@ export class BossOni1 extends BossOni {
                 projectileDamage = this.game.bossOni1ProjectileDamage || 15;
                 console.log("BossOni1 shooting cannon ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
                 this.game.projectileManager.spawnCannonBallProjectile(x, y, player, projectileSpeed, projectileDamage);
+                playSE("taihou"); // 大砲効果音
                 break;
                 
             case 'black_ball':
