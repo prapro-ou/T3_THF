@@ -400,6 +400,16 @@ export class EnemyRenderer {
 
         // HPバー描画
         this.drawHealthBar(ctx, enemy, drawX, drawY);
+
+        // ボス鬼2のパーティクルと軌跡エフェクトを描画
+        if (enemy.constructor.name === 'BossOni2') {
+            if (typeof enemy.drawParticles === 'function') {
+                enemy.drawParticles(ctx, scrollX, scrollY);
+            }
+            if (typeof enemy.drawTrailEffect === 'function') {
+                enemy.drawTrailEffect(ctx, scrollX, scrollY);
+            }
+        }
     }
 
     drawHealthBar(ctx, enemy, x, y) {
