@@ -1,7 +1,9 @@
 {
   "resources": [
+    "combined_audio.ogg",
+    "combined_audio.m4a",
     "combined_audio.mp3",
-    "combined_audio.ogg"
+    "combined_audio.ac3"
   ],
   "spritemap": {
     "open-husuma": {

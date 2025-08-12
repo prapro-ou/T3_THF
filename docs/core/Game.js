@@ -14,11 +14,12 @@ import { PlayerController } from '../components/PlayerController.js';
 import { Otomo } from '../entities/Otomo.js';
 import { ProjectileManager } from '../managers/ProjectileManager.js';
 import { BgmManager } from '../managers/BgmManager.js';
+import { playSE } from '../managers/KoukaonManager.js';
 
 export class Game {
     constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0, bgmManager = null) {
         console.log('Game constructor called with selectedBossType:', selectedBossType);
-        
+
         this.canvas = canvas;
         this.ctx = ctx;
         this.bgmManager = bgmManager;
@@ -66,7 +67,7 @@ export class Game {
 
         // デバッグモード設定
         this.debugMode = false;
-        
+
         // 当たり判定表示設定
         this.debugSettings = {
             showPlayerHitbox: false,
@@ -90,7 +91,7 @@ export class Game {
 
         this.setupEvents();
         this.initializeGame();
-        
+
         // cannon_ballのスプライトシート読み込みを開始
         this.projectileManager.preloadCannonBallSpriteSheet(() => {
             console.log('Cannon ball sprite sheet loaded in Game constructor');
@@ -100,7 +101,7 @@ export class Game {
     setupEvents() {
         // イベントハンドラーを保存してあとで削除できるようにする
         this.eventHandlers = {};
-        
+
         // 右クリックを無効化
         this.eventHandlers.contextmenu = (e) => {
             e.preventDefault();
@@ -176,20 +177,20 @@ export class Game {
         this.particleManager.clearParticles();
         this.timer.reset();
         this.attackManager.reset();
-        
+
         this.uiManager.updateScore(this.gameState.getScore());
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
         this.uiManager.hideGameOver();
-        
+
         this.otomo = new Otomo(this, this.player.x, this.player.y);
         // ProjectileManagerのリセット
         this.projectileManager.reset();
-        
+
         this.bossAppeared = false;
         this.bossDefeated = false;
         this.bossStartTime = null;
         this.bossSpawnComplete = false;
-        
+
         this.animate();
 
         if (this.bgmManager) {
@@ -209,11 +210,11 @@ export class Game {
             }
             return;
         }
-        
+
         if (this.pauseManager.isPaused) return;
 
         const deltaTime = this.gameState.updateDeltaTime();
-        
+
         // タイマー更新
         this.timer.update();
         if (!this.bossAppeared) {
@@ -226,7 +227,7 @@ export class Game {
             const seconds = String(remaining % 60).padStart(2, '0');
             this.uiManager.updateTimer(`${minutes}:${seconds}`, 'boss');
         }
-        
+
         // --- ボス出現・撃破などのギミック管理 ---
         const elapsedTime = this.timer.getElapsedTime(); // 経過時間を取得
         const bossSpawnTime = this.bossSpawnTime || 180; // デフォルト180秒
@@ -234,7 +235,8 @@ export class Game {
             // ボス出現処理
             this.bossAppeared = true;
             this.bossCutInStartTime = Date.now();
-            this.uiManager.showBossCutIn();
+            const cutInMsg = (this.selectedBossType === 4) ? '風神・雷神、参上！！' : 'ボス鬼出現！！';
+            this.uiManager.showBossCutIn(cutInMsg);
             this.enemyManager.clearEnemies(); // 通常敵を一掃
             this.enemyManager.spawnBoss(this.selectedBossType);
             this.bossStartTime = Date.now();
@@ -244,7 +246,7 @@ export class Game {
             if (this.bgmManager) {
                 if (this.selectedBossType === 5) {
                     this.bgmManager.play('lastbossBgm');
-                }else {
+                } else {
                     this.bgmManager.play('bossBgm');
                 }
             }
@@ -273,7 +275,11 @@ export class Game {
                 if (!boss) {
                     this.bossDefeated = true;
                     this.gameState.setGameOver();
-                    this.uiManager.showGameOver('クリア！ボス鬼を倒した！');
+                    playSE("gameclear"); // ← ボス撃破時に効果音を鳴らす
+                    const clearMsg = (this.selectedBossType === 4)
+                        ? 'クリア！風神・雷神を倒した！'
+                        : 'クリア！ボス鬼を倒した！';
+                    this.uiManager.showGameOver(clearMsg);
                     return;
                 }
             }
@@ -355,7 +361,7 @@ export class Game {
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
         // オトモレベルUIを毎フレーム更新
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
-        
+
         // ミニマップを更新（背景画像も含む）
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
         this.uiManager.updateMinimap(this.player, this.enemyManager.getEnemies(), mapWidth, mapHeight, scrollX, scrollY, this.renderer);
@@ -368,57 +374,64 @@ export class Game {
 
     // ボス鬼の存在判定を修正
     isBossEnemy(enemy) {
-        return enemy.constructor.name === 'BossOni' || 
-               enemy.constructor.name === 'BossOni1' || 
-               enemy.constructor.name === 'BossOni2' || 
-               enemy.constructor.name === 'BossOni3' || 
-               enemy.constructor.name === 'BossOni4' || 
-               enemy.constructor.name === 'BossOni5';
+        return enemy.constructor.name === 'BossOni' ||
+            enemy.constructor.name === 'BossOni1' ||
+            enemy.constructor.name === 'BossOni2' ||
+            enemy.constructor.name === 'BossOni3' ||
+            enemy.constructor.name === 'BossOni4' ||
+            enemy.constructor.name === 'BossOni5';
     }
 
     // 当たり判定の描画
     drawHitboxes(scrollX, scrollY) {
         const ctx = this.ctx;
-        
+
         // プレイヤーの当たり判定
         if (this.debugSettings.showPlayerHitbox) {
             ctx.strokeStyle = '#00ff00';
             ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
-            
-            // プレイヤーの実際の中心座標（描画位置ではなく実際の座標）
-            const playerCenterX = this.player.x - scrollX;
-            const playerCenterY = this.player.y - scrollY;
+
+            // プレイヤーの実際の中心座標（プレイヤーの位置 + width/2, height/2を中心とする）
+            const playerCenterX = this.player.x + this.player.width / 2 - scrollX;
+            const playerCenterY = this.player.y + this.player.height / 2 - scrollY;
             const playerRadius = Math.min(this.player.width, this.player.height) / 2 * (this.playerHitboxSize || 0.8);
-            
+
+            // 当たり判定円を描画
             ctx.beginPath();
             ctx.arc(playerCenterX, playerCenterY, playerRadius, 0, Math.PI * 2);
             ctx.stroke();
+
+            // プレイヤーの実際の描画範囲も表示（デバッグ用）
+            ctx.strokeStyle = '#00ffff';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 2]);
+            ctx.strokeRect(this.player.x - scrollX, this.player.y - scrollY, this.player.width, this.player.height);
         }
-        
+
         // 敵の当たり判定
         if (this.debugSettings.showEnemyHitbox) {
             ctx.strokeStyle = '#ff0000';
             ctx.lineWidth = 2;
             ctx.setLineDash([5, 5]);
-            
+
             this.enemyManager.getEnemies().forEach(enemy => {
                 const enemyCenterX = enemy.x + enemy.width / 2 - scrollX;
                 const enemyCenterY = enemy.y + enemy.height / 2 - scrollY;
                 const enemyRadius = Math.max(enemy.width, enemy.height) / 2;
-                
+
                 ctx.beginPath();
                 ctx.arc(enemyCenterX, enemyCenterY, enemyRadius, 0, Math.PI * 2);
                 ctx.stroke();
             });
         }
-        
+
         // 弾の当たり判定
         if (this.debugSettings.showProjectileHitbox) {
             ctx.strokeStyle = '#ffff00';
             ctx.lineWidth = 2;
             ctx.setLineDash([3, 3]);
-            
+
             this.projectileManager.getProjectiles().forEach(projectile => {
                 // すべての弾を円形の当たり判定で表示
                 ctx.beginPath();
@@ -426,22 +439,22 @@ export class Game {
                 ctx.stroke();
             });
         }
-        
+
         // 攻撃範囲の表示
         if (this.debugSettings.showAttackRange && this.attackManager.attackCircle) {
             ctx.strokeStyle = '#00ffff';
             ctx.lineWidth = 3;
             ctx.setLineDash([]);
-            
+
             const attackX = this.attackManager.attackCircle.x - scrollX;
             const attackY = this.attackManager.attackCircle.y - scrollY;
             const radius = this.attackManager.attackCircle.radius;
-            
+
             ctx.beginPath();
             ctx.arc(attackX, attackY, radius, 0, Math.PI * 2);
             ctx.stroke();
         }
-        
+
         // 線のスタイルをリセット
         ctx.setLineDash([]);
     }
@@ -449,7 +462,7 @@ export class Game {
     // デバッグ設定を適用
     applyDebugSettings(settings) {
         console.log('Applying debug settings:', settings);
-        
+
         // 敵の設定
         if (settings.enemySpawnInterval !== undefined) {
             this.enemyManager.spawnInterval = settings.enemySpawnInterval;
@@ -474,7 +487,7 @@ export class Game {
         if (settings.bossBattleTime !== undefined) {
             this.bossTimer = settings.bossBattleTime;
         }
-        
+
         // プレイヤーの設定
         if (settings.playerHP !== undefined) {
             this.player.maxHP = settings.playerHP;
@@ -489,7 +502,7 @@ export class Game {
         if (settings.ammoRecoveryTime !== undefined) {
             this.player.ammoManager.ammoRecoveryTime = settings.ammoRecoveryTime;
         }
-        
+
         // 当たり判定表示設定
         if (settings.showPlayerHitbox !== undefined) {
             console.log('Setting showPlayerHitbox:', settings.showPlayerHitbox);
@@ -507,7 +520,7 @@ export class Game {
             console.log('Setting showAttackRange:', settings.showAttackRange);
             this.debugSettings.showAttackRange = settings.showAttackRange;
         }
-        
+
         // 高速移動設定
         if (settings.highSpeedThreshold !== undefined) {
             this.highSpeedThreshold = settings.highSpeedThreshold;
@@ -518,7 +531,7 @@ export class Game {
         if (settings.enableLineIntersection !== undefined) {
             this.enableLineIntersection = settings.enableLineIntersection;
         }
-        
+
         // ボス設定
         if (settings.bossOni1ProjectileSpeed !== undefined) {
             this.bossOni1ProjectileSpeed = settings.bossOni1ProjectileSpeed;
@@ -526,7 +539,7 @@ export class Game {
         if (settings.bossOni1ProjectileDamage !== undefined) {
             this.bossOni1ProjectileDamage = settings.bossOni1ProjectileDamage;
         }
-        
+
         // 当たり判定詳細設定
         if (settings.showCollisionDebug !== undefined) {
             console.log('Setting showCollisionDebug:', settings.showCollisionDebug);
@@ -536,7 +549,7 @@ export class Game {
             console.log('Setting playerHitboxSize:', settings.playerHitboxSize);
             this.playerHitboxSize = settings.playerHitboxSize;
         }
-        
+
         console.log('Debug settings after apply:', this.debugSettings);
     }
 
@@ -549,13 +562,18 @@ export class Game {
     // ゲームを完全に破棄する関数
     destroy() {
         console.log('Game destroy called');
-        
+
         // アニメーションループを停止
         if (this.gameState.getAnimationId()) {
             cancelAnimationFrame(this.gameState.getAnimationId());
             this.gameState.setAnimationId(null);
         }
-        
+
+        // BGMを停止
+        if (this.bgmManager) {
+            this.bgmManager.stop();
+        }
+
         // イベントリスナーを削除
         if (this.eventHandlers) {
             if (this.canvas && this.eventHandlers.contextmenu) {
@@ -575,39 +593,64 @@ export class Game {
             }
             this.eventHandlers = null;
         }
-        
+
         // すべてのマネージャーをクリア
         if (this.enemyManager) {
             this.enemyManager.reset();
             this.enemyManager.clearAllEnemies();
         }
-        
+
         if (this.particleManager) {
             this.particleManager.clearParticles();
         }
-        
+
         if (this.projectileManager) {
             this.projectileManager.reset();
         }
-        
+
         if (this.inputManager) {
             this.inputManager.destroy();
         }
-        
+
         if (this.pauseManager) {
             this.pauseManager.destroy();
         }
-        
+
         if (this.timer) {
             this.timer.stop();
         }
-        
+
+        if (this.attackManager) {
+            this.attackManager.reset();
+        }
+
+        // UIの状態もリセット
+        if (this.uiManager) {
+            this.uiManager.hideGameOver();
+            this.uiManager.hidePauseMessage();
+            this.uiManager.hideBossCutIn();
+            this.uiManager.hideMinimap();
+        }
+
         // オブジェクト参照をクリア
         this.player = null;
         this.otomo = null;
         this.canvas = null;
         this.ctx = null;
-        
+        this.enemyManager = null;
+        this.particleManager = null;
+        this.projectileManager = null;
+        this.inputManager = null;
+        this.pauseManager = null;
+        this.timer = null;
+        this.attackManager = null;
+        this.uiManager = null;
+        this.cameraManager = null;
+        this.renderer = null;
+        this.collisionManager = null;
+        this.gameState = null;
+        this.bgmManager = null;
+
         console.log('Game destroyed successfully');
     }
 
@@ -632,6 +675,11 @@ export class Game {
                 this.player.ammoManager.ammoRecoveryTime /= 1.1; // リロード速度1.1倍
             }
             leveledUp = true;
+
+            // メインキャラ（プレイヤー）のレベルアップ時のみ効果音を鳴らす
+            if (this.player) {
+                playSE("levelup");
+            }
         }
         // UI即時反映
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
@@ -653,7 +701,7 @@ export class Game {
     updateEnemyParameters(settings) {
         // 各敵クラスの基本パラメータを更新
         const { RedOni, BlueOni, BlackOni } = this.enemyManager.constructor;
-        
+
         // 基本HPと速度を更新（新しい敵生成時に適用）
         this.enemyBaseHP = {
             red: settings.redOniHP,

@@ -17,10 +17,15 @@ export class BgmManager {
         this.volume = 0.7;
         this.loopInterval = null;
         this.introTimeout = null;
+        this.isUserInteracted = false; // ユーザーの最初の相互作用フラグ
+        this.pendingPlay = null; // 保留中の再生要求
         Object.values(this.bgms).forEach(bgm => {
             bgm.loop = true;
             bgm.volume = this.volume;
         });
+
+        // 初回クリック/タップでオーディオコンテキストを有効化
+        this.initializeUserInteraction();
 
         // ループ戦略を設定
         this.loopStrategies = {
@@ -54,7 +59,49 @@ export class BgmManager {
         };
     }
 
-    play(key = 'mainBgm') {
+    // ユーザーの初回相互作用を検出してオーディオを有効化
+    initializeUserInteraction() {
+        const enableAudio = async () => {
+            if (!this.isUserInteracted) {
+                this.isUserInteracted = true;
+                
+                // 音声案内を非表示
+                const audioNotice = document.getElementById('audioNotice');
+                if (audioNotice) {
+                    audioNotice.style.display = 'none';
+                }
+                
+                // 保留中の再生があれば実行
+                if (this.pendingPlay) {
+                    await this.playInternal(this.pendingPlay);
+                    this.pendingPlay = null;
+                }
+                
+                // イベントリスナーを削除
+                document.removeEventListener('click', enableAudio);
+                document.removeEventListener('touchstart', enableAudio);
+                document.removeEventListener('keydown', enableAudio);
+            }
+        };
+
+        // 各種ユーザーイベントを監視
+        document.addEventListener('click', enableAudio);
+        document.addEventListener('touchstart', enableAudio);
+        document.addEventListener('keydown', enableAudio);
+    }
+
+    async play(key = 'mainBgm') {
+        if (!this.isUserInteracted) {
+            // ユーザーの相互作用前なら保留
+            this.pendingPlay = key;
+            console.log(`BGM "${key}" は最初のユーザー操作後に再生されます`);
+            return;
+        }
+        
+        await this.playInternal(key);
+    }
+
+    async playInternal(key) {
         this.stop();
         if (this.bgms[key]) {
             const bgm = this.bgms[key];
@@ -65,9 +112,14 @@ export class BgmManager {
             } else {
                 bgm.currentTime = loop ? loop.start : 0;
             }
-            bgm.play();
-            this.currentKey = key;
-            this.loopStrategies[strategy](bgm, loop);
+            
+            try {
+                await bgm.play();
+                this.currentKey = key;
+                this.loopStrategies[strategy](bgm, loop);
+            } catch (error) {
+                console.warn(`BGM "${key}" の再生に失敗しました:`, error);
+            }
         }
     }
 
@@ -94,8 +146,10 @@ export class BgmManager {
     }
 
     resume() {
-        if (this.currentKey !== null) {
-            this.bgms[this.currentKey].play();
+        if (this.currentKey !== null && this.isUserInteracted) {
+            this.bgms[this.currentKey].play().catch(error => {
+                console.warn(`BGM "${this.currentKey}" の再開に失敗しました:`, error);
+            });
         }
     }
 

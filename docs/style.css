@@ -45,6 +45,22 @@ canvas {
     display: none !important;
 }
 
+/* ===== 照準カーソル ===== */
+#crosshair {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 999;
+    transform: translate(-50%, -50%);
+}
+
+#crosshair img {
+    width: 192px;
+    height: 192px;
+    opacity: 0.8;
+}
+
 /* ===== 障子風画面切り替えアニメーション ===== */
 .screen-transition {
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -205,6 +221,26 @@ canvas {
     opacity: 1;
     transform: scale(1) translateY(0);
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 音声案内スタイル */
+.audio-notice {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #ffd700;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #ffd700;
+    animation: fadeInOut 3s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
 #stageSelectArea {

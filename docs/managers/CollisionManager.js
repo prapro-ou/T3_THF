@@ -38,8 +38,8 @@ export class CollisionManager {
 
     // 高速移動時のプレイヤー-敵衝突判定
     checkPlayerEnemyCollisionWithMovement(player, enemy, playerPrevX, playerPrevY) {
-        // 桃太郎と敵の中心座標を計算
-        const playerCenterX = player.x+ player.width / 2;
+        // 桃太郎と敵の中心座標を計算（プレイヤーの座標は左上が基準なので中心を計算）
+        const playerCenterX = player.x + player.width / 2;
         const playerCenterY = player.y + player.height / 2;
         const enemyCenterX = enemy.x + enemy.width / 2;
         const enemyCenterY = enemy.y + enemy.height / 2;
@@ -59,9 +59,15 @@ export class CollisionManager {
             );
             
             if (moveDistance > 10) { // 高速移動時
+                // 前の位置も中心座標で計算
+                const playerPrevCenterX = playerPrevX + player.width / 2;
+                const playerPrevCenterY = playerPrevY + player.height / 2;
+                const playerCurrCenterX = player.x + player.width / 2;
+                const playerCurrCenterY = player.y + player.height / 2;
+                
                 return this.checkLineCircleIntersection(
-                    playerPrevX, playerPrevY, 
-                    player.x, player.y, 
+                    playerPrevCenterX, playerPrevCenterY, 
+                    playerCurrCenterX, playerCurrCenterY, 
                     enemyCenterX, enemyCenterY, 
                     playerRadius + enemyRadius
                 );

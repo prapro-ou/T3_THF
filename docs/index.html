@@ -9,7 +9,6 @@
     <!-- 和風Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Serif+JP:wght@700&display=swap"
         rel="stylesheet">
-    <script src="https://code.createjs.com/1.0.0/soundjs.min.js"></script>
 </head>
 
 <body>
@@ -26,6 +25,9 @@
     <div id="startScreen" class="dark-bg">
         <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
         <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
+        <div id="audioNotice" class="audio-notice">
+            <p>🔊 最初のクリックでBGMが開始されます</p>
+        </div>
     </div>
     <div id="stageSelectArea" class="hidden">
         <img id="backToStartButton" src="assets/UI/UI/button/modoru_button_UI.png" alt="スタート画面に戻る" class="image-btn"
@@ -120,6 +122,11 @@
     <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span
             id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span
             id="otomoExpToLevelUpValue">10</span></div>
+
+    <!-- 照準カーソル -->
+    <div id="crosshair" class="hidden">
+        <img src="assets/UI/UI/cross_hair.png" alt="照準">
+    </div>
 
     <!-- デバッグパネル -->
     <div id="debugPanel" class="hidden debug-panel">
