@@ -2,6 +2,7 @@
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
 import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet, preloadFuzinSpriteSheet, preloadRaizinSpriteSheet } from './components/EnemyRenderer.js';
 import { BgmManager } from './managers/BgmManager.js';
+import { playSE } from './managers/KoukaonManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -24,19 +25,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const stageSelectArea = document.getElementById('stageSelectArea');
     const minimapContainer = document.getElementById('minimapContainer');
     const crosshair = document.getElementById('crosshair');
-    
+
     // デバッグパネルの要素
     const debugPanel = document.getElementById('debugPanel');
     const closeDebug = document.getElementById('closeDebug');
     const applyDebugSettings = document.getElementById('applyDebugSettings');
     const resetDebugSettings = document.getElementById('resetDebugSettings');
-    
+
     // ポーズ画面の要素
     const pauseMessage = document.getElementById('pauseMessage');
     const resumeButton = document.getElementById('resumeButton');
     const pauseHelpButton = document.getElementById('pauseHelpButton');
     const pauseBackToStartButton = document.getElementById('pauseBackToStartButton');
-    
+
     // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
     const bgmManager = new BgmManager();
     bgmManager.play('mainBgm'); // ユーザー操作後まで保留される
@@ -48,18 +49,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function switchToScreenWithShojiOpen(fromScreen, toScreen, callback = null) {
         // 障子コンテナを表示
         shojiContainer.classList.remove('hidden');
-        
+
         // 障子を閉じる（画面を隠す）
         setTimeout(() => {
             shojiContainer.classList.add('shoji-close');
         }, 100);
-        
+
         // 障子が閉じた後、画面を切り替え
         setTimeout(() => {
             if (fromScreen) {
                 fromScreen.classList.add('hidden');
             }
-            
+
             if (toScreen) {
                 toScreen.classList.remove('hidden');
                 // ボス選択画面の場合、確実に表示されるようにする
@@ -70,11 +71,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     toScreen.style.zIndex = '5';
                 }
             }
-            
+
             // 障子を開く（新しい画面を表示）
             shojiContainer.classList.remove('shoji-close');
             shojiContainer.classList.add('shoji-open');
-            
+            playSE("open-husuma"); // ← ここで効果音を鳴らす
+
+
             // アニメーション完了後、障子コンテナを隠す
             setTimeout(() => {
                 shojiContainer.classList.add('hidden');
@@ -89,25 +92,26 @@ document.addEventListener('DOMContentLoaded', () => {
         // 障子コンテナを表示（開いた状態から開始）
         shojiContainer.classList.remove('hidden');
         shojiContainer.classList.add('shoji-open');
-        
+
         // 障子を閉じる
         setTimeout(() => {
             shojiContainer.classList.remove('shoji-open');
             shojiContainer.classList.add('shoji-close');
+            playSE("close-husuma"); // ← ここで効果音を鳴らす
         }, 100);
-        
+
         // 障子が完全に閉じた後、画面を切り替え
         setTimeout(() => {
             // 画面を切り替え
             if (fromScreen) {
                 fromScreen.classList.add('hidden');
             }
-            
+
             if (toScreen) {
                 toScreen.classList.remove('hidden');
             }
         }, 800);
-        
+
         // アニメーション完了後、障子コンテナを隠す
         setTimeout(() => {
             shojiContainer.classList.add('hidden');
@@ -124,7 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // キャンバス内の相対座標を計算
             const canvasX = e.clientX - rect.left;
             const canvasY = e.clientY - rect.top;
-            
+
             // 照準の位置をキャンバス座標系で設定
             crosshair.style.left = (rect.left + canvasX) + 'px';
             crosshair.style.top = (rect.top + canvasY) + 'px';
@@ -228,8 +232,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     startButton.addEventListener('click', () => {
         if (!assetsLoaded) return; // 念のため
-        
+
         console.log('スタートボタンがクリックされました');
+        playSE("kettei"); // ← 決定音
 
         // 障子風アニメーションでボス選択画面へ（開く方向）
         switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
@@ -244,15 +249,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // リスタート時もゲーム画面を維持
     restartButton.addEventListener('click', () => {
         console.log('リスタートボタンがクリックされました');
+        playSE("kettei"); // ← 決定音
         console.log('現在のselectedBossType:', selectedBossType);
-        
+
         // 既存のゲームインスタンスを破棄
         if (game) {
             console.log('既存のゲームインスタンスを破棄します');
             game.destroy();
             game = null;
         }
-        
+
         gameCanvas.classList.remove('hidden');
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
@@ -262,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         showCrosshair(); // 照準を表示
         // 選択されたボスの種類を使用
         console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
+
         game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
         
         // ゲーム状態監視を開始
@@ -276,23 +283,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 操作説明表示
     helpButton.addEventListener('click', () => {
+        playSE("kettei"); // ← 決定音
         helpModal.classList.remove('hidden');
     });
     // 操作説明閉じる
     closeHelp.addEventListener('click', () => {
+        playSE("kasoruidou"); // ← 戻り音
         helpModal.classList.add('hidden');
     });
-    
+
     // ボス選択画面からスタート画面へ戻る
     backToStartFromStageButton.addEventListener('click', () => {
         console.log('ボス選択画面から戻るボタンがクリックされました');
-        
+        playSE("kasoruidou"); // ← 戻り音
+
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(stageSelectArea, startScreen, () => {
             console.log('戻る障子アニメーション完了');
         });
     });
-    
+
     // スタート画面へ戻る
     backToStartButton.addEventListener('click', () => {
         // ゲーム画面を非表示
@@ -304,13 +314,13 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
         hideCrosshair(); // 照準を非表示
-        
+
         // otomoLevelDisplayも非表示にする
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
         if (otomoLevelDisplay) {
             otomoLevelDisplay.classList.add('hidden');
         }
-        
+
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
             if (game) {
@@ -329,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 helpModal.classList.remove('hidden');
             }
         }
-        
+
         // Pキーでポーズ切り替え時の照準制御
         if (e.key.toLowerCase() === 'p' && game) {
             setTimeout(() => {
@@ -352,11 +362,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
-    
+
     pauseHelpButton.addEventListener('click', () => {
         helpModal.classList.remove('hidden');
     });
-    
+
     pauseBackToStartButton.addEventListener('click', () => {
         // ゲーム画面を非表示
         gameCanvas.classList.add('hidden');
@@ -367,13 +377,13 @@ document.addEventListener('DOMContentLoaded', () => {
         pauseMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
         hideCrosshair(); // 照準を非表示
-        
+
         // otomoLevelDisplayも非表示にする
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
         if (otomoLevelDisplay) {
             otomoLevelDisplay.classList.add('hidden');
         }
-        
+
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
             if (game) {
@@ -383,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
             bgmManager.play('mainBgm');
         });
     });
-    
+
     // 操作説明ボタンもポーズ中のみ有効
     helpButton.addEventListener('click', () => {
         if (game && game.pauseManager.isPaused) {
@@ -398,7 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     applyDebugSettings.addEventListener('click', () => {
         if (!game) return;
-        
+
         // 鬼の設定を適用
         const enemySpawnInterval = parseInt(document.getElementById('enemySpawnInterval').value);
         const maxEnemies = parseInt(document.getElementById('maxEnemies').value);
@@ -408,32 +418,32 @@ document.addEventListener('DOMContentLoaded', () => {
         const enemyBaseSpeed = parseFloat(document.getElementById('enemyBaseSpeed').value);
         const bossSpawnTime = parseInt(document.getElementById('bossSpawnTime').value);
         const bossBattleTime = parseInt(document.getElementById('bossBattleTime').value);
-        
+
         // プレイヤーの設定を適用
         const playerHP = parseInt(document.getElementById('playerHP').value);
         const playerSpeed = parseFloat(document.getElementById('playerSpeed').value);
         const maxAmmo = parseInt(document.getElementById('maxAmmo').value);
         const ammoRecoveryTime = parseFloat(document.getElementById('ammoRecoveryTime').value);
-        
+
         // 当たり判定表示設定を適用
         const showPlayerHitbox = document.getElementById('showPlayerHitbox').checked;
         const showEnemyHitbox = document.getElementById('showEnemyHitbox').checked;
         const showProjectileHitbox = document.getElementById('showProjectileHitbox').checked;
         const showAttackRange = document.getElementById('showAttackRange').checked;
-        
+
         // 高速移動設定を適用
         const highSpeedThreshold = parseInt(document.getElementById('highSpeedThreshold').value);
         const maxSubframeSteps = parseInt(document.getElementById('maxSubframeSteps').value);
         const enableLineIntersection = document.getElementById('enableLineIntersection').checked;
-        
+
         // ボス設定を適用
         const bossOni1ProjectileSpeed = parseFloat(document.getElementById('bossOni1ProjectileSpeed').value);
         const bossOni1ProjectileDamage = parseInt(document.getElementById('bossOni1ProjectileDamage').value);
-        
+
         // 当たり判定詳細設定を適用
         const showCollisionDebug = document.getElementById('showCollisionDebug').checked;
         const playerHitboxSize = parseFloat(document.getElementById('playerHitboxSize').value);
-        
+
         // デバッグ情報を出力
         console.log('UI values from debug panel:', {
             showPlayerHitbox,
@@ -443,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showCollisionDebug,
             playerHitboxSize
         });
-        
+
         // 設定を適用
         const settings = {
             enemySpawnInterval,
@@ -470,10 +480,10 @@ document.addEventListener('DOMContentLoaded', () => {
             showCollisionDebug,
             playerHitboxSize
         };
-        
+
         console.log('Applying settings to game:', settings);
         game.applyDebugSettings(settings);
-        
+
         debugPanel.classList.add('hidden');
     });
 
@@ -491,23 +501,23 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('playerSpeed').value = 3.5;
         document.getElementById('maxAmmo').value = 10;
         document.getElementById('ammoRecoveryTime').value = 3;
-        
+
         // 当たり判定表示設定をデフォルトにリセット
         document.getElementById('showPlayerHitbox').checked = false;
         document.getElementById('showEnemyHitbox').checked = false;
         document.getElementById('showProjectileHitbox').checked = false;
         document.getElementById('showAttackRange').checked = false;
         document.getElementById('showCollisionDebug').checked = false; // デバッグ情報もOFF
-        
+
         // 高速移動設定をデフォルトにリセット
         document.getElementById('highSpeedThreshold').value = 10;
         document.getElementById('maxSubframeSteps').value = 10;
         document.getElementById('enableLineIntersection').checked = true;
-        
+
         // ボス設定をデフォルトにリセット
         document.getElementById('bossOni1ProjectileSpeed').value = 3;
         document.getElementById('bossOni1ProjectileDamage').value = 15;
-        
+
         // 当たり判定詳細設定をデフォルトにリセット
         document.getElementById('showCollisionDebug').checked = true;
         document.getElementById('playerHitboxSize').value = 0.8;
@@ -584,18 +594,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const bossCards = document.querySelectorAll('.boss-card');
     bossCards.forEach(card => {
         card.addEventListener('click', () => {
+            playSE("kettei"); // ← 決定音
             bossCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             // ボス種別取得
             const selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
-            
+
             // 既存のゲームインスタンスがあれば破棄
             if (game) {
                 console.log('既存のゲームインスタンスを破棄します（ボス選択）');
                 game.destroy();
                 game = null;
             }
-            
+
             // 障子風アニメーションでゲーム画面へ（開く方向）
             switchToScreenWithShojiOpen(stageSelectArea, null, () => {
                 // ゲーム画面を表示
@@ -606,9 +617,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 minimapContainer.classList.remove('hidden'); // ミニマップ表示
                 quickHelp.classList.remove('hidden');
                 showCrosshair(); // 照準を表示
-                
+
                 // 新しいゲームインスタンスを作成
                 console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
+                
                 game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
                 
                 // ゲーム状態監視を開始
@@ -619,7 +631,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         clearInterval(gameStateInterval);
                     }
                 }, 100); // 100ms間隔で監視
-                
+               
                 // cannon_ballのスプライトシートも読み込み
                 if (game && game.projectileManager) {
                     game.projectileManager.preloadCannonBallSpriteSheet(() => {

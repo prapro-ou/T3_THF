@@ -1,5 +1,6 @@
 import { BossOni } from './BossOni.js';
 import { SpriteSheet } from '../../utils/SpriteSheet.js';
+import { playSE } from '../../managers/KoukaonManager.js'; // 追加
 
 /**
  * BossOni2: バイクに乗って突進を繰り返すボス（強化改良版）
@@ -15,7 +16,7 @@ export class BossOni2 extends BossOni {
             console.log('BossOni2: Constructor called');
             super(game, x, y);
             console.log('BossOni2: Super constructor completed');
-            
+
             this.color = '#3498db'; // 青系
             this._maxHP = 400; // HP増加
             this._hp = 400;
@@ -133,7 +134,7 @@ export class BossOni2 extends BossOni {
     initializeAnimation() {
         // bike_oniのスプライトシートを直接読み込み
         console.log('BossOni2: Loading bike_oni sprite sheet...');
-        
+
         fetch('assets/characters/oni/bike_oni/bike_oni.json')
             .then(res => {
                 if (!res.ok) throw new Error('JSON not found');
@@ -143,15 +144,15 @@ export class BossOni2 extends BossOni {
             .then(data => {
                 console.log('BossOni2: JSON data:', data);
                 console.log('BossOni2: Frames array length:', data.frames.length);
-                
+
                 let retryCount = 0;
                 const maxRetries = 10;
-                
+
                 function tryLoadImage() {
                     const img = new Image();
                     img.src = 'assets/characters/oni/bike_oni/bike_oni.png?' + new Date().getTime();
                     console.log('BossOni2: Trying to load image, attempt', retryCount + 1, 'src:', img.src);
-                    
+
                     img.onload = () => {
                         console.log('BossOni2: Image loaded successfully');
                         console.log('BossOni2: Image dimensions:', img.width, 'x', img.height);
@@ -162,7 +163,7 @@ export class BossOni2 extends BossOni {
                         this.spriteSheet.startAnimation();
                         console.log('BossOni2: SpriteSheet initialized');
                     };
-                    
+
                     img.onerror = () => {
                         console.log('BossOni2: Image load failed, attempt', retryCount + 1, 'src:', img.src);
                         retryCount++;
@@ -174,7 +175,7 @@ export class BossOni2 extends BossOni {
                         }
                     };
                 }
-                
+
                 tryLoadImage.call(this);
             })
             .catch(err => {
@@ -200,7 +201,7 @@ export class BossOni2 extends BossOni {
         // アニメーション更新
         if (this.spriteSheet) {
             this.spriteSheet.updateAnimation();
-            
+
             // 状態に応じてアニメーション速度を調整
             switch (this.state) {
                 case 'idle':
@@ -253,7 +254,8 @@ export class BossOni2 extends BossOni {
                     this.stateTimer = 0;
                     this.currentDashFrame = 0;
                     this.comboCount++;
-                }
+                    playSE("baiku1"); // ← 突進開始時に効果音を鳴らす
+           }
                 break;
                 
             case 'dashing':
@@ -262,11 +264,12 @@ export class BossOni2 extends BossOni {
                 this.x += this._dx;
                 this.y += this._dy;
                 this.currentDashFrame++;
-                
+
                 // 突進エフェクトを生成
                 this.createDashParticles();
                 this.createTrailEffect();
                 
+
                 // 攻撃判定
                 this.checkDashAttack();
                 if (this.currentDashFrame > this.dashDuration || this.isOutOfBounds()) {
@@ -607,11 +610,11 @@ export class BossOni2 extends BossOni {
         this.particleTimer++;
         if (this.particleTimer >= 2) { // 2フレームごとにパーティクル生成
             this.particleTimer = 0;
-            
+
             // バイクの後ろにパーティクルを生成
             const particleX = this.x + (this.spriteDirection === 'left' ? this.width : 0);
             const particleY = this.y + this.height * 0.7; // バイクの後輪付近
-            
+
             this.dashParticles.push({
                 x: particleX,
                 y: particleY,
@@ -681,7 +684,7 @@ export class BossOni2 extends BossOni {
             particle.y += particle.vy;
             particle.life--;
             particle.alpha = particle.life / particle.maxLife;
-            
+
             if (particle.life <= 0) {
                 this.dashParticles.splice(i, 1);
             }
@@ -718,6 +721,7 @@ export class BossOni2 extends BossOni {
         }
         ctx.restore();
     }
+
 
     drawTrailEffect(ctx, scrollX, scrollY) {
         // 軌跡エフェクトを描画
@@ -764,3 +768,4 @@ export class BossOni2 extends BossOni {
         };
     }
 } 
+

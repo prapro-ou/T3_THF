@@ -1,4 +1,5 @@
 import { BossOni } from './BossOni.js';
+import { playSE } from '../../managers/KoukaonManager.js'; // 効果音をインポート
 
 export class BossOni5 extends BossOni {
     constructor(game, x = null, y = null) {
@@ -44,6 +45,7 @@ export class BossOni5 extends BossOni {
                 this._lastStrikeSchedule = nowFrame - this.strikeEveryFrames; // すぐ最初を打てるように
                 this._pendingStrikes = [];
                 this._attackCooldown = this.attackCooldownFrames; // 次回用
+                playSE("Thunder"); // ← 攻撃開始時にThunder効果音を鳴らす
             }
         } else {
             // 一定間隔で新規落雷を予約
@@ -163,4 +165,4 @@ export class BossOni5 extends BossOni {
         // 着弾点にも強いフラッシュ
         this.game.particleManager.createExplosion(cx, cy, '#ffeaa7', 18);
     }
-} 
+}

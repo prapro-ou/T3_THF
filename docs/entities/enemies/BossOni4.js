@@ -1,4 +1,5 @@
 import { BossOni } from './BossOni.js';
+import { playSE } from '../../managers/KoukaonManager.js'; // 効果音をインポート
 
 export class BossOni4 extends BossOni {
     constructor(game, x = null, y = null) {
@@ -60,6 +61,7 @@ export class BossOni4 extends BossOni {
                     this._attackPhase = 'active';
                     this._phaseTimer = (this._attackType === 'cone') ? this.coneActiveFrames : this.ringActiveFrames;
                     this._startedAtFrame = this.game.enemyManager.frame || 0;
+                    playSE("Wind"); // ← 攻撃開始時にWind効果音を鳴らす
                 }
             } else if (this._attackPhase === 'active') {
                 this.applyAttackEffect();
@@ -202,4 +204,4 @@ export class BossOni4 extends BossOni {
     }
 
     degToRad(d) { return d * Math.PI / 180; }
-} 
+}
