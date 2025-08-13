@@ -331,6 +331,13 @@ export class Game {
 
         // プレイヤーとの衝突判定
         this.enemyManager.getEnemies().forEach(enemy => {
+            // ボス出現から2秒間はボスの当たり判定を無効化
+            if (this.bossAppeared) {
+                const now = Date.now();
+                if (now - this.bossStartTime < 2000){
+                    return;
+                }
+            }
             if (this.collisionManager.checkPlayerEnemyCollision(this.player, enemy)) {
                 if (!enemy.markedForDeletion) {
                     const damage = this.isBossEnemy(enemy) ? 40 : 20;
