@@ -62,13 +62,30 @@ export class ProjectileManager {
     }
 
     update(deltaTime) {
-        this.projectiles.forEach(p => p.update(deltaTime));
+        console.log('ProjectileManager: Updating', this.projectiles.length, 'projectiles');
+        this.projectiles.forEach((p, index) => {
+            console.log(`ProjectileManager: Updating projectile ${index}, type: ${p.type || 'unknown'}, markedForDeletion: ${p.markedForDeletion}`);
+            p.update(deltaTime);
+            
+            // お札の当たり判定をチェック
+            if (p.type === 'ofuda' && this.game.player && !p.markedForDeletion) {
+                console.log('ProjectileManager: Checking ofuda collision with player');
+                if (p.checkPlayerCollision && p.checkPlayerCollision(this.game.player)) {
+                    console.log('ProjectileManager: Ofuda hit player, collision detected');
+                    // markedForDeletionはcheckPlayerCollision内で設定されるので、ここでは設定しない
+                }
+            }
+        });
         this.projectiles = this.projectiles.filter(p => !p.markedForDeletion);
+        console.log('ProjectileManager: After cleanup,', this.projectiles.length, 'projectiles remaining');
     }
 
     draw(ctx, scrollX, scrollY) {
-        console.log("Drawing", this.projectiles.length, "projectiles");
-        this.projectiles.forEach(p => p.draw(ctx, scrollX, scrollY));
+        console.log("ProjectileManager: Drawing", this.projectiles.length, "projectiles");
+        this.projectiles.forEach((p, index) => {
+            console.log(`ProjectileManager: Drawing projectile ${index}, type: ${p.type || 'unknown'}, position: (${p.x}, ${p.y})`);
+            p.draw(ctx, scrollX, scrollY);
+        });
     }
 
     reset() {

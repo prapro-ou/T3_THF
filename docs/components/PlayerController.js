@@ -15,23 +15,31 @@ export class PlayerController {
     updatePlayerMovement(player, deltaTime) {
         this._isMoving = false;
         
+        // 減速効果を考慮した移動速度を計算
+        const currentSpeed = player.constructor.SPEED * (player.slowStrength || 1);
+        
+        // デバッグ用：減速効果が適用されている場合のみログ出力
+        if (player.slowStrength && player.slowStrength !== 1) {
+            console.log(`PlayerController: Current speed: ${currentSpeed} (base: ${player.constructor.SPEED}, slow: ${player.slowStrength}, timer: ${player.slowTimer?.toFixed(1) || 'N/A'})`);
+        }
+        
         if (this.inputManager.isKeyPressed('w')) {
-            player.y -= player.constructor.SPEED;
+            player.y -= currentSpeed;
             player.direction = 'up';
             this._isMoving = true;
         }
         if (this.inputManager.isKeyPressed('s')) {
-            player.y += player.constructor.SPEED;
+            player.y += currentSpeed;
             player.direction = 'down';
             this._isMoving = true;
         }
         if (this.inputManager.isKeyPressed('a')) {
-            player.x -= player.constructor.SPEED;
+            player.x -= currentSpeed;
             player.direction = 'left';
             this._isMoving = true;
         }
         if (this.inputManager.isKeyPressed('d')) {
-            player.x += player.constructor.SPEED;
+            player.x += currentSpeed;
             player.direction = 'right';
             this._isMoving = true;
         }

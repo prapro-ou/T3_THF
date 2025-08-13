@@ -2,6 +2,7 @@ import { BossOni } from './BossOni.js';
 import { RedOni } from './RedOni.js'; // 例: 雑魚鬼
 import { playSE } from '../../managers/KoukaonManager.js'; // 効果音をインポート
 import { SpriteSheet } from '../../utils/SpriteSheet.js';
+import { OfudaProjectile } from '../OfudaProjectile.js';
 
 export class BossOni3 extends BossOni {
     constructor(game, x = null, y = null) {
@@ -27,6 +28,15 @@ export class BossOni3 extends BossOni {
             // 雑魚召喚の管理
             this.summonTimer = 0;
             this.summonInterval = 300; // 5秒ごとに召喚（60fps想定）
+
+            // お札攻撃の管理
+            this.ofudaAttackCooldown = 0;
+            this.ofudaAttackMaxCooldown = 180; // 3秒ごと（60fps想定）
+            this.ofudaAttackActive = false;
+            this.ofudaAttackCount = 0;
+            this.ofudaAttackMaxCount = 3; // 1回の攻撃で3枚のお札
+            this.ofudaAttackPattern = 'spread'; // 'spread', 'circle', 'target', 'spiral'
+            this.ofudaEffects = ['slow', 'poison'];
 
             // アニメーション方向管理
             this.currentDirection = 'front'; // 'front', 'back', 'left', 'right'
@@ -108,6 +118,13 @@ export class BossOni3 extends BossOni {
         if (this.summonTimer >= this.summonInterval) {
             this.summonTimer = 0;
             this.summonMinion();
+        }
+
+        // お札攻撃タイマー更新
+        this.ofudaAttackCooldown++;
+        if (this.ofudaAttackCooldown >= this.ofudaAttackMaxCooldown) {
+            this.executeOfudaAttack();
+            this.ofudaAttackCooldown = 0;
         }
     }
 
@@ -205,8 +222,7 @@ export class BossOni3 extends BossOni {
         }
 
         // フレームが存在する場合のみ設定
-        if (this.spriteSheet.frames[frameName]) {
-            this.spriteSheet.setCurrentFrame(frameName);
+        if (this.spriteSheet.frameNames.includes(frameName)) {
             console.log(`BossOni3: Animation direction changed to ${this.currentDirection}`);
         }
     }
@@ -384,7 +400,8 @@ export class BossOni3 extends BossOni {
                 `Pos: (${Math.round(this.x)}, ${Math.round(this.y)})`,
                 `SpriteSheet: ${this.spriteSheet ? (this.spriteSheet.image ? 'Image Loaded' : 'No Image') : 'Not created'}`,
                 `Current Frame: ${this.getCurrentFrameName()}`,
-                `Available Frames: ${this.spriteSheet ? this.spriteSheet.frameNames.join(', ') : 'None'}`
+                `Available Frames: ${this.spriteSheet ? this.spriteSheet.frameNames.join(', ') : 'None'}`,
+                `Ofuda Attack: ${this.ofudaAttackCooldown}/${this.ofudaAttackMaxCooldown}`
             ];
 
             debugText.forEach((text, index) => {
@@ -392,4 +409,147 @@ export class BossOni3 extends BossOni {
             });
         }
     }
+
+    executeOfudaAttack() {
+        // お札攻撃パターンをランダムに選択
+        this.ofudaAttackPattern = this.getRandomOfudaPattern();
+        
+        // 攻撃エフェクトを生成
+        this.createOfudaAttackEffect();
+        
+        // 選択されたパターンに基づいてお札を発射
+        console.log('BossOni3: Executing ofuda attack with pattern:', this.ofudaAttackPattern);
+        switch (this.ofudaAttackPattern) {
+            case 'spread':
+                this.fireSpreadOfuda();
+                break;
+            case 'circle':
+                this.fireCircleOfuda();
+                break;
+            case 'target':
+                this.fireTargetOfuda();
+                break;
+            case 'spiral':
+                this.fireSpiralOfuda();
+                break;
+        }
+        
+        // 効果音を再生
+        playSE('syoukan-syutugen');
+    }
+
+    getRandomOfudaPattern() {
+        const patterns = ['spread', 'circle', 'target', 'spiral'];
+        return patterns[Math.floor(Math.random() * patterns.length)];
+    }
+
+    fireSpreadOfuda() {
+        // 扇状に3枚のお札を発射
+        const player = this.game.player;
+        if (!player) return;
+        
+        console.log('BossOni3: Firing spread ofuda attack');
+        
+        const baseAngle = Math.atan2(player.centerY - this.centerY, player.centerX - this.centerX);
+        const spreadAngle = Math.PI / 6; // 30度の広がり
+        
+        for (let i = 0; i < this.ofudaAttackMaxCount; i++) {
+            const angle = baseAngle - spreadAngle + (spreadAngle * 2 * i) / (this.ofudaAttackMaxCount - 1);
+            const effectType = this.ofudaEffects[Math.floor(Math.random() * this.ofudaEffects.length)];
+            
+            // プレイヤーの現在位置を直接目標にする（より確実に当たるように）
+            const targetX = player.centerX;
+            const targetY = player.centerY;
+            
+            console.log(`BossOni3: Creating ofuda ${i + 1} with effect ${effectType}, target: (${targetX}, ${targetY})`);
+            const ofuda = new OfudaProjectile(this.game, this.centerX, this.centerY, targetX, targetY, effectType);
+            this.game.projectileManager.addProjectile(ofuda);
+            console.log('BossOni3: Ofuda added to projectile manager');
+        }
+    }
+
+    fireCircleOfuda() {
+        // 円形に8枚のお札を発射
+        const numOfuda = 8;
+        
+        for (let i = 0; i < numOfuda; i++) {
+            const angle = (Math.PI * 2 * i) / numOfuda;
+            const effectType = this.ofudaEffects[Math.floor(Math.random() * this.ofudaEffects.length)];
+            
+            const targetX = this.centerX + Math.cos(angle) * 150;
+            const targetY = this.centerY + Math.sin(angle) * 150;
+            
+            const ofuda = new OfudaProjectile(this.game, this.centerX, this.centerY, targetX, targetY, effectType);
+            this.game.projectileManager.addProjectile(ofuda);
+        }
+    }
+
+    fireTargetOfuda() {
+        // プレイヤーを狙って3枚のお札を発射（少しずつずらして）
+        const player = this.game.player;
+        if (!player) return;
+        
+        const baseAngle = Math.atan2(player.centerY - this.centerY, player.centerX - this.centerX);
+        const offsetAngle = Math.PI / 12; // 15度のずれ
+        
+        for (let i = 0; i < this.ofudaAttackMaxCount; i++) {
+            const angle = baseAngle + (offsetAngle * (i - 1));
+            const effectType = this.ofudaEffects[Math.floor(Math.random() * this.ofudaEffects.length)];
+            
+            const targetX = this.centerX + Math.cos(angle) * 300;
+            const targetY = this.centerY + Math.sin(angle) * 300;
+            
+            const ofuda = new OfudaProjectile(this.game, this.centerX, this.centerY, targetX, targetY, effectType);
+            this.game.projectileManager.addProjectile(ofuda);
+        }
+    }
+
+    fireSpiralOfuda() {
+        // 螺旋状に6枚のお札を発射
+        const numOfuda = 6;
+        const spiralAngle = Math.PI / 3; // 60度ずつ回転
+        
+        for (let i = 0; i < numOfuda; i++) {
+            const angle = spiralAngle * i;
+            const effectType = this.ofudaEffects[Math.floor(Math.random() * this.ofudaEffects.length)];
+            
+            const targetX = this.centerX + Math.cos(angle) * 180;
+            const targetY = this.centerY + Math.sin(angle) * 180;
+            
+            const ofuda = new OfudaProjectile(this.game, this.centerX, this.centerY, targetX, targetY, effectType);
+            this.game.projectileManager.addProjectile(ofuda);
+        }
+    }
+
+    createOfudaAttackEffect() {
+        // お札攻撃開始時のエフェクト
+        for (let i = 0; i < 12; i++) {
+            const angle = (Math.PI * 2 * i) / 12;
+            const speed = 3 + Math.random() * 2;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            
+            this.game.particleManager.createParticle(
+                this.centerX,
+                this.centerY,
+                vx,
+                vy,
+                '#FFD700', // 金色
+                45,
+                0.9
+            );
+        }
+        
+        // 中心の光るエフェクト
+        this.game.particleManager.createParticle(
+            this.centerX,
+            this.centerY,
+            0,
+            0,
+            '#FFD700',
+            60,
+            1.0
+        );
+    }
 }
+
