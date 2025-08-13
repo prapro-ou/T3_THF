@@ -17,8 +17,8 @@ export class BossOni3 extends BossOni {
             this.name = 'BossOni3';
 
             // warp_oni画像のサイズに合わせて調整
-            this.setSize(100, 100); // 視覚的サイズ
-            this.setCircularCollision(20); // 当たり判定半径
+            this.setSize(150, 150); // 視覚的サイズ
+            this.setCircularCollision(75); // 当たり判定半径
 
             // スプライト画像の設定
             this.spriteSheet = null;
@@ -28,6 +28,12 @@ export class BossOni3 extends BossOni {
             // 雑魚召喚の管理
             this.summonTimer = 0;
             this.summonInterval = 300; // 5秒ごとに召喚（60fps想定）
+            this.summonPatterns = ['single', 'double', 'triangle', 'circle', 'cross', 'spiral', 'wall', 'bomb'];
+            this.currentSummonPattern = 'single';
+            this.summonCooldown = 0;
+            this.summonCooldownMax = 90; // 1.5秒間のクールダウン（短縮）
+            this.summonWarningTimer = 0;
+            this.summonWarningDuration = 45; // 0.75秒間の予告（短縮）
 
             // お札攻撃の管理
             this.ofudaAttackCooldown = 0;
@@ -50,7 +56,7 @@ export class BossOni3 extends BossOni {
             // ワープ状態の管理
             this.isWarping = false; // ワープ中フラグ
             this.warpCooldown = 0; // ワープ後のクールダウン
-            this.warpCooldownMax = 180; // 3秒間（60fps想定）
+            this.warpCooldownMax = 60; // 1秒間（60fps想定）
             this.preWarpDelay = 0; // ワープ前の遅延
             this.preWarpDelayMax = 180; // 3秒間（60fps想定）
 
@@ -137,13 +143,9 @@ export class BossOni3 extends BossOni {
 
         // ワープ中でない場合のみ通常の行動を実行
         if (!this.isWarping && this.warpCooldown <= 0 && this.preWarpDelay <= 0) {
-        // 雑魚召喚処理
-        this.summonTimer++;
-        if (this.summonTimer >= this.summonInterval) {
-            this.summonTimer = 0;
-            this.summonMinion();
-            }
-
+            // 召喚システムの更新
+            this.updateSummonSystem();
+            
             // お札攻撃タイマー更新
             this.ofudaAttackCooldown++;
             if (this.ofudaAttackCooldown >= this.ofudaAttackMaxCooldown) {
@@ -259,16 +261,400 @@ export class BossOni3 extends BossOni {
         }
     }
 
-    summonMinion() {
-        // 雑魚鬼を自分の近くに召喚（HPを明示的に設定）
-        const minion = new RedOni(this.game, 'red', 15); // HP15の弱い雑魚鬼
-        // 召喚位置を設定
-        minion.x = this.x + this.width / 2 - minion.width / 2;
-        minion.y = this.y + this.height / 2 - minion.height / 2;
+    // 召喚システムの更新
+    updateSummonSystem() {
+        // 召喚クールダウンの更新
+        if (this.summonCooldown > 0) {
+            this.summonCooldown--;
+            return;
+        }
+        
+        // 召喚予告タイマーの更新
+        if (this.summonWarningTimer > 0) {
+            this.summonWarningTimer--;
+            
+            // 予告中は定期的にエフェクトを表示
+            if (this.summonWarningTimer % 15 === 0) {
+                this.createSummonWarningEffect();
+            }
+            
+            // 予告終了時に召喚実行
+            if (this.summonWarningTimer <= 0) {
+                this.executeSummon();
+            }
+            return;
+        }
+        
+        // 召喚タイマーの更新
+        this.summonTimer++;
+        if (this.summonTimer >= this.summonInterval) {
+            this.summonTimer = 0;
+            this.startSummonSequence();
+        }
+    }
+
+    // 召喚シーケンスの開始
+    startSummonSequence() {
+        // 召喚パターンを選択
+        this.selectSummonPattern();
+        
+        // 召喚予告を開始
+        this.summonWarningTimer = this.summonWarningDuration;
+        this.createSummonWarningEffect();
+        
+        console.log(`BossOni3: Starting summon sequence with pattern: ${this.currentSummonPattern}`);
+    }
+
+    // 召喚パターンの選択
+    selectSummonPattern() {
+        // 体力に応じてパターンを選択
+        const healthRatio = this.hp / this.maxHP;
+        
+        if (healthRatio <= 0.2) {
+            // 体力20%以下：最強パターン + 召喚頻度大幅アップ
+            this.currentSummonPattern = this.getRandomPattern(['spiral', 'wall', 'bomb', 'circle']);
+            this.summonInterval = Math.floor(this.summonInterval * 0.4); // 60%短縮
+        } else if (healthRatio <= 0.4) {
+            // 体力40%以下：強力なパターン + 召喚頻度アップ
+            this.currentSummonPattern = this.getRandomPattern(['circle', 'cross', 'triangle', 'spiral']);
+            this.summonInterval = Math.floor(this.summonInterval * 0.5); // 50%短縮
+        } else if (healthRatio <= 0.7) {
+            // 体力70%以下：中程度のパターン + 召喚頻度アップ
+            this.currentSummonPattern = this.getRandomPattern(['double', 'triangle', 'single', 'cross']);
+            this.summonInterval = Math.floor(this.summonInterval * 0.7); // 30%短縮
+        } else {
+            // 体力70%以上：基本的なパターン
+            this.currentSummonPattern = this.getRandomPattern(['single', 'double', 'triangle']);
+            this.summonInterval = 300; // 基本間隔
+        }
+    }
+
+    // ランダムパターン選択
+    getRandomPattern(patterns) {
+        return patterns[Math.floor(Math.random() * patterns.length)];
+    }
+
+    // 召喚予告エフェクト
+    createSummonWarningEffect() {
+        // 召喚陣の予告エフェクト
+        for (let i = 0; i < 20; i++) { // 16→20に増加
+            const angle = (Math.PI * 2 * i) / 20;
+            const distance = 40 + Math.random() * 20;
+            const x = this.centerX + Math.cos(angle) * distance;
+            const y = this.centerY + Math.sin(angle) * distance;
+            
+            this.game.particleManager.createParticle(
+                x, y,
+                (Math.random() - 0.5) * 2,
+                (Math.random() - 0.5) * 2,
+                '#FFD700', // 金色
+                45,
+                0.8
+            );
+        }
+        
+        // 中心の光
+        this.game.particleManager.createParticle(
+            this.centerX, this.centerY,
+            0, 0,
+            '#FFD700',
+            60,
+            1.0
+        );
+        
+        // パターンに応じた追加エフェクト
+        if (this.currentSummonPattern === 'spiral' || this.currentSummonPattern === 'wall' || this.currentSummonPattern === 'bomb') {
+            // 最強パターン用の赤い警告エフェクト
+            for (let i = 0; i < 12; i++) {
+                const angle = (Math.PI * 2 * i) / 12;
+                const distance = 60 + Math.random() * 30;
+                const x = this.centerX + Math.cos(angle) * distance;
+                const y = this.centerY + Math.sin(angle) * distance;
+                
+                this.game.particleManager.createParticle(
+                    x, y,
+                    (Math.random() - 0.5) * 3,
+                    (Math.random() - 0.5) * 3,
+                    '#FF4500', // オレンジレッド
+                    60,
+                    0.9
+                );
+            }
+        }
+    }
+
+    // 召喚実行
+    executeSummon() {
+        switch (this.currentSummonPattern) {
+            case 'single':
+                this.summonSingleMinion();
+                break;
+            case 'double':
+                this.summonDoubleMinions();
+                break;
+            case 'triangle':
+                this.summonTriangleMinions();
+                break;
+            case 'circle':
+                this.summonCircleMinions();
+                break;
+            case 'cross':
+                this.summonCrossMinions();
+                break;
+            case 'spiral':
+                this.summonSpiralMinions();
+                break;
+            case 'wall':
+                this.summonWallMinions();
+                break;
+            case 'bomb':
+                this.summonBombMinions();
+                break;
+        }
+        
+        // 召喚クールダウンを設定
+        this.summonCooldown = this.summonCooldownMax;
+        
+        // 効果音
+        playSE("syoukan-syutugen");
+    }
+
+    // 単体召喚（序盤強化）
+    summonSingleMinion() {
+        // 序盤は複数体召喚
+        const numMinions = this.healthRatio > 0.8 ? 3 : 1;
+        
+        for (let i = 0; i < numMinions; i++) {
+            const minion = new RedOni(this.game, 'red', 15);
+            const offsetX = (Math.random() - 0.5) * 120; // 60→120に拡大
+            const offsetY = (Math.random() - 0.5) * 120; // 60→120に拡大
+            
+            minion.x = this.x + this.width / 2 - minion.width / 2 + offsetX;
+            minion.y = this.y + this.height / 2 - minion.height / 2 + offsetY;
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        console.log(`BossOni3 summoned ${numMinions} minions (single pattern)`);
+    }
+
+    // 二体召喚（序盤強化）
+    summonDoubleMinions() {
+        // 序盤は4体、中盤は3体、終盤は2体
+        const numMinions = this.healthRatio > 0.8 ? 4 : this.healthRatio > 0.5 ? 3 : 2;
+        
+        for (let i = 0; i < numMinions; i++) {
+            const minion = new RedOni(this.game, 'red', 12);
+            const angle = (Math.PI * 2 * i) / numMinions;
+            const distance = 80; // 40→80に拡大
+            
+            minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(angle) * distance;
+            minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(angle) * distance;
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        console.log(`BossOni3 summoned ${numMinions} minions (double pattern)`);
+    }
+
+    // 三角形召喚（序盤強化）
+    summonTriangleMinions() {
+        // 序盤は5体、中盤は4体、終盤は3体
+        const numMinions = this.healthRatio > 0.8 ? 5 : this.healthRatio > 0.5 ? 4 : 3;
+        
+        for (let i = 0; i < numMinions; i++) {
+            const minion = new RedOni(this.game, 'red', 10);
+            const angle = (Math.PI * 2 * i) / numMinions;
+            const distance = 90; // 45→90に拡大
+            
+            minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(angle) * distance;
+            minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(angle) * distance;
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        console.log(`BossOni3 summoned ${numMinions} minions (triangle pattern)`);
+    }
+
+    // 円形召喚（序盤強化）
+    summonCircleMinions() {
+        // 序盤は10体、中盤は8体、終盤は6体
+        const numMinions = this.healthRatio > 0.8 ? 10 : this.healthRatio > 0.5 ? 8 : 6;
+        
+        for (let i = 0; i < numMinions; i++) {
+            const angle = (Math.PI * 2 * i) / numMinions;
+            const baseDistance = 100; // 60→100に拡大
+            const distance = baseDistance + (Math.random() - 0.5) * 40; // 20→40に拡大
+            
+            const minion = new RedOni(this.game, 'red', 6); // HP: 8→6に強化
+            
+            // プレイヤーの位置を考慮して配置
+            const player = this.game.player;
+            if (player) {
+                const playerAngle = Math.atan2(player.centerY - this.centerY, player.centerX - this.centerX);
+                const adjustedAngle = angle + playerAngle + Math.PI; // プレイヤーの反対側
+                
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(adjustedAngle) * distance;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(adjustedAngle) * distance;
+            } else {
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(angle) * distance;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(angle) * distance;
+            }
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        console.log(`BossOni3 summoned ${numMinions} minions (circle pattern)`);
+    }
+
+    // 十字形召喚
+    summonCrossMinions() {
+        const positions = [
+            { x: 0, y: -60 },   // 上
+            { x: 0, y: 60 },    // 下
+            { x: -60, y: 0 },   // 左
+            { x: 60, y: 0 }     // 右
+        ];
+        
+        // プレイヤーの位置を考慮して配置
+        const player = this.game.player;
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        if (player) {
+            const dx = player.centerX - this.centerX;
+            const dy = player.centerY - this.centerY;
+            
+            // プレイヤーから離れた位置に配置
+            if (Math.abs(dx) > Math.abs(dy)) {
+                offsetY = dx > 0 ? -80 : 80;
+            } else {
+                offsetX = dy > 0 ? -80 : 80;
+            }
+        }
+        
+        // 序盤は6体、中盤は5体、終盤は4体
+        const numMinions = this.healthRatio > 0.8 ? 6 : this.healthRatio > 0.5 ? 5 : 4;
+        
+        for (let i = 0; i < numMinions; i++) {
+            const minion = new RedOni(this.game, 'red', 6);
+            const angle = (Math.PI * 2 * i) / numMinions;
+            const distance = 100 + (Math.random() - 0.5) * 40; // 60→100、20→40に拡大
+            
+            // プレイヤーの位置を考慮して配置
+            if (player) {
+                const playerAngle = Math.atan2(player.centerY - this.centerY, player.centerX - this.centerX);
+                const adjustedAngle = angle + playerAngle + Math.PI; // プレイヤーの反対側
+                
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(adjustedAngle) * distance + offsetX;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(adjustedAngle) * distance + offsetY;
+            } else {
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(angle) * distance + offsetX;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(angle) * distance + offsetY;
+            }
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        console.log(`BossOni3 summoned ${numMinions} minions (cross pattern)`);
+    }
+
+    // 螺旋形召喚（最強パターン）
+    summonSpiralMinions() {
+        // 序盤は10体、中盤は8体、終盤は6体
+        const numMinions = this.healthRatio > 0.8 ? 10 : this.healthRatio > 0.5 ? 8 : 6;
+        
+        for (let i = 0; i < numMinions; i++) {
+            const angle = (Math.PI * 2 * i) / numMinions;
+            const baseDistance = 80; // 40→80に拡大
+            const distance = baseDistance + (i * 25); // 15→25に拡大
+            const minion = new RedOni(this.game, 'red', 5);
+            
+            // プレイヤーの位置を考慮して反対側に配置
+            const player = this.game.player;
+            if (player) {
+                const playerAngle = Math.atan2(player.centerY - this.centerY, player.centerX - this.centerX);
+                const adjustedAngle = angle + playerAngle + Math.PI; // プレイヤーの反対側
+                
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(adjustedAngle) * distance;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(adjustedAngle) * distance;
+            } else {
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(angle) * distance;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(angle) * distance;
+            }
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        console.log(`BossOni3 summoned ${numMinions} minions (spiral pattern)`);
+    }
+
+    // 壁形召喚（最強パターン）
+    summonWallMinions() {
+        // 序盤は7体、中盤は6体、終盤は5体
+        const wallLength = this.healthRatio > 0.8 ? 7 : this.healthRatio > 0.5 ? 6 : 5;
+        const spacing = 60; // 35→60に拡大
+        
+        // プレイヤーの位置を考慮
+        const player = this.game.player;
+        let offsetX = 0;
+        let offsetY = 0;
+        
+        if (player) {
+            // プレイヤーから離れた位置に壁を配置
+            const dx = player.centerX - this.centerX;
+            const dy = player.centerY - this.centerY;
+            
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // 横方向の移動が多い場合、縦の壁を強化
+                offsetY = dx > 0 ? -100 : 100; // 60→100に拡大
+            } else {
+                // 縦方向の移動が多い場合、横の壁を強化
+                offsetX = dy > 0 ? -100 : 100; // 60→100に拡大
+            }
+        }
+        
+        // 横の壁（より分散）
+        for (let i = 0; i < wallLength; i++) {
+            const minion = new RedOni(this.game, 'red', 4);
+            minion.x = this.x + this.width / 2 - minion.width / 2 + (i - Math.floor(wallLength/2)) * spacing + offsetX;
+            minion.y = this.y + this.height / 2 - minion.height / 2 - 80 + (Math.random() - 0.5) * 30; // 50→80、20→30に拡大
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        
+        // 縦の壁（より分散）
+        for (let i = 0; i < wallLength; i++) {
+            const minion = new RedOni(this.game, 'red', 4);
+            minion.x = this.x + this.width / 2 - minion.width / 2 - 80 + (Math.random() - 0.5) * 30; // 50→80、20→30に拡大
+            minion.y = this.y + this.height / 2 - minion.height / 2 + (i - Math.floor(wallLength/2)) * spacing + offsetY;
+            
+            this.game.enemyManager.enemies.push(minion);
+        }
+        console.log(`BossOni3 summoned ${wallLength * 2} minions (wall pattern)`);
+    }
+
+    // 爆弾形召喚（最強パターン）
+    summonBombMinions() {
+        // 序盤は15体、中盤は12体、終盤は9体
+        const numMinions = this.healthRatio > 0.8 ? 15 : this.healthRatio > 0.5 ? 12 : 9;
+        const baseDistance = 30;
+        
+        for (let i = 0; i < numMinions; i++) {
+            const angle = (Math.PI * 2 * i) / numMinions;
+            const distance = baseDistance + Math.random() * 80; // 40→80に拡大
+            const minion = new RedOni(this.game, 'red', 3);
+            
+            // プレイヤーの位置を考慮して分散配置
+            const player = this.game.player;
+            if (player) {
+                const playerAngle = Math.atan2(player.centerY - this.centerY, player.centerX - this.centerX);
+                const adjustedAngle = angle + playerAngle + (Math.random() - 0.5) * Math.PI / 2; // ランダムな角度調整
+                
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(adjustedAngle) * distance;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(adjustedAngle) * distance;
+            } else {
+                minion.x = this.x + this.width / 2 - minion.width / 2 + Math.cos(angle) * distance;
+                minion.y = this.y + this.height / 2 - minion.height / 2 + Math.sin(angle) * distance;
+            }
 
         this.game.enemyManager.enemies.push(minion);
-        playSE("syoukan-syutugen"); // ← 雑魚鬼召喚時に効果音
-        console.log("BossOni3 summoned a weak minion with HP:", minion._hp);
+        }
+        console.log(`BossOni3 summoned ${numMinions} minions (bomb pattern)`);
     }
 
     // ワープ実行（遅延後の実際のワープ処理）
@@ -496,7 +882,8 @@ export class BossOni3 extends BossOni {
                 `Ofuda Attack: ${this.ofudaAttackCooldown}/${this.ofudaAttackMaxCooldown}`,
                 `Mode: ${this.berserkMode ? 'BERSERK' : this.rageMode ? 'RAGE' : 'NORMAL'}`,
                 `Speed: ${this.speed.toFixed(1)} (Base: ${this.baseSpeed})`,
-                `Warp: ${this.isWarping ? 'WARPING' : this.preWarpDelay > 0 ? `PRE-DELAY: ${Math.ceil(this.preWarpDelay/60)}s` : this.warpCooldown > 0 ? `COOLDOWN: ${Math.ceil(this.warpCooldown/60)}s` : 'READY'}`
+                `Warp: ${this.isWarping ? 'WARPING' : this.preWarpDelay > 0 ? `PRE-DELAY: ${Math.ceil(this.preWarpDelay/60)}s` : this.warpCooldown > 0 ? `COOLDOWN: ${Math.ceil(this.warpCooldown/60)}s` : 'READY'}`,
+                `Summon: ${this.summonWarningTimer > 0 ? `WARNING: ${this.currentSummonPattern.toUpperCase()}` : this.summonCooldown > 0 ? `COOLDOWN: ${Math.ceil(this.summonCooldown/60)}s` : `READY: ${Math.ceil(this.summonTimer/60)}s`}`
             ];
 
             debugText.forEach((text, index) => {

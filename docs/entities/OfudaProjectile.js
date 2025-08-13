@@ -4,17 +4,17 @@ export class OfudaProjectile extends Projectile {
     constructor(game, x, y, targetX, targetY, effectType = 'slow') {
         // お札の速度とサイズを設定
         const speed = 6.0; // さらに速度を上げてプレイヤーに確実に到達させる
-        const size = 50; // さらにサイズを大きくして当たり判定を確実にする
+        const size = 40; // さらにサイズを大きくして当たり判定を確実にする
         
         // ダミーターゲットを作成（方向計算用）
         const dummyTarget = { x: targetX, y: targetY, width: 0, height: 0 };
         
         super(game, x, y, dummyTarget, speed, 0, 'ofuda');
         
-        // お札固有のプロパティ
-        this.width = size;
-        this.height = size;
-        this.radius = size / 2;
+        // お札固有のプロパティ（縦長長方形）
+        this.width = size * 0.6; // 幅を狭く
+        this.height = size * 1.4; // 高さを高く
+        this.radius = Math.max(this.width, this.height) / 2; // 当たり判定用
         
         // 中心座標を設定（当たり判定用）
         this.centerX = this.x + this.width / 2;
@@ -38,9 +38,9 @@ export class OfudaProjectile extends Projectile {
         
         // アニメーション用
         this.rotation = 0;
-        this.rotationSpeed = 0.3;
+        this.rotationSpeed = 0.2; // 回転速度を少し遅く
         this.pulseTimer = 0;
-        this.pulseSpeed = 0.2;
+        this.pulseSpeed = 0.15; // パルス速度を少し遅く
         
         // お札の見た目を設定
         this.color = this.getEffectColor();
@@ -292,7 +292,7 @@ export class OfudaProjectile extends Projectile {
         const pulseScale = 1 + Math.sin(this.pulseTimer) * 0.1;
         ctx.scale(pulseScale, pulseScale);
         
-        // お札の背景（和紙風）
+        // お札の背景（和紙風）- 縦長長方形
         ctx.fillStyle = '#F5F5DC';
         ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
         
@@ -301,35 +301,57 @@ export class OfudaProjectile extends Projectile {
         ctx.lineWidth = 2;
         ctx.strokeRect(-this.width / 2, -this.height / 2, this.width, this.height);
         
-        // 効果シンボル
-        ctx.font = '16px Arial';
+        // 効果シンボル（縦長に合わせて調整）
+        ctx.font = '14px Arial';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillStyle = this.color;
         ctx.fillText(this.symbol, 0, 0);
         
-        // お札の模様（簡単な線）
+        // お札の模様（縦長長方形に適した模様）
         ctx.strokeStyle = this.color;
         ctx.lineWidth = 1;
         ctx.globalAlpha = 0.3;
         
-        // 縦線
+        // 縦線（中央）
         ctx.beginPath();
         ctx.moveTo(0, -this.height / 2);
         ctx.lineTo(0, this.height / 2);
         ctx.stroke();
         
-        // 横線
+        // 縦線（左右）
+        ctx.beginPath();
+        ctx.moveTo(-this.width / 3, -this.height / 2);
+        ctx.lineTo(-this.width / 3, this.height / 2);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(this.width / 3, -this.height / 2);
+        ctx.lineTo(this.width / 3, this.height / 2);
+        ctx.stroke();
+        
+        // 横線（中央）
         ctx.beginPath();
         ctx.moveTo(-this.width / 2, 0);
         ctx.lineTo(this.width / 2, 0);
+        ctx.stroke();
+        
+        // 横線（上下）
+        ctx.beginPath();
+        ctx.moveTo(-this.width / 2, -this.height / 3);
+        ctx.lineTo(this.width / 2, -this.height / 3);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.moveTo(-this.width / 2, this.height / 3);
+        ctx.lineTo(this.width / 2, this.height / 3);
         ctx.stroke();
         
         ctx.restore();
     }
     
     drawTrailEffect(ctx, scrollX, scrollY) {
-        // 軌跡パーティクルを描画
+        // 軌跡パーティクルを描画（縦長長方形に適した形）
         this.trailParticles.forEach(particle => {
             const screenX = particle.x - scrollX;
             const screenY = particle.y - scrollY;
@@ -337,9 +359,10 @@ export class OfudaProjectile extends Projectile {
             ctx.save();
             ctx.globalAlpha = particle.alpha;
             ctx.fillStyle = this.color;
-            ctx.beginPath();
-            ctx.arc(screenX, screenY, 3, 0, Math.PI * 2);
-            ctx.fill();
+            
+            // 縦長の軌跡パーティクル
+            ctx.fillRect(screenX - 2, screenY - 4, 4, 8);
+            
             ctx.restore();
         });
     }
