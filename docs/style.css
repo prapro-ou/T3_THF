@@ -699,7 +699,7 @@ button:hover,
 /* ===== スタート画面 ===== */
 #startScreen,
 .dark-bg {
-    background: url('assets/UI/title1.png') center center no-repeat;
+    background: url('assets/UI/kibidango_title.png') center center no-repeat;
     background-size: contain;
     min-height: 100vh;
     width: 100vw;
@@ -914,7 +914,8 @@ button:hover,
     max-height: 100vh;
     margin: 0 auto;
     padding: 0;
-    background: linear-gradient(120deg, #181818 60%, #232323 100%);
+    background: url('assets/UI/kibidango_home.png') no-repeat center center;
+    background-size: cover;
     border-radius: 0;
     box-shadow: none;
     display: flex;
