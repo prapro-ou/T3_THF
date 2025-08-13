@@ -38,6 +38,22 @@ export class BossOni3 extends BossOni {
             this.ofudaAttackPattern = 'spread'; // 'spread', 'circle', 'target', 'spiral'
             this.ofudaEffects = ['slow', 'poison'];
 
+            // 体力段階による行動変化の管理
+            this.rageMode = false; // 激怒モード
+            this.berserkMode = false; // 狂戦士モード
+            this.healthThresholds = {
+                rage: 0.5, // 体力50%以下で激怒モード
+                berserk: 0.2  // 体力20%以下で狂戦士モード
+            };
+            this.baseSpeed = this.speed; // 基本速度を保存
+
+            // ワープ状態の管理
+            this.isWarping = false; // ワープ中フラグ
+            this.warpCooldown = 0; // ワープ後のクールダウン
+            this.warpCooldownMax = 180; // 3秒間（60fps想定）
+            this.preWarpDelay = 0; // ワープ前の遅延
+            this.preWarpDelayMax = 180; // 3秒間（60fps想定）
+
             // アニメーション方向管理
             this.currentDirection = 'front'; // 'front', 'back', 'left', 'right'
             this.lastDirection = 'front';
@@ -108,27 +124,43 @@ export class BossOni3 extends BossOni {
     update() {
         super.update();
 
+        // 体力段階に応じた行動変化のチェック
+        this.checkHealthPhase();
+
+        // ワープ状態の更新
+        this.updateWarpState();
+
         // アニメーション更新
         if (this.spriteSheet) {
             this.spriteSheet.updateAnimation();
         }
 
+        // ワープ中でない場合のみ通常の行動を実行
+        if (!this.isWarping && this.warpCooldown <= 0 && this.preWarpDelay <= 0) {
         // 雑魚召喚処理
         this.summonTimer++;
         if (this.summonTimer >= this.summonInterval) {
             this.summonTimer = 0;
             this.summonMinion();
-        }
+            }
 
-        // お札攻撃タイマー更新
-        this.ofudaAttackCooldown++;
-        if (this.ofudaAttackCooldown >= this.ofudaAttackMaxCooldown) {
-            this.executeOfudaAttack();
-            this.ofudaAttackCooldown = 0;
+            // お札攻撃タイマー更新
+            this.ofudaAttackCooldown++;
+            if (this.ofudaAttackCooldown >= this.ofudaAttackMaxCooldown) {
+                this.executeOfudaAttack();
+                this.ofudaAttackCooldown = 0;
+            }
         }
     }
 
     updateMovement() {
+        // ワープ中、ワープ前の遅延中、ワープ後のクールダウン中は移動しない
+        if (this.isWarping || this.preWarpDelay > 0 || this.warpCooldown > 0) {
+            this._dx = 0;
+            this._dy = 0;
+            return;
+        }
+
         if (this.isEdgeWarping) {
             this._dx = 0;
             this._dy = 0;
@@ -165,10 +197,10 @@ export class BossOni3 extends BossOni {
             this.x <= 0 || this.x >= mapWidth - this.width ||
             this.y <= 0 || this.y >= mapHeight - this.height;
 
-        // 端に到達したら即座にワープ
+        // 端に到達したらワープ開始（遅延付き）
         if (atEdge) {
             this.warpToRandomPosition();
-            console.log("BossOni3 reached edge and warped!");
+            console.log("BossOni3 reached edge and starting warp delay!");
             return;
         }
     }
@@ -239,19 +271,63 @@ export class BossOni3 extends BossOni {
         console.log("BossOni3 summoned a weak minion with HP:", minion._hp);
     }
 
-    warpToRandomPosition() {
+    // ワープ実行（遅延後の実際のワープ処理）
+    executeWarp() {
         const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
         let newX, newY;
+        
+        // マップの中心部に近い位置を優先的に選択
+        const centerX = mapWidth / 2;
+        const centerY = mapHeight / 2;
+        const safeMargin = 150; // 端からの安全マージン
+        
         do {
-            newX = Math.random() * (mapWidth - this.width);
-            newY = Math.random() * (mapHeight - this.height);
+            // マップの中心部を基準に、ランダムな位置を生成
+            // 中心から最大でマップサイズの1/3の範囲内に制限
+            const maxDistance = Math.min(mapWidth, mapHeight) / 3;
+            const distance = Math.random() * maxDistance;
+            const angle = Math.random() * Math.PI * 2;
+            
+            newX = centerX + Math.cos(angle) * distance;
+            newY = centerY + Math.sin(angle) * distance;
+            
+            // マップの境界内に収める
+            newX = Math.max(safeMargin, Math.min(mapWidth - this.width - safeMargin, newX));
+            newY = Math.max(safeMargin, Math.min(mapHeight - this.height - safeMargin, newY));
+            
         } while (
             Math.abs(newX - this.x) < 100 && Math.abs(newY - this.y) < 100
         ); // 近すぎる場合は再抽選
         
+        // プレイヤーとの距離もチェック（近すぎる場合は再調整）
+        const player = this.game.player;
+        if (player) {
+            const playerDistance = Math.sqrt(
+                Math.pow(newX - player.centerX, 2) + Math.pow(newY - player.centerY, 2)
+            );
+            
+            // プレイヤーから200px以上離れているかチェック
+            if (playerDistance < 200) {
+                // プレイヤーから離れる方向に調整
+                const angleToPlayer = Math.atan2(player.centerY - newY, player.centerX - newX);
+                const adjustDistance = 200 - playerDistance;
+                
+                newX -= Math.cos(angleToPlayer) * adjustDistance;
+                newY -= Math.sin(angleToPlayer) * adjustDistance;
+                
+                // 再度マップ境界内に収める
+                newX = Math.max(safeMargin, Math.min(mapWidth - this.width - safeMargin, newX));
+                newY = Math.max(safeMargin, Math.min(mapHeight - this.height - safeMargin, newY));
+            }
+        }
+        
         // ワープ前の位置を保存
         const oldX = this.x;
         const oldY = this.y;
+        
+        // ワープエフェクトを表示
+        console.log('BossOni3: Creating warping effect');
+        this.createWarpingEffect();
         
         // 新しい位置に移動
         this.x = newX;
@@ -260,8 +336,24 @@ export class BossOni3 extends BossOni {
         // ワープ方向を計算してアニメーションを更新
         this.updateWarpDirection(oldX, oldY, newX, newY);
         
+        // ワープ状態を設定
+        this.isWarping = true;
+        this.warpCooldown = this.warpCooldownMax;
+        
         playSE("warp"); // ← ワープ時に効果音
         console.log('BossOni3 warped to:', newX, newY);
+    }
+
+    // ワープ開始（遅延付き）
+    warpToRandomPosition() {
+        // ワープ前の3秒間遅延を設定
+        this.preWarpDelay = this.preWarpDelayMax;
+        
+        // 遅延開始時のエフェクトを表示
+        console.log('BossOni3: Creating initial pre-warp effect');
+        this.createPreWarpEffect();
+        
+        console.log('BossOni3: Starting warp delay (3 seconds)');
     }
 
     updateWarpDirection(oldX, oldY, newX, newY) {
@@ -401,13 +493,265 @@ export class BossOni3 extends BossOni {
                 `SpriteSheet: ${this.spriteSheet ? (this.spriteSheet.image ? 'Image Loaded' : 'No Image') : 'Not created'}`,
                 `Current Frame: ${this.getCurrentFrameName()}`,
                 `Available Frames: ${this.spriteSheet ? this.spriteSheet.frameNames.join(', ') : 'None'}`,
-                `Ofuda Attack: ${this.ofudaAttackCooldown}/${this.ofudaAttackMaxCooldown}`
+                `Ofuda Attack: ${this.ofudaAttackCooldown}/${this.ofudaAttackMaxCooldown}`,
+                `Mode: ${this.berserkMode ? 'BERSERK' : this.rageMode ? 'RAGE' : 'NORMAL'}`,
+                `Speed: ${this.speed.toFixed(1)} (Base: ${this.baseSpeed})`,
+                `Warp: ${this.isWarping ? 'WARPING' : this.preWarpDelay > 0 ? `PRE-DELAY: ${Math.ceil(this.preWarpDelay/60)}s` : this.warpCooldown > 0 ? `COOLDOWN: ${Math.ceil(this.warpCooldown/60)}s` : 'READY'}`
             ];
 
             debugText.forEach((text, index) => {
                 ctx.fillText(text, debugX, debugY + index * 15);
             });
         }
+    }
+
+    // ワープ状態の更新
+    updateWarpState() {
+        // ワープ前の遅延
+        if (this.preWarpDelay > 0) {
+            this.preWarpDelay--;
+            console.log(`BossOni3: Pre-warp delay: ${this.preWarpDelay} frames remaining`);
+            
+            // 遅延中は定期的にエフェクトを表示（0.5秒ごと）
+            if (this.preWarpDelay % 30 === 0) {
+                console.log('BossOni3: Creating pre-warp effect');
+                this.createPreWarpEffect();
+            }
+            
+            if (this.preWarpDelay <= 0) {
+                // 遅延終了、ワープ実行
+                console.log('BossOni3: Pre-warp delay finished, executing warp');
+                this.executeWarp();
+            }
+        }
+        
+        // ワープ後のクールダウン
+        if (this.warpCooldown > 0) {
+            this.warpCooldown--;
+            console.log(`BossOni3: Warp cooldown: ${this.warpCooldown} frames remaining`);
+            
+            // クールダウン中は定期的にエフェクトを表示（0.5秒ごと）
+            if (this.warpCooldown % 30 === 0) {
+                console.log('BossOni3: Creating warp cooldown effect');
+                this.createWarpCooldownEffect();
+            }
+            
+            if (this.warpCooldown <= 0) {
+                // クールダウン終了
+                this.isWarping = false;
+                console.log('BossOni3: Warp cooldown finished, resuming normal actions');
+            }
+        }
+    }
+
+    // 体力段階に応じた行動変化のチェック
+    checkHealthPhase() {
+        const healthRatio = this.hp / this.maxHP;
+        
+        // 激怒モード（体力50%以下）
+        if (healthRatio <= this.healthThresholds.rage && !this.rageMode) {
+            this.enterRageMode();
+        }
+        
+        // 狂戦士モード（体力20%以下）
+        if (healthRatio <= this.healthThresholds.berserk && !this.berserkMode) {
+            this.enterBerserkMode();
+        }
+    }
+
+    // 激怒モードに入る
+    enterRageMode() {
+        this.rageMode = true;
+        console.log('BossOni3: Entering RAGE MODE!');
+        
+        // 攻撃頻度を上げる（控えめに）
+        this.ofudaAttackMaxCooldown = Math.floor(this.ofudaAttackMaxCooldown * 0.85); // 15%短縮
+        
+        // 移動速度を上げる（控えめに）
+        this.speed = this.baseSpeed * 1.15;
+        
+        // 激怒エフェクト
+        this.createRageEffect();
+        
+        // 効果音
+        playSE('onivoice');
+    }
+
+    // 狂戦士モードに入る
+    enterBerserkMode() {
+        this.berserkMode = true;
+        console.log('BossOni3: Entering BERSERK MODE!');
+        
+        // 攻撃頻度を上げる（控えめに）
+        this.ofudaAttackMaxCooldown = Math.floor(this.ofudaAttackMaxCooldown * 0.75); // 25%短縮
+        
+        // 移動速度を上げる（控えめに）
+        this.speed = this.baseSpeed * 1.25;
+        
+        // 攻撃数を少し増やす
+        this.ofudaAttackMaxCount = 4; // 3枚→4枚
+        
+        // 狂戦士エフェクト
+        this.createBerserkEffect();
+        
+        // 効果音
+        playSE('bossSE');
+    }
+
+    // 激怒エフェクト
+    createRageEffect() {
+        // 赤い炎のようなエフェクト
+        for (let i = 0; i < 15; i++) {
+            const angle = (Math.PI * 2 * i) / 15;
+            const speed = 4 + Math.random() * 3;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            
+            this.game.particleManager.createParticle(
+                this.centerX,
+                this.centerY,
+                vx,
+                vy,
+                '#FF4500', // オレンジレッド
+                60,
+                0.8
+            );
+        }
+    }
+
+    // 狂戦士エフェクト
+    createBerserkEffect() {
+        // 紫の雷のようなエフェクト
+        for (let i = 0; i < 20; i++)
+        {
+            const angle = (Math.PI * 2 * i) / 20;
+            const speed = 5 + Math.random() * 4;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            
+            this.game.particleManager.createParticle(
+                this.centerX,
+                this.centerY,
+                vx,
+                vy,
+                '#8A2BE2', // ブルーバイオレット
+                90,
+                1.0
+            );
+        }
+    }
+
+    // ワープ前の遅延エフェクト
+    createPreWarpEffect() {
+        console.log('BossOni3: createPreWarpEffect called, creating purple swirl effect');
+        
+        // 紫の渦巻きエフェクト
+        for (let i = 0; i < 8; i++) {
+            const angle = (Math.PI * 2 * i) / 8;
+            const speed = 1 + Math.random() * 2;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            
+            this.game.particleManager.createParticle(
+                this.centerX,
+                this.centerY,
+                vx,
+                vy,
+                '#9370DB', // ミディアムスレートブルー
+                45,
+                0.7
+            );
+        }
+        
+        // 中心の光るエフェクト
+        this.game.particleManager.createParticle(
+            this.centerX,
+                this.centerY,
+                0,
+                0,
+                '#8A2BE2', // ブルーバイオレット
+                60,
+                0.9
+        );
+        
+        console.log('BossOni3: Pre-warp effect particles created');
+    }
+
+    // ワープ中のエフェクト
+    createWarpingEffect() {
+        console.log('BossOni3: createWarpingEffect called, creating purple light pillar effect');
+        
+        // 紫の光の柱エフェクト
+        for (let i = 0; i < 12; i++) {
+            const angle = (Math.PI * 2 * i) / 12;
+            const distance = 20 + Math.random() * 30;
+            const x = this.centerX + Math.cos(angle) * distance;
+            const y = this.centerY + Math.sin(angle) * distance;
+            
+            // 上向きの速度
+            const speed = 2 + Math.random() * 3;
+            const vx = (Math.random() - 0.5) * 1;
+            const vy = -speed;
+            
+            this.game.particleManager.createParticle(
+                x,
+                y,
+                vx,
+                vy,
+                '#DDA0DD', // プラム
+                75,
+                0.8
+            );
+        }
+        
+        // 中心の強力な光
+        this.game.particleManager.createParticle(
+            this.centerX,
+            this.centerY,
+            0,
+            0,
+            '#FF00FF', // マゼンタ
+            90,
+            1.0
+        );
+        
+        console.log('BossOni3: Warping effect particles created');
+    }
+
+    // ワープ後のクールダウンエフェクト
+    createWarpCooldownEffect() {
+        console.log('BossOni3: createWarpCooldownEffect called, creating purple spark effect');
+        
+        // 紫の火花エフェクト
+        for (let i = 0; i < 10; i++) {
+            const angle = (Math.PI * 2 * i) / 10;
+            const speed = 3 + Math.random() * 4;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            
+            this.game.particleManager.createParticle(
+                this.centerX,
+                this.centerY,
+                vx,
+                vy,
+                '#9932CC', // ダークオーキッド
+                60,
+                0.6
+            );
+        }
+        
+        // 中心の残光
+        this.game.particleManager.createParticle(
+            this.centerX,
+            this.centerY,
+            0,
+            0,
+            '#BA55D3', // ミディアムオーキッド
+            45,
+            0.5
+        );
+        
+        console.log('BossOni3: Warp cooldown effect particles created');
     }
 
     executeOfudaAttack() {
@@ -439,7 +783,17 @@ export class BossOni3 extends BossOni {
     }
 
     getRandomOfudaPattern() {
-        const patterns = ['spread', 'circle', 'target', 'spiral'];
+        let patterns = ['spread', 'circle', 'target', 'spiral'];
+        
+        // 体力が低い時は少し攻撃的なパターンを優先
+        if (this.berserkMode) {
+            // 狂戦士モード：spiralとtargetを少し優先
+            patterns = ['spiral', 'target', 'spread', 'circle', 'spiral', 'target'];
+        } else if (this.rageMode) {
+            // 激怒モード：spreadとtargetを少し優先
+            patterns = ['spread', 'target', 'circle', 'spiral', 'spread', 'target'];
+        }
+        
         return patterns[Math.floor(Math.random() * patterns.length)];
     }
 
