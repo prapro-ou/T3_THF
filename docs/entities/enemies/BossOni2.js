@@ -1,6 +1,7 @@
 import { BossOni } from './BossOni.js';
 import { SpriteSheet } from '../../utils/SpriteSheet.js';
 import { playSE } from '../../managers/KoukaonManager.js'; // 追加
+import { NoteProjectile } from '../NoteProjectile.js';
 
 /**
  * BossOni2: バイクに乗って突進を繰り返すボス（強化改良版）
@@ -26,15 +27,15 @@ export class BossOni2 extends BossOni {
             // 円形当たり判定の半径を設定
             this.setCircularCollision(40);
 
-            // 状態管理（拡張）
-            this.state = 'idle'; // idle, charge, dashing, recover, special_attack, rage_mode
+                    // 状態管理（拡張）
+        this.state = 'idle'; // idle, charge, dashing, consecutive_charge, recover, special_attack, rage_mode
             this.stateTimer = 0;
             this.dashDirection = { x: 0, y: 0 };
             this.dashSpeed = 18; // 突進速度向上
-            this.dashDuration = 36; // 突進フレーム数（0.6秒@60fps）
-            this.chargeDuration = 25; // 溜めフレーム数短縮（0.4秒）
-            this.recoverDuration = 20; // クールダウン短縮（0.33秒）
-            this.idleDuration = 45; // 待機短縮（0.75秒）
+            this.dashDuration = 45; // 突進フレーム数（0.6秒@60fps）
+            this.chargeDuration = 45; // 溜めフレーム数短縮（0.4秒）
+            this.recoverDuration = 30; // クールダウン短縮（0.33秒）
+            this.idleDuration = 55; // 待機短縮（0.75秒）
             this.currentDashFrame = 0;
             this.spriteDirection = 'right'; // 'left' or 'right'
             
@@ -42,6 +43,13 @@ export class BossOni2 extends BossOni {
             this.hasHitPlayerThisDash = false;
             this.comboCount = 0; // コンボカウント
             this.maxCombo = 3; // 最大コンボ数
+            
+            // 連続突進用
+            this.consecutiveDashCount = 0; // 現在の連続突進回数
+            this.maxConsecutiveDashes = 3; // 最大連続突進回数
+            this.consecutiveDashDelay = 15; // 連続突進間の遅延フレーム数
+            this.consecutiveDashTimer = 0; // 連続突進タイマー
+            this.isConsecutiveDashing = false; // 連続突進中フラグ
 
             // 新機能: 特殊攻撃
             this.specialAttackCooldown = 0;
@@ -51,6 +59,14 @@ export class BossOni2 extends BossOni {
             this.specialAttackActive = false;
             this.specialAttackCount = 0;
             this.specialAttackMaxCount = 3;
+
+            // 新機能: 音符攻撃
+            this.noteAttackCooldown = 0;
+            this.noteAttackMaxCooldown = 120; // 2秒
+            this.noteAttackActive = false;
+            this.noteAttackCount = 0;
+            this.noteAttackMaxCount = 5; // 一度に5発の音符
+            this.noteAttackPattern = 'spread'; // 'spread', 'circle', 'target'
 
             // 新機能: 予測移動
             this.predictionLevel = 0.7; // プレイヤーの移動を予測するレベル
@@ -103,6 +119,10 @@ export class BossOni2 extends BossOni {
                 this._hp = 300;
                 this.specialAttackMaxCooldown = 240;
                 this.knockbackStrength = 15; // 弱いノックバック
+                this.noteAttackMaxCooldown = 180; // 音符攻撃のクールダウン長め
+                this.noteAttackMaxCount = 3; // 音符数少なめ
+                this.maxConsecutiveDashes = 2; // 連続突進回数少なめ
+                this.consecutiveDashDelay = 20; // 連続突進間の遅延長め
                 break;
             case 'normal':
                 this.dashSpeed = 18;
@@ -110,6 +130,10 @@ export class BossOni2 extends BossOni {
                 this._hp = 400;
                 this.specialAttackMaxCooldown = 180;
                 this.knockbackStrength = 18; // 通常のノックバック
+                this.noteAttackMaxCooldown = 120; // 音符攻撃のクールダウン通常
+                this.noteAttackMaxCount = 5; // 音符数通常
+                this.maxConsecutiveDashes = 3; // 連続突進回数通常
+                this.consecutiveDashDelay = 15; // 連続突進間の遅延通常
                 break;
             case 'hard':
                 this.dashSpeed = 22;
@@ -118,6 +142,10 @@ export class BossOni2 extends BossOni {
                 this.specialAttackMaxCooldown = 120;
                 this.predictionLevel = 0.9;
                 this.knockbackStrength = 22; // 強いノックバック
+                this.noteAttackMaxCooldown = 90; // 音符攻撃のクールダウン短め
+                this.noteAttackMaxCount = 6; // 音符数多め
+                this.maxConsecutiveDashes = 4; // 連続突進回数多め
+                this.consecutiveDashDelay = 12; // 連続突進間の遅延短め
                 break;
             case 'extreme':
                 this.dashSpeed = 26;
@@ -127,6 +155,10 @@ export class BossOni2 extends BossOni {
                 this.predictionLevel = 1.0;
                 this.rageModeThreshold = 0.5; // HP50%以下で怒りモード
                 this.knockbackStrength = 28; // 非常に強いノックバック
+                this.noteAttackMaxCooldown = 60; // 音符攻撃のクールダウン非常に短い
+                this.noteAttackMaxCount = 7; // 音符数非常に多い
+                this.maxConsecutiveDashes = 5; // 連続突進回数非常に多い
+                this.consecutiveDashDelay = 8; // 連続突進間の遅延非常に短い
                 break;
         }
     }
@@ -193,6 +225,11 @@ export class BossOni2 extends BossOni {
             this.specialAttackCooldown--;
         }
         
+        // 音符攻撃クールダウン更新
+        if (this.noteAttackCooldown > 0) {
+            this.noteAttackCooldown--;
+        }
+        
         // デバッグ用: パーティクル状態をログ出力
         if (this.stateTimer % 60 === 0) { // 1秒ごとにログ出力
             console.log(`BossOni2 Debug - State: ${this.state}, Timer: ${this.stateTimer}, Particles: ${this.dashParticles.length}, Trail: ${this.trailEffect.length}, Rage: ${this.isRageMode}, Special: ${this.specialAttackActive}`);
@@ -212,6 +249,9 @@ export class BossOni2 extends BossOni {
                     break;
                 case 'dashing':
                     this.spriteSheet.setFrameDelay(this.isRageMode ? 2 : 3);
+                    break;
+                case 'consecutive_charge':
+                    this.spriteSheet.setFrameDelay(this.isRageMode ? 3 : 5);
                     break;
                 case 'recover':
                     this.spriteSheet.setFrameDelay(this.isRageMode ? 6 : 10);
@@ -239,6 +279,9 @@ export class BossOni2 extends BossOni {
                     this.state = 'special_attack';
                     this.stateTimer = 0;
                     this.executeSpecialAttack();
+                } else if (this.noteAttackCooldown <= 0 && Math.random() < 0.4) {
+                    // 音符攻撃の実行
+                    this.executeNoteAttack();
                 } else if (this.stateTimer > this.idleDuration) {
                     this.state = 'charge';
                     this.stateTimer = 0;
@@ -249,13 +292,21 @@ export class BossOni2 extends BossOni {
                 this.stateTimer++;
                 // プレイヤー方向を向く（予測移動対応）
                 this.updateDashDirection();
+                
+                // 突進開始前の事前エフェクト
+                if (this.stateTimer === 1) {
+                    this.createPreDashEffect();
+                }
+                
                 if (this.stateTimer > this.chargeDuration) {
                     this.state = 'dashing';
                     this.stateTimer = 0;
                     this.currentDashFrame = 0;
                     this.comboCount++;
+                    this.isConsecutiveDashing = true;
+                    this.consecutiveDashCount = 1;
                     playSE("baiku1"); // ← 突進開始時に効果音を鳴らす
-           }
+                }
                 break;
                 
             case 'dashing':
@@ -269,33 +320,42 @@ export class BossOni2 extends BossOni {
                 this.createDashParticles();
                 this.createTrailEffect();
                 
-
                 // 攻撃判定
                 this.checkDashAttack();
+                
+                // 突進終了判定
                 if (this.currentDashFrame > this.dashDuration || this.isOutOfBounds()) {
-                    this.state = 'recover';
-                    this.stateTimer = 0;
-                    this._dx = 0;
-                    this._dy = 0;
-                    this.hasHitPlayerThisDash = false;
-                    
-                    // コンボ判定
-                    if (this.comboCount >= this.maxCombo) {
-                        this.comboCount = 0;
-                        this.stateTimer = -30; // 長めの回復時間
-                    }
+                    this.handleDashEnd();
                 }
                 break;
                 
-            case 'recover':
-                this.stateTimer++;
-                this._dx = 0;
-                this._dy = 0;
-                if (this.stateTimer > this.recoverDuration) {
-                    this.state = 'idle';
-                    this.stateTimer = 0;
-                }
-                break;
+                            case 'consecutive_charge':
+                    this.stateTimer++;
+                    this._dx = 0;
+                    this._dy = 0;
+                    
+                    // 連続突進準備エフェクト
+                    if (this.stateTimer % 5 === 0) {
+                        this.createConsecutiveChargeEffect();
+                    }
+                    
+                    if (this.stateTimer > this.consecutiveDashDelay) {
+                        this.state = 'dashing';
+                        this.stateTimer = 0;
+                        this.currentDashFrame = 0;
+                        playSE("baiku1"); // 連続突進開始時の効果音
+                    }
+                    break;
+                    
+                case 'recover':
+                    this.stateTimer++;
+                    this._dx = 0;
+                    this._dy = 0;
+                    if (this.stateTimer > this.recoverDuration) {
+                        this.state = 'idle';
+                        this.stateTimer = 0;
+                    }
+                    break;
                 
             case 'special_attack':
                 this.stateTimer++;
@@ -373,6 +433,14 @@ export class BossOni2 extends BossOni {
             // スプライトシートの色調整（可能な場合）
             console.log('BossOni2: Applying rage mode color filter');
         }
+        
+        // 怒りモード時は音符攻撃も強化
+        this.noteAttackMaxCount = 8; // 音符数を増加
+        this.noteAttackMaxCooldown = Math.max(60, this.noteAttackMaxCooldown - 60); // クールダウン短縮
+        
+        // 怒りモード時は連続突進も強化
+        this.maxConsecutiveDashes = 5; // 最大連続突進回数を増加
+        this.consecutiveDashDelay = Math.max(8, this.consecutiveDashDelay - 7); // 連続突進間の遅延を短縮
     }
 
     executeSpecialAttack() {
@@ -408,6 +476,469 @@ export class BossOni2 extends BossOni {
         // 突進エフェクトを生成
         this.createDashParticles();
         this.createTrailEffect();
+    }
+
+    handleDashEnd() {
+        // 突進終了時の処理
+        this._dx = 0;
+        this._dy = 0;
+        this.hasHitPlayerThisDash = false;
+        
+        if (this.isConsecutiveDashing && this.consecutiveDashCount < this.maxConsecutiveDashes) {
+            // 連続突進の準備
+            this.prepareNextDash();
+        } else {
+            // 連続突進終了
+            this.finishConsecutiveDash();
+        }
+    }
+
+    prepareNextDash() {
+        // 次の突進の準備
+        this.consecutiveDashCount++;
+        this.state = 'consecutive_charge';
+        this.stateTimer = 0;
+        this.consecutiveDashTimer = 0;
+        
+        // 次の突進方向を更新
+        this.updateDashDirection();
+        
+        console.log(`BossOni2: Preparing consecutive dash ${this.consecutiveDashCount}/${this.maxConsecutiveDashes}`);
+        
+        // 連続突進準備エフェクト
+        this.createConsecutiveDashEffect();
+    }
+
+    finishConsecutiveDash() {
+        // 連続突進終了
+        this.isConsecutiveDashing = false;
+        this.consecutiveDashCount = 0;
+        this.state = 'recover';
+        this.stateTimer = 0;
+        
+        // コンボ判定
+        if (this.comboCount >= this.maxCombo) {
+            this.comboCount = 0;
+            this.stateTimer = -30; // 長めの回復時間
+        }
+        
+        console.log('BossOni2: Consecutive dash finished');
+    }
+
+    executeNoteAttack() {
+        // 音符攻撃の実行
+        console.log('BossOni2: Note Attack - Musical Notes!');
+        
+        this.noteAttackActive = true;
+        this.noteAttackCount = 0;
+        this.noteAttackPattern = this.getRandomNotePattern();
+        
+        // 音符攻撃の音
+        playSE('syoukan-syutugen');
+        
+        // 音符攻撃エフェクト
+        this.createNoteAttackEffect();
+        
+        // 音符を発射
+        this.fireNotes();
+        
+        // クールダウン設定
+        this.noteAttackCooldown = this.noteAttackMaxCooldown;
+    }
+
+    getRandomNotePattern() {
+        const patterns = ['spread', 'circle', 'target'];
+        return patterns[Math.floor(Math.random() * patterns.length)];
+    }
+
+    fireNotes() {
+        const player = this.game.player;
+        if (!player) return;
+        
+        const noteCount = this.isRageMode ? this.noteAttackMaxCount : 5;
+        const centerX = this.centerX;
+        const centerY = this.centerY;
+        
+        switch (this.noteAttackPattern) {
+            case 'spread':
+                this.fireSpreadNotes(centerX, centerY, noteCount);
+                break;
+            case 'circle':
+                this.fireCircleNotes(centerX, centerY, noteCount);
+                break;
+            case 'target':
+                this.fireTargetNotes(centerX, centerY, noteCount, player);
+                break;
+        }
+    }
+
+    fireSpreadNotes(centerX, centerY, noteCount) {
+        // 扇形に音符を発射
+        const angleStep = (Math.PI * 2) / noteCount;
+        const startAngle = -Math.PI / 2; // 上方向から開始
+        
+        for (let i = 0; i < noteCount; i++) {
+            const angle = startAngle + angleStep * i;
+            const direction = {
+                x: Math.cos(angle),
+                y: Math.sin(angle)
+            };
+            
+            const note = new NoteProjectile(this.game, centerX, centerY, direction, 2);
+            this.game.projectileManager.addProjectile(note);
+        }
+    }
+
+    fireCircleNotes(centerX, centerY, noteCount) {
+        // 円形に音符を発射
+        const angleStep = (Math.PI * 2) / noteCount;
+        
+        for (let i = 0; i < noteCount; i++) {
+            const angle = angleStep * i;
+            const direction = {
+                x: Math.cos(angle),
+                y: Math.sin(angle)
+            };
+            
+            const note = new NoteProjectile(this.game, centerX, centerY, direction, 1.5);
+            this.game.projectileManager.addProjectile(note);
+        }
+    }
+
+    fireTargetNotes(centerX, centerY, noteCount, player) {
+        // プレイヤーを狙って音符を発射
+        const dx = player.centerX - centerX;
+        const dy = player.centerY - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > 0) {
+            const baseDirection = {
+                x: dx / distance,
+                y: dy / distance
+            };
+            
+            for (let i = 0; i < noteCount; i++) {
+                // 少しずつ角度をずらして発射
+                const angleOffset = (i - (noteCount - 1) / 2) * 0.3;
+                const direction = {
+                    x: baseDirection.x * Math.cos(angleOffset) - baseDirection.y * Math.sin(angleOffset),
+                    y: baseDirection.x * Math.sin(angleOffset) + baseDirection.y * Math.cos(angleOffset)
+                };
+                
+                const note = new NoteProjectile(this.game, centerX, centerY, direction, 2.5);
+                this.game.projectileManager.addProjectile(note);
+            }
+        }
+    }
+
+    createNoteAttackEffect() {
+        // 音符攻撃開始時のエフェクト
+        console.log('BossOni2: Creating note attack effect');
+        
+        // 音符攻撃開始パーティクル
+        for (let i = 0; i < 15; i++) {
+            this.dashParticles.push({
+                x: this.centerX + (Math.random() - 0.5) * 80,
+                y: this.centerY + (Math.random() - 0.5) * 80,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
+                life: 45,
+                maxLife: 45,
+                size: Math.random() * 8 + 4,
+                alpha: 1.0,
+                color: '#8e44ad' // 音符の色
+            });
+        }
+        
+        // 画面シェイク効果
+        this.screenShake = Math.max(this.screenShake, 8);
+    }
+
+    createPreDashEffect() {
+        // 突進開始前の事前エフェクト
+        console.log('BossOni2: Creating pre-dash effect');
+        
+        // 突進方向を示す矢印エフェクト
+        const arrowLength = 80;
+        const arrowX = this.centerX + this.dashDirection.x * arrowLength;
+        const arrowY = this.centerY + this.dashDirection.y * arrowLength;
+        
+        // 1. 大きな警告サークル
+        this.createWarningCircle();
+        
+        // 2. 矢印パーティクル（より目立つ）
+        this.createArrowParticles(arrowLength);
+        
+        // 3. 突進経路のライン
+        this.createDashPathLine(arrowLength);
+        
+        // 4. ボス鬼の周囲の警告エフェクト
+        this.createBossWarningEffect();
+        
+        // 突進予告の音
+        playSE('teki-syutugen');
+        
+        // 画面シェイク効果（強化）
+        this.screenShake = Math.max(this.screenShake, 8);
+    }
+
+    createWarningCircle() {
+        // 大きな警告サークルを生成
+        for (let i = 0; i < 30; i++) {
+            const angle = (i / 30) * Math.PI * 2;
+            const radius = 50 + Math.sin(Date.now() * 0.01) * 10; // 脈動する半径
+            
+            this.dashParticles.push({
+                x: this.centerX + Math.cos(angle) * radius,
+                y: this.centerY + Math.sin(angle) * radius,
+                vx: 0,
+                vy: 0,
+                life: 60,
+                maxLife: 60,
+                size: 4,
+                alpha: 1.0,
+                color: '#ff0000' // 真っ赤な警告色
+            });
+        }
+    }
+
+    createArrowParticles(arrowLength) {
+        // 矢印パーティクル（より目立つ）
+        for (let i = 0; i < 25; i++) {
+            const progress = i / 25;
+            const particleX = this.centerX + this.dashDirection.x * arrowLength * progress;
+            const particleY = this.centerY + this.dashDirection.y * arrowLength * progress;
+            
+            // サイズを大きくして目立たせる
+            const size = 8 + progress * 8; // 8から16までサイズが大きくなる
+            
+            this.dashParticles.push({
+                x: particleX,
+                y: particleY,
+                vx: (Math.random() - 0.5) * 3,
+                vy: (Math.random() - 0.5) * 3,
+                life: 45 + progress * 45,
+                maxLife: 45 + progress * 45,
+                size: size,
+                alpha: 1.0,
+                color: '#ff0000' // 真っ赤な警告色
+            });
+        }
+        
+        // 矢印の先端を強調
+        for (let i = 0; i < 8; i++) {
+            this.dashParticles.push({
+                x: this.centerX + this.dashDirection.x * arrowLength,
+                y: this.centerY + this.dashDirection.y * arrowLength,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
+                life: 60,
+                maxLife: 60,
+                size: 12,
+                alpha: 1.0,
+                color: '#ffff00' // 黄色で先端を強調
+            });
+        }
+    }
+
+    createDashPathLine(arrowLength) {
+        // 突進経路のライン
+        for (let i = 0; i < 40; i++) {
+            const progress = i / 40;
+            const particleX = this.centerX + this.dashDirection.x * arrowLength * progress;
+            const particleY = this.centerY + this.dashDirection.y * arrowLength * progress;
+            
+            this.dashParticles.push({
+                x: particleX,
+                y: particleY,
+                vx: 0,
+                vy: 0,
+                life: 90,
+                maxLife: 90,
+                size: 3,
+                alpha: 0.8,
+                color: '#ff4444' // 薄い赤色でラインを形成
+            });
+            }
+        }
+
+    createBossWarningEffect() {
+        // ボス鬼の周囲の警告エフェクト
+        for (let i = 0; i < 20; i++) {
+            const angle = (i / 20) * Math.PI * 2;
+            const radius = 40;
+            
+            this.dashParticles.push({
+                x: this.centerX + Math.cos(angle) * radius,
+                y: this.centerY + Math.sin(angle) * radius,
+                vx: Math.cos(angle) * 2,
+                vy: Math.sin(angle) * 2,
+                life: 40,
+                maxLife: 40,
+                size: 6,
+                alpha: 1.0,
+                color: '#ff6666' // 明るい赤色
+            });
+        }
+    }
+
+    createConsecutiveDashEffect() {
+        // 連続突進準備時のエフェクト
+        console.log('BossOni2: Creating consecutive dash effect');
+        
+        // 1. 連続突進を示す大きなサークル
+        this.createConsecutiveWarningCircle();
+        
+        // 2. 連続突進を示すパーティクル
+        for (let i = 0; i < 15; i++) {
+            this.dashParticles.push({
+                x: this.centerX + (Math.random() - 0.5) * 70,
+                y: this.centerY + (Math.random() - 0.5) * 70,
+                vx: (Math.random() - 0.5) * 4,
+                vy: (Math.random() - 0.5) * 4,
+                life: 35,
+                maxLife: 35,
+                size: Math.random() * 6 + 4,
+                alpha: 1.0,
+                color: '#ff8800' // 明るいオレンジ色
+            });
+        }
+        
+        // 3. 連続突進カウンター表示
+        this.createConsecutiveCounter();
+        
+        // 連続突進準備の音
+        playSE('syoukan-syutugen');
+        
+        // 画面シェイク効果
+        this.screenShake = Math.max(this.screenShake, 6);
+    }
+
+    createConsecutiveWarningCircle() {
+        // 連続突進を示す大きなサークル
+        for (let i = 0; i < 25; i++) {
+            const angle = (i / 25) * Math.PI * 2;
+            const radius = 60;
+            
+            this.dashParticles.push({
+                x: this.centerX + Math.cos(angle) * radius,
+                y: this.centerY + Math.sin(angle) * radius,
+                vx: 0,
+                vy: 0,
+                life: 50,
+                maxLife: 50,
+                size: 5,
+                alpha: 1.0,
+                color: '#ff8800' // 明るいオレンジ色
+            });
+        }
+    }
+
+    createConsecutiveCounter() {
+        // 連続突進カウンター表示
+        const counterText = `${this.consecutiveDashCount}/${this.maxConsecutiveDashes}`;
+        const counterSize = 8;
+        
+        // カウンターの背景
+        for (let i = 0; i < 12; i++) {
+            this.dashParticles.push({
+                x: this.centerX + (Math.random() - 0.5) * 30,
+                y: this.centerY + (Math.random() - 0.5) * 30,
+                vx: 0,
+                vy: 0,
+                life: 60,
+                maxLife: 60,
+                size: counterSize,
+                alpha: 0.9,
+                color: '#000000' // 黒い背景
+            });
+        }
+        
+        // カウンターの数字（簡易的な表現）
+        for (let i = 0; i < 8; i++) {
+            this.dashParticles.push({
+                x: this.centerX + (Math.random() - 0.5) * 20,
+                y: this.centerY + (Math.random() - 0.5) * 20,
+                vx: 0,
+                vy: 0,
+                life: 60,
+                maxLife: 60,
+                size: 6,
+                alpha: 1.0,
+                color: '#ffffff' // 白い数字
+            });
+        }
+    }
+
+    createConsecutiveChargeEffect() {
+        // 連続突進準備中の継続エフェクト
+        const intensity = this.consecutiveDashCount / this.maxConsecutiveDashes;
+        
+        // 1. 強度に応じたパーティクル生成
+        for (let i = 0; i < 5; i++) {
+            this.dashParticles.push({
+                x: this.centerX + (Math.random() - 0.5) * 50,
+                y: this.centerY + (Math.random() - 0.5) * 50,
+                vx: (Math.random() - 0.5) * 2,
+                vy: (Math.random() - 0.5) * 2,
+                life: 25,
+                maxLife: 25,
+                size: Math.random() * 5 + 3,
+                alpha: intensity,
+                color: `hsl(${30 + intensity * 30}, 100%, 50%)` // オレンジから赤へのグラデーション
+            });
+        }
+        
+        // 2. 脈動する警告サークル
+        if (this.stateTimer % 10 === 0) {
+            this.createPulsingWarningCircle(intensity);
+        }
+        
+        // 3. 方向指示エフェクト
+        this.createDirectionIndicator(intensity);
+    }
+
+    createPulsingWarningCircle(intensity) {
+        // 脈動する警告サークル
+        const pulseRadius = 45 + Math.sin(Date.now() * 0.02) * 15;
+        
+        for (let i = 0; i < 15; i++) {
+            const angle = (i / 15) * Math.PI * 2;
+            
+            this.dashParticles.push({
+                x: this.centerX + Math.cos(angle) * pulseRadius,
+                y: this.centerY + Math.sin(angle) * pulseRadius,
+                vx: 0,
+                vy: 0,
+                life: 30,
+                maxLife: 30,
+                size: 4,
+                alpha: intensity * 0.8,
+                color: `hsl(${20 + intensity * 40}, 100%, 60%)` // オレンジから赤へのグラデーション
+            });
+        }
+    }
+
+    createDirectionIndicator(intensity) {
+        // 方向指示エフェクト
+        const indicatorLength = 40;
+        const indicatorX = this.centerX + this.dashDirection.x * indicatorLength;
+        const indicatorY = this.centerY + this.dashDirection.y * indicatorLength;
+        
+        // 方向を示すパーティクル
+        for (let i = 0; i < 3; i++) {
+            this.dashParticles.push({
+                x: indicatorX + (Math.random() - 0.5) * 20,
+                y: indicatorY + (Math.random() - 0.5) * 20,
+                vx: 0,
+                vy: 0,
+                life: 20,
+                maxLife: 20,
+                size: 6,
+                alpha: intensity,
+                color: '#ffff00' // 黄色で方向を強調
+            });
+        }
     }
 
     updateDashDirection() {
@@ -764,7 +1295,12 @@ export class BossOni2 extends BossOni {
             isRageMode: this.isRageMode,
             comboCount: this.comboCount,
             specialAttackCooldown: this.specialAttackCooldown,
-            predictionLevel: this.predictionLevel
+            predictionLevel: this.predictionLevel,
+            noteAttackCooldown: this.noteAttackCooldown,
+            noteAttackPattern: this.noteAttackPattern,
+            consecutiveDashCount: this.consecutiveDashCount,
+            maxConsecutiveDashes: this.maxConsecutiveDashes,
+            isConsecutiveDashing: this.isConsecutiveDashing
         };
     }
 } 

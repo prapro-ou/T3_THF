@@ -11,7 +11,8 @@ const enemySpriteSheets = {
     cannon: { sheet: null, loaded: false },
     boss2: { sheet: null, loaded: false }, // BossOni2用
     fuzin: { sheet: null, loaded: false }, // BossOni4用（風神）
-    raizin: { sheet: null, loaded: false } // BossOni5用（雷神）
+    raizin: { sheet: null, loaded: false }, // BossOni5用（雷神）
+    warp: { sheet: null, loaded: false } // BossOni3用（warp_oni_v2）
 };
 
 // 赤鬼のスプライトシート読み込み
@@ -58,6 +59,50 @@ export function preloadRedOniSpriteSheet(callback) {
         .catch(err => {
             console.log('Red Oni JSON fetch or image load failed:', err);
             window.redOniSpriteSheetLoaded = false;
+            callback();
+        });
+}
+
+// warp_oni_v2のスプライトシート読み込み
+export function preloadWarpOniSpriteSheet(callback) {
+    if (enemySpriteSheets.warp.loaded) {
+        return callback();
+    }
+    
+    fetch('assets/characters/oni/warp_oni/warp_oni_v2.json')
+        .then(res => {
+            if (!res.ok) throw new Error('Warp Oni JSON not found');
+            console.log('Warp Oni JSON fetch success');
+            return res.json();
+        })
+        .then(json => {
+            let retryCount = 0;
+            const maxRetries = 10;
+            function tryLoadImage() {
+                const img = new Image();
+                img.src = 'assets/characters/oni/warp_oni/warp_oni_v2.png?' + new Date().getTime();
+                console.log('Trying to load warp oni image, attempt', retryCount + 1, 'src:', img.src);
+                img.onload = () => {
+                    console.log('Warp Oni image loaded successfully');
+                    enemySpriteSheets.warp.sheet = new SpriteSheet(img, json);
+                    enemySpriteSheets.warp.loaded = true;
+                    callback();
+                };
+                img.onerror = () => {
+                    console.log('Warp Oni image load failed, attempt', retryCount + 1, 'src:', img.src);
+                    retryCount++;
+                    if (retryCount < maxRetries) {
+                        setTimeout(tryLoadImage, 500);
+                    } else {
+                        console.log('Warp Oni image load failed after', maxRetries, 'attempts');
+                        callback();
+                    }
+                };
+            }
+            tryLoadImage();
+        })
+        .catch(err => {
+            console.log('Warp Oni JSON fetch or image load failed:', err);
             callback();
         });
 }
@@ -294,6 +339,8 @@ export class EnemyRenderer {
             enemyType = 'boss';
         } else if (enemy.constructor.name === 'BossOni2') {
             enemyType = 'boss2'; // BossOni2のスプライトシートを使用
+        } else if (enemy.constructor.name === 'BossOni3') {
+            enemyType = 'warp'; // warp_oni_v2のスプライトシートを使用
         } else if (enemy.constructor.name === 'BossOni4') {
             enemyType = 'fuzin'; // 風神
         } else if (enemy.constructor.name === 'BossOni5') {
@@ -327,6 +374,17 @@ export class EnemyRenderer {
                     frameName = 'bike_oni_left.png';
                 } else {
                     frameName = 'bike_oni_right.png';
+                }
+            } else if (enemyType === 'warp') {
+                // BossOni3は方向に応じてフレームを選択
+                if (enemy.currentDirection === 'left') {
+                    frameName = 'warp_oni_left.png';
+                } else if (enemy.currentDirection === 'right') {
+                    frameName = 'warp_oni_right.png';
+                } else if (enemy.currentDirection === 'back') {
+                    frameName = 'warp_oni_back.png';
+                } else {
+                    frameName = 'warp_oni_front.png';
                 }
             } else if (enemyType === 'fuzin') {
                 // 風神は単一フレーム
