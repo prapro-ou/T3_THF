@@ -7,7 +7,7 @@ import { Projectile } from './Projectile.js';
  * - 音符の形状で描画
  */
 export class NoteProjectile extends Projectile {
-    constructor(game, x, y, direction, speed = 3) {
+    constructor(game, x, y, direction, speed = 2) {
         // ダミーのターゲットを作成してProjectileクラスのコンストラクタを呼び出す
         const dummyTarget = { x: x + direction.x * 1000, y: y + direction.y * 1000, width: 0, height: 0 };
         super(game, x, y, dummyTarget, speed, 0, 'note');
@@ -16,16 +16,16 @@ export class NoteProjectile extends Projectile {
         this.name = 'NoteProjectile';
         
         // 音符特有のプロパティを上書き
-        this.width = 20;
-        this.height = 20;
-        this.radius = 10; // 円形当たり判定の半径
+        this.width = 40;
+        this.height = 40;
+        this.radius = 20; // 円形当たり判定の半径
         
         // 速度ベクトルを設定（Projectileクラスのvx, vyを上書き）
         this.vx = direction.x * speed;
         this.vy = direction.y * speed;
         
         // 音符特有のプロパティ
-        this.lifeTime = 180; // 3秒間滞留（60fps）
+        this.lifeTime = 300; // 5秒間滞留（60fps）
         this.currentLife = 0;
         this.stunDuration = 120; // スタン時間（2秒）
         this.stunStrength = 0.8; // スタン強度
@@ -112,13 +112,20 @@ export class NoteProjectile extends Projectile {
 
     applyStunEffect(player) {
         if (typeof player.applyStun === 'function') {
-            player.applyStun(this.stunDuration, this.stunStrength);
+            // プレイヤーが既にスタン中の場合は、スタン時間を延長
+            if (player.getStunned && player.getStunned()) {
+                const currentRemaining = player.getStunRemaining ? player.getStunRemaining() : 0;
+                const extendedDuration = Math.max(this.stunDuration, currentRemaining);
+                player.applyStun(extendedDuration, this.stunStrength);
+                console.log(`NoteProjectile: Stun extended to ${extendedDuration} frames (was ${currentRemaining})`);
+            } else {
+                player.applyStun(this.stunDuration, this.stunStrength);
+                console.log(`NoteProjectile: Stun applied to player for ${this.stunDuration} frames`);
+            }
         } else {
             // プレイヤーにスタンメソッドがない場合は直接適用
             this.applyDirectStun(player);
         }
-        
-        console.log(`NoteProjectile: Stun applied to player for ${this.stunDuration} frames`);
     }
 
     applyDirectStun(player) {

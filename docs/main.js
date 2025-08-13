@@ -1,6 +1,6 @@
 ﻿import { Game } from './core/Game.js';
 import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
-import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet, preloadFuzinSpriteSheet, preloadRaizinSpriteSheet } from './components/EnemyRenderer.js';
+import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet, preloadFuzinSpriteSheet, preloadRaizinSpriteSheet, preloadWarpOniSpriteSheet } from './components/EnemyRenderer.js';
 import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
 
@@ -200,15 +200,18 @@ document.addEventListener('DOMContentLoaded', () => {
                                 preloadCannonOniSpriteSheet(() => {
                                     // BossOni2の画像プリロードを追加
                                     preloadBossOni2SpriteSheet(() => {
-                                        // ステージ4の風神・雷神もプリロード
-                                        preloadFuzinSpriteSheet(() => {
-                                            preloadRaizinSpriteSheet(() => {
+                                                                            // ステージ4の風神・雷神もプリロード
+                                    preloadFuzinSpriteSheet(() => {
+                                        preloadRaizinSpriteSheet(() => {
+                                            // BossOni3のwarp_oni_v2もプリロード
+                                            preloadWarpOniSpriteSheet(() => {
                                                 assetsLoaded = true;
                                                 startButton.disabled = false;
                                                 startButton.textContent = 'ゲームスタート';
                                                 loadingScreen.style.display = 'none';
                                             });
                                         });
+                                    });
                                     });
                                 });
                             });

@@ -33,12 +33,14 @@ export class Player extends Character {
         // 弾回復監視用
         this._prevAmmo = this.ammoManager.getAmmo();
 
-        // スタン機能用
-        this.isStunned = false;
-        this.stunTimer = 0;
-        this.stunDuration = 0;
-        this.stunStrength = 0;
-        this.originalSpeed = Player.SPEED;
+            // スタン機能用
+    this.isStunned = false;
+    this.stunTimer = 0;
+    this.stunDuration = 0;
+    this.stunStrength = 0;
+    this.originalSpeed = Player.SPEED;
+    this.stunImmunityTimer = 0; // スタン免疫時間（連続スタンを防ぐ）
+    this.stunImmunityDuration = 10; // 10フレームの免疫時間
     }
 
     // カプセル化: プロパティへのアクセスを制御
@@ -162,38 +164,86 @@ export class Player extends Character {
 
     // スタン機能のメソッド
     applyStun(duration, strength) {
-        this.isStunned = true;
-        this.stunTimer = 0;
-        this.stunDuration = duration;
-        this.stunStrength = strength;
-        
-        // スタン中の移動速度を制限
-        this.originalSpeed = Player.SPEED;
-        Player.SPEED = Player.SPEED * (1 - strength);
-        
-        console.log(`Player: Stunned for ${duration} frames with strength ${strength}`);
+        // スタン免疫中は新しいスタンを適用しない
+        if (this.stunImmunityTimer > 0) {
+            console.log(`Player: Stun immunity active, ignoring new stun (${this.stunImmunityTimer} frames remaining)`);
+            return;
+        }
+
+        // 既にスタン中の場合は、より長いスタン時間を適用
+        if (this.isStunned) {
+            // 現在のスタン時間と新しいスタン時間を比較して、長い方を採用
+            const newDuration = Math.max(this.stunDuration, duration);
+            const newStrength = Math.max(this.stunStrength, strength);
+            
+            // スタン時間を延長
+            this.stunDuration = newDuration;
+            this.stunStrength = newStrength;
+            
+            // スタンタイマーをリセット（新しいスタン時間でカウント開始）
+            this.stunTimer = 0;
+            
+            console.log(`Player: Stun extended to ${newDuration} frames with strength ${newStrength}`);
+        } else {
+            // 初回のスタン
+            this.isStunned = true;
+            this.stunTimer = 0;
+            this.stunDuration = duration;
+            this.stunStrength = strength;
+            
+            // スタン中の移動速度を制限
+            this.originalSpeed = Player.SPEED;
+            Player.SPEED = Player.SPEED * (1 - strength);
+            
+            console.log(`Player: Stunned for ${duration} frames with strength ${strength}`);
+        }
     }
 
     updateStunState(deltaTime) {
+        // スタン免疫タイマーの更新
+        if (this.stunImmunityTimer > 0) {
+            this.stunImmunityTimer -= deltaTime * 60;
+            if (this.stunImmunityTimer < 0) this.stunImmunityTimer = 0;
+        }
+
         if (this.isStunned) {
             this.stunTimer += deltaTime * 60; // フレーム数に変換
             
+            // スタン時間が終了したらスタンを解除
             if (this.stunTimer >= this.stunDuration) {
                 this.removeStun();
+            }
+            
+            // デバッグ用: スタン残り時間をログ出力（1秒ごと）
+            if (Math.floor(this.stunTimer / 60) !== Math.floor((this.stunTimer - deltaTime * 60) / 60)) {
+                const remainingFrames = this.stunDuration - this.stunTimer;
+                const remainingSeconds = (remainingFrames / 60).toFixed(1);
+                console.log(`Player: Stun remaining: ${remainingFrames} frames (${remainingSeconds}s)`);
             }
         }
     }
 
     removeStun() {
+        // スタン状態をクリア
         this.isStunned = false;
         this.stunTimer = 0;
         this.stunDuration = 0;
         this.stunStrength = 0;
         
-        // 移動速度を元に戻す
-        Player.SPEED = this.originalSpeed;
+        // スタン免疫タイマーを設定（連続スタンを防ぐ）
+        this.stunImmunityTimer = this.stunImmunityDuration;
         
-        console.log('Player: Stun removed, speed restored');
+        // 移動速度を元に戻す
+        if (this.originalSpeed !== undefined) {
+            Player.SPEED = this.originalSpeed;
+            console.log(`Player: Speed restored to ${this.originalSpeed}`);
+        } else {
+            // 元の速度が設定されていない場合はデフォルト値を使用
+            Player.SPEED = 3.5;
+            console.log('Player: Speed restored to default (3.5)');
+        }
+        
+        console.log('Player: Stun removed, speed restored, immunity activated');
     }
 
     setStunned(stunned) {
@@ -220,6 +270,24 @@ export class Player extends Character {
     getStunRemaining() {
         if (!this.isStunned) return 0;
         return Math.max(0, this.stunDuration - this.stunTimer);
+    }
+
+    // スタン状態を強制的にリセット（デバッグ用）
+    forceRemoveStun() {
+        console.log('Player: Force removing stun');
+        this.removeStun();
+    }
+
+    // スタン状態の詳細情報を取得
+    getStunInfo() {
+        return {
+            isStunned: this.isStunned,
+            stunTimer: this.stunTimer,
+            stunDuration: this.stunDuration,
+            stunStrength: this.stunStrength,
+            remainingFrames: this.getStunRemaining(),
+            remainingSeconds: (this.getStunRemaining() / 60).toFixed(1)
+        };
     }
 }
 //test
