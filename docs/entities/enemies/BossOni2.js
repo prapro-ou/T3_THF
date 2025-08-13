@@ -1,6 +1,7 @@
 import { BossOni } from './BossOni.js';
 import { SpriteSheet } from '../../utils/SpriteSheet.js';
 import { playSE } from '../../managers/KoukaonManager.js'; // 追加
+import { NoteProjectile } from '../NoteProjectile.js';
 
 /**
  * BossOni2: バイクに乗って突進を繰り返すボス（強化改良版）
@@ -51,6 +52,14 @@ export class BossOni2 extends BossOni {
             this.specialAttackActive = false;
             this.specialAttackCount = 0;
             this.specialAttackMaxCount = 3;
+
+            // 新機能: 音符攻撃
+            this.noteAttackCooldown = 0;
+            this.noteAttackMaxCooldown = 120; // 2秒
+            this.noteAttackActive = false;
+            this.noteAttackCount = 0;
+            this.noteAttackMaxCount = 5; // 一度に5発の音符
+            this.noteAttackPattern = 'spread'; // 'spread', 'circle', 'target'
 
             // 新機能: 予測移動
             this.predictionLevel = 0.7; // プレイヤーの移動を予測するレベル
@@ -103,6 +112,8 @@ export class BossOni2 extends BossOni {
                 this._hp = 300;
                 this.specialAttackMaxCooldown = 240;
                 this.knockbackStrength = 15; // 弱いノックバック
+                this.noteAttackMaxCooldown = 180; // 音符攻撃のクールダウン長め
+                this.noteAttackMaxCount = 3; // 音符数少なめ
                 break;
             case 'normal':
                 this.dashSpeed = 18;
@@ -110,6 +121,8 @@ export class BossOni2 extends BossOni {
                 this._hp = 400;
                 this.specialAttackMaxCooldown = 180;
                 this.knockbackStrength = 18; // 通常のノックバック
+                this.noteAttackMaxCooldown = 120; // 音符攻撃のクールダウン通常
+                this.noteAttackMaxCount = 5; // 音符数通常
                 break;
             case 'hard':
                 this.dashSpeed = 22;
@@ -118,6 +131,8 @@ export class BossOni2 extends BossOni {
                 this.specialAttackMaxCooldown = 120;
                 this.predictionLevel = 0.9;
                 this.knockbackStrength = 22; // 強いノックバック
+                this.noteAttackMaxCooldown = 90; // 音符攻撃のクールダウン短め
+                this.noteAttackMaxCount = 6; // 音符数多め
                 break;
             case 'extreme':
                 this.dashSpeed = 26;
@@ -127,6 +142,8 @@ export class BossOni2 extends BossOni {
                 this.predictionLevel = 1.0;
                 this.rageModeThreshold = 0.5; // HP50%以下で怒りモード
                 this.knockbackStrength = 28; // 非常に強いノックバック
+                this.noteAttackMaxCooldown = 60; // 音符攻撃のクールダウン非常に短い
+                this.noteAttackMaxCount = 7; // 音符数非常に多い
                 break;
         }
     }
@@ -193,6 +210,11 @@ export class BossOni2 extends BossOni {
             this.specialAttackCooldown--;
         }
         
+        // 音符攻撃クールダウン更新
+        if (this.noteAttackCooldown > 0) {
+            this.noteAttackCooldown--;
+        }
+        
         // デバッグ用: パーティクル状態をログ出力
         if (this.stateTimer % 60 === 0) { // 1秒ごとにログ出力
             console.log(`BossOni2 Debug - State: ${this.state}, Timer: ${this.stateTimer}, Particles: ${this.dashParticles.length}, Trail: ${this.trailEffect.length}, Rage: ${this.isRageMode}, Special: ${this.specialAttackActive}`);
@@ -239,6 +261,9 @@ export class BossOni2 extends BossOni {
                     this.state = 'special_attack';
                     this.stateTimer = 0;
                     this.executeSpecialAttack();
+                } else if (this.noteAttackCooldown <= 0 && Math.random() < 0.4) {
+                    // 音符攻撃の実行
+                    this.executeNoteAttack();
                 } else if (this.stateTimer > this.idleDuration) {
                     this.state = 'charge';
                     this.stateTimer = 0;
@@ -373,6 +398,10 @@ export class BossOni2 extends BossOni {
             // スプライトシートの色調整（可能な場合）
             console.log('BossOni2: Applying rage mode color filter');
         }
+        
+        // 怒りモード時は音符攻撃も強化
+        this.noteAttackMaxCount = 8; // 音符数を増加
+        this.noteAttackMaxCooldown = Math.max(60, this.noteAttackMaxCooldown - 60); // クールダウン短縮
     }
 
     executeSpecialAttack() {
@@ -408,6 +437,135 @@ export class BossOni2 extends BossOni {
         // 突進エフェクトを生成
         this.createDashParticles();
         this.createTrailEffect();
+    }
+
+    executeNoteAttack() {
+        // 音符攻撃の実行
+        console.log('BossOni2: Note Attack - Musical Notes!');
+        
+        this.noteAttackActive = true;
+        this.noteAttackCount = 0;
+        this.noteAttackPattern = this.getRandomNotePattern();
+        
+        // 音符攻撃の音
+        playSE('syoukan-syutugen');
+        
+        // 音符攻撃エフェクト
+        this.createNoteAttackEffect();
+        
+        // 音符を発射
+        this.fireNotes();
+        
+        // クールダウン設定
+        this.noteAttackCooldown = this.noteAttackMaxCooldown;
+    }
+
+    getRandomNotePattern() {
+        const patterns = ['spread', 'circle', 'target'];
+        return patterns[Math.floor(Math.random() * patterns.length)];
+    }
+
+    fireNotes() {
+        const player = this.game.player;
+        if (!player) return;
+        
+        const noteCount = this.isRageMode ? this.noteAttackMaxCount : 5;
+        const centerX = this.centerX;
+        const centerY = this.centerY;
+        
+        switch (this.noteAttackPattern) {
+            case 'spread':
+                this.fireSpreadNotes(centerX, centerY, noteCount);
+                break;
+            case 'circle':
+                this.fireCircleNotes(centerX, centerY, noteCount);
+                break;
+            case 'target':
+                this.fireTargetNotes(centerX, centerY, noteCount, player);
+                break;
+        }
+    }
+
+    fireSpreadNotes(centerX, centerY, noteCount) {
+        // 扇形に音符を発射
+        const angleStep = (Math.PI * 2) / noteCount;
+        const startAngle = -Math.PI / 2; // 上方向から開始
+        
+        for (let i = 0; i < noteCount; i++) {
+            const angle = startAngle + angleStep * i;
+            const direction = {
+                x: Math.cos(angle),
+                y: Math.sin(angle)
+            };
+            
+            const note = new NoteProjectile(this.game, centerX, centerY, direction, 2);
+            this.game.projectileManager.addProjectile(note);
+        }
+    }
+
+    fireCircleNotes(centerX, centerY, noteCount) {
+        // 円形に音符を発射
+        const angleStep = (Math.PI * 2) / noteCount;
+        
+        for (let i = 0; i < noteCount; i++) {
+            const angle = angleStep * i;
+            const direction = {
+                x: Math.cos(angle),
+                y: Math.sin(angle)
+            };
+            
+            const note = new NoteProjectile(this.game, centerX, centerY, direction, 1.5);
+            this.game.projectileManager.addProjectile(note);
+        }
+    }
+
+    fireTargetNotes(centerX, centerY, noteCount, player) {
+        // プレイヤーを狙って音符を発射
+        const dx = player.centerX - centerX;
+        const dy = player.centerY - centerY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > 0) {
+            const baseDirection = {
+                x: dx / distance,
+                y: dy / distance
+            };
+            
+            for (let i = 0; i < noteCount; i++) {
+                // 少しずつ角度をずらして発射
+                const angleOffset = (i - (noteCount - 1) / 2) * 0.3;
+                const direction = {
+                    x: baseDirection.x * Math.cos(angleOffset) - baseDirection.y * Math.sin(angleOffset),
+                    y: baseDirection.x * Math.sin(angleOffset) + baseDirection.y * Math.cos(angleOffset)
+                };
+                
+                const note = new NoteProjectile(this.game, centerX, centerY, direction, 2.5);
+                this.game.projectileManager.addProjectile(note);
+            }
+        }
+    }
+
+    createNoteAttackEffect() {
+        // 音符攻撃開始時のエフェクト
+        console.log('BossOni2: Creating note attack effect');
+        
+        // 音符攻撃開始パーティクル
+        for (let i = 0; i < 15; i++) {
+            this.dashParticles.push({
+                x: this.centerX + (Math.random() - 0.5) * 80,
+                y: this.centerY + (Math.random() - 0.5) * 80,
+                vx: (Math.random() - 0.5) * 6,
+                vy: (Math.random() - 0.5) * 6,
+                life: 45,
+                maxLife: 45,
+                size: Math.random() * 8 + 4,
+                alpha: 1.0,
+                color: '#8e44ad' // 音符の色
+            });
+        }
+        
+        // 画面シェイク効果
+        this.screenShake = Math.max(this.screenShake, 8);
     }
 
     updateDashDirection() {
@@ -764,7 +922,9 @@ export class BossOni2 extends BossOni {
             isRageMode: this.isRageMode,
             comboCount: this.comboCount,
             specialAttackCooldown: this.specialAttackCooldown,
-            predictionLevel: this.predictionLevel
+            predictionLevel: this.predictionLevel,
+            noteAttackCooldown: this.noteAttackCooldown,
+            noteAttackPattern: this.noteAttackPattern
         };
     }
 } 

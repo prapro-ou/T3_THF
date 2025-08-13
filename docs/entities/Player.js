@@ -32,6 +32,13 @@ export class Player extends Character {
 
         // 弾回復監視用
         this._prevAmmo = this.ammoManager.getAmmo();
+
+        // スタン機能用
+        this.isStunned = false;
+        this.stunTimer = 0;
+        this.stunDuration = 0;
+        this.stunStrength = 0;
+        this.originalSpeed = Player.SPEED;
     }
 
     // カプセル化: プロパティへのアクセスを制御
@@ -49,6 +56,9 @@ export class Player extends Character {
         // 移動前の位置を保存
         this.prevX = this.x;
         this.prevY = this.y;
+
+        // スタン状態の更新
+        this.updateStunState(deltaTime);
 
         this.controller.updatePlayerMovement(this, deltaTime);
         this.ammoManager.update(deltaTime);
@@ -148,6 +158,68 @@ export class Player extends Character {
         playSE("gameover"); // ← 死亡時に効果音
         // 必要ならここにゲームオーバー演出やUI処理を追加
         // 例:
+    }
+
+    // スタン機能のメソッド
+    applyStun(duration, strength) {
+        this.isStunned = true;
+        this.stunTimer = 0;
+        this.stunDuration = duration;
+        this.stunStrength = strength;
+        
+        // スタン中の移動速度を制限
+        this.originalSpeed = Player.SPEED;
+        Player.SPEED = Player.SPEED * (1 - strength);
+        
+        console.log(`Player: Stunned for ${duration} frames with strength ${strength}`);
+    }
+
+    updateStunState(deltaTime) {
+        if (this.isStunned) {
+            this.stunTimer += deltaTime * 60; // フレーム数に変換
+            
+            if (this.stunTimer >= this.stunDuration) {
+                this.removeStun();
+            }
+        }
+    }
+
+    removeStun() {
+        this.isStunned = false;
+        this.stunTimer = 0;
+        this.stunDuration = 0;
+        this.stunStrength = 0;
+        
+        // 移動速度を元に戻す
+        Player.SPEED = this.originalSpeed;
+        
+        console.log('Player: Stun removed, speed restored');
+    }
+
+    setStunned(stunned) {
+        this.isStunned = stunned;
+        if (!stunned) {
+            this.removeStun();
+        }
+    }
+
+    setStunVisual(visual) {
+        // スタン中の視覚効果（必要に応じて実装）
+        if (visual) {
+            console.log('Player: Stun visual effect activated');
+        } else {
+            console.log('Player: Stun visual effect deactivated');
+        }
+    }
+
+    // スタン状態のgetter
+    getStunned() {
+        return this.isStunned;
+    }
+
+    getStunRemaining() {
+        if (!this.isStunned) return 0;
+        return Math.max(0, this.stunDuration - this.stunTimer);
     }
 }
 //test
