@@ -207,17 +207,17 @@ export class BossOni5 extends BossOni {
         if (!this._pendingStrikes) this._pendingStrikes = [];
         if (!this._lastStrikeSchedule) this._lastStrikeSchedule = nowFrame - this.strikeEveryFrames;
         
-        // 一定間隔で新規落雷を予約
-        if (
-            nowFrame - this._lastStrikeSchedule >= this.strikeEveryFrames &&
-            this._pendingStrikes.length < this.strikesPerWave
-        ) {
-            this._lastStrikeSchedule = nowFrame;
-            this.scheduleRandomStrikeNearPlayer(nowFrame);
-        }
-        
-        // 予兆描画と着弾処理
-        this.updateStrikes(nowFrame);
+            // 一定間隔で新規落雷を予約
+            if (
+                nowFrame - this._lastStrikeSchedule >= this.strikeEveryFrames &&
+                this._pendingStrikes.length < this.strikesPerWave
+            ) {
+                this._lastStrikeSchedule = nowFrame;
+                this.scheduleRandomStrikeNearPlayer(nowFrame);
+            }
+
+            // 予兆描画と着弾処理
+            this.updateStrikes(nowFrame);
     }
     
     // 新攻撃パターン: 直線稲妻ビーム攻撃
