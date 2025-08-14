@@ -32,11 +32,12 @@ export class BossOni1 extends BossOni {
         }
     }
 
-    // 移動を無効化
+    // 移動を完全に無効化
     updateMovement() {
-        // 何もしない - 移動しない
+        // 絶対に動かない - 位置固定
         this._dx = 0;
         this._dy = 0;
+        // 衝突回避機能は無効化
     }
 
     shootAtPlayer() {

@@ -73,7 +73,7 @@
     </div>
 
     <div class="game-container">
-        <canvas id="gameCanvas" width="800" height="600" class="hidden"></canvas>
+        <canvas id="gameCanvas" width="1000" height="800" class="hidden"></canvas>
         <div id="scoreDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">スコア</span>: <span
                 id="scoreValue">0</span></div>
         <div id="livesDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残弾数</span>: <span
@@ -200,6 +200,12 @@
                 </div>
                 <div class="debug-control">
                     <label><input type="checkbox" id="showEnemyHitbox"> 敵当たり判定を表示</label>
+                </div>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showBossCollision"> ボス衝突判定を表示</label>
+                </div>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showBossRageMode"> ボス怒りモード状態を表示</label>
                 </div>
                 <div class="debug-control">
                     <label><input type="checkbox" id="showProjectileHitbox"> 弾当たり判定を表示</label>
