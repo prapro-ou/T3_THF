@@ -45,7 +45,8 @@ export class BossOni5 extends BossOni {
                 this._lastStrikeSchedule = nowFrame - this.strikeEveryFrames; // すぐ最初を打てるように
                 this._pendingStrikes = [];
                 this._attackCooldown = this.attackCooldownFrames; // 次回用
-                playSE("Thunder"); // ← 攻撃開始時にThunder効果音を鳴らす
+                const thunderSE = playSE("Thunder");
+                if (thunderSE) thunderSE.volume = 1.0; // 最大音量
             }
         } else {
             // 一定間隔で新規落雷を予約

@@ -33,7 +33,7 @@ export class Player extends Character {
         // 弾回復監視用
         this._prevAmmo = this.ammoManager.getAmmo();
 
-            // スタン機能用
+        // スタン機能用
         this.isStunned = false;
         this.stunTimer = 0;
         this.stunDuration = 0;
@@ -69,7 +69,7 @@ export class Player extends Character {
 
         // スタン状態の更新
         this.updateStunState(deltaTime);
-        
+
         // お札効果状態の更新
         this.updateEffectStates(deltaTime);
 
@@ -107,7 +107,7 @@ export class Player extends Character {
             // ...
             return true;
         } else {
-            // 効果音は鳴らさない
+            playSE("can'ttouch"); // 残弾数が0の時にクリックした場合のみ効果音
             return false;
         }
     }
@@ -156,10 +156,20 @@ export class Player extends Character {
 
     takeDamage(amount) {
         if (this.invincibleTimer > 0) return; // 無敵中はダメージ無効
+        const prevHpRatio = this.health / this.maxHP;
         const nextHp = this.health - amount;
+        const nextHpRatio = nextHp / this.maxHP;
+
+        // 死なない場合のみ効果音
         if (nextHp > 0) {
-            playSE("receivedamage"); // 死なない場合のみ効果音
+            playSE("receivedamage");
         }
+
+        // HPが10%以上から10%未満になった瞬間だけ効果音
+        if (prevHpRatio >= 0.1 && nextHpRatio < 0.1) {
+            playSE("lawhp");
+        }
+
         this.health = nextHp;
         this.invincibleTimer = 1.0; // 1秒間無敵
         if (!this.isAlive) {
@@ -186,14 +196,14 @@ export class Player extends Character {
             // 現在のスタン時間と新しいスタン時間を比較して、長い方を採用
             const newDuration = Math.max(this.stunDuration, duration);
             const newStrength = Math.max(this.stunStrength, strength);
-            
+
             // スタン時間を延長
             this.stunDuration = newDuration;
             this.stunStrength = newStrength;
-            
+
             // スタンタイマーをリセット（新しいスタン時間でカウント開始）
             this.stunTimer = 0;
-            
+
             console.log(`Player: Stun extended to ${newDuration} frames with strength ${newStrength}`);
         } else {
             // 初回のスタン
@@ -201,11 +211,11 @@ export class Player extends Character {
             this.stunTimer = 0;
             this.stunDuration = duration;
             this.stunStrength = strength;
-            
+
             // スタン中の移動速度を制限
             this.originalSpeed = Player.SPEED;
             Player.SPEED = Player.SPEED * (1 - strength);
-            
+
             console.log(`Player: Stunned for ${duration} frames with strength ${strength}`);
         }
     }
@@ -219,12 +229,12 @@ export class Player extends Character {
 
         if (this.isStunned) {
             this.stunTimer += deltaTime * 60; // フレーム数に変換
-            
+
             // スタン時間が終了したらスタンを解除
             if (this.stunTimer >= this.stunDuration) {
                 this.removeStun();
             }
-            
+
             // デバッグ用: スタン残り時間をログ出力（1秒ごと）
             if (Math.floor(this.stunTimer / 60) !== Math.floor((this.stunTimer - deltaTime * 60) / 60)) {
                 const remainingFrames = this.stunDuration - this.stunTimer;
@@ -240,10 +250,10 @@ export class Player extends Character {
         this.stunTimer = 0;
         this.stunDuration = 0;
         this.stunStrength = 0;
-        
+
         // スタン免疫タイマーを設定（連続スタンを防ぐ）
         this.stunImmunityTimer = this.stunImmunityDuration;
-        
+
         // 移動速度を元に戻す
         if (this.originalSpeed !== undefined) {
             Player.SPEED = this.originalSpeed;
@@ -253,7 +263,7 @@ export class Player extends Character {
             Player.SPEED = 3.5;
             console.log('Player: Speed restored to default (3.5)');
         }
-        
+
         console.log('Player: Stun removed, speed restored, immunity activated');
     }
 
@@ -315,7 +325,7 @@ export class Player extends Character {
             // 速度を直接変更せず、slowStrengthを使用して制御
         }
         console.log(`Player: Slow effect applied for ${duration} frames with strength ${strength}`);
-        
+
         // 減速効果のパーティクルを表示
         this.createSlowEffectParticles();
     }
@@ -327,7 +337,7 @@ export class Player extends Character {
         this.poisonInterval = interval;
         this.poisonTickTimer = 0;
         console.log(`Player: Poison effect applied for ${duration} frames with ${damage} damage every ${interval} frames`);
-        
+
         // 毒効果のパーティクルを表示
         this.createPoisonEffectParticles();
     }
@@ -337,18 +347,18 @@ export class Player extends Character {
     // 効果状態の更新
     updateEffectStates(deltaTime) {
         console.log(`Player: updateEffectStates called with deltaTime: ${deltaTime}`);
-        
+
         // 減速効果の更新
         if (this.slowTimer > 0) {
             const oldTimer = this.slowTimer;
             this.slowTimer -= deltaTime * 60;
             console.log(`Player: Slow timer updated - Old: ${oldTimer.toFixed(1)}, New: ${this.slowTimer.toFixed(1)}, Delta: ${(deltaTime * 60).toFixed(1)}`);
-            
+
             // 効果継続中は定期的にパーティクルを表示（1秒ごと）
             if (Math.floor(this.slowTimer / 60) !== Math.floor((this.slowTimer + deltaTime * 60) / 60)) {
                 this.createSlowEffectParticles();
             }
-            
+
             if (this.slowTimer <= 0) {
                 console.log('Player: Slow timer expired, removing effect');
                 this.removeSlow();
@@ -365,17 +375,17 @@ export class Player extends Character {
         if (this.poisonTimer > 0) {
             this.poisonTimer -= deltaTime * 60;
             this.poisonTickTimer += deltaTime * 60;
-            
+
             // 効果継続中は定期的にパーティクルを表示（1秒ごと）
             if (Math.floor(this.poisonTimer / 60) !== Math.floor((this.poisonTimer + deltaTime * 60) / 60)) {
                 this.createPoisonEffectParticles();
             }
-            
+
             if (this.poisonTickTimer >= this.poisonInterval) {
                 this.takeDamage(this.poisonDamage);
                 this.poisonTickTimer = 0;
             }
-            
+
             if (this.poisonTimer <= 0) {
                 this.removePoison();
             }
@@ -414,12 +424,12 @@ export class Player extends Character {
             const distance = 30 + Math.random() * 20; // プレイヤーの周囲30-50px
             const x = this.centerX + Math.cos(angle) * distance;
             const y = this.centerY + Math.sin(angle) * distance;
-            
+
             // 内側に向かう速度
             const speed = 0.5 + Math.random() * 1;
             const vx = -Math.cos(angle) * speed;
             const vy = -Math.sin(angle) * speed;
-            
+
             this.game.particleManager.createParticle(
                 x,
                 y,
@@ -439,12 +449,12 @@ export class Player extends Character {
             const distance = 25 + Math.random() * 25; // プレイヤーの周囲25-50px
             const x = this.centerX + Math.cos(angle) * distance;
             const y = this.centerY + Math.sin(angle) * distance;
-            
+
             // 外側に向かう速度
             const speed = 0.8 + Math.random() * 1.2;
             const vx = Math.cos(angle) * speed;
             const vy = Math.sin(angle) * speed;
-            
+
             this.game.particleManager.createParticle(
                 x,
                 y,
