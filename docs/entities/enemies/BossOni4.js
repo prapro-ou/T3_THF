@@ -38,11 +38,29 @@ export class BossOni4 extends BossOni {
         this.ringActiveFrames = 36;
         this.ringRadius = 220;
         this.ringThickness = 80; // 当たり幅
+        
+        // 風神・雷神ペア識別
+        this.bossPairId = 'fuzin_raizin';
+        this.isPartnerAlive = true; // パートナー（雷神）が生存しているか
+        this.rageMode = false; // 怒りモード（パートナー死亡時）
+        
+        // 怒りモード時の強化パラメータ（大幅強化）
+        this.rageAttackCooldownFrames = 80;  // 攻撃クールダウン大幅短縮（180 → 80、56%短縮）
+        this.rageWindRange = 700;            // 風の到達距離大幅増加（520 → 700、35%増加）
+        this.rageWindPushStrength = 12.0;    // 押し出し量大幅増加（6.0 → 12.0、100%増加）
+        this.rageWindDamage = 18;            // ダメージ大幅増加（8 → 18、125%増加）
+        this.rageConeHalfAngleRad = this.degToRad(60); // 扇の角度大幅拡大（35° → 60°、71%拡大）
+        this.rageRingRadius = 350;           // リング半径大幅拡大（220 → 350、59%拡大）
+        this.rageRingThickness = 120;        // リング幅大幅拡大（80 → 120、50%増加）
     }
 
     update() {
         // 親クラスの更新処理を呼び出し
         super.update();
+        
+        // パートナーの生存状態をチェック
+        this.checkPartnerStatus();
+        
         // 攻撃状態の更新
         if (!this._isAttacking) {
             if (this._attackCooldown > 0) this._attackCooldown--;
@@ -77,6 +95,73 @@ export class BossOni4 extends BossOni {
             }
         }
     }
+    
+    // パートナーの生存状態をチェック
+    checkPartnerStatus() {
+        const enemies = this.game.enemyManager.getEnemies();
+        const partner = enemies.find(enemy => 
+            enemy !== this && 
+            enemy.bossPairId === this.bossPairId && 
+            enemy.name === 'BossOni5'
+        );
+        
+        const wasPartnerAlive = this.isPartnerAlive;
+        this.isPartnerAlive = !!partner;
+        
+        // パートナーが死亡した瞬間に怒りモードに移行
+        if (wasPartnerAlive && !this.isPartnerAlive && !this.rageMode) {
+            this.activateRageMode();
+        }
+    }
+    
+    // 怒りモードを有効化
+    activateRageMode() {
+        this.rageMode = true;
+        console.log('風神: 雷神が倒された！怒りモード発動！');
+        
+        // 怒りモード時のパラメータを適用
+        this.attackCooldownFrames = this.rageAttackCooldownFrames;
+        this.windRange = this.rageWindRange;
+        this.windPushStrength = this.rageWindPushStrength;
+        this.windDamage = this.rageWindDamage;
+        this.coneHalfAngleRad = this.rageConeHalfAngleRad;
+        this.ringRadius = this.rageRingRadius;
+        this.ringThickness = this.rageRingThickness;
+        
+        // 怒りモードの視覚効果
+        this.color = '#8e44ad'; // より濃い紫に変化
+        this.game.particleManager.createExplosion(this.x + this.width/2, this.y + this.height/2, '#8e44ad', 30);
+        
+        // 怒りモード発動時の追加エフェクト
+        this.createRageModeEffect();
+        
+        // 怒りモードの効果音
+        playSE("Wind"); // 風の効果音で怒りモード開始を表現
+    }
+    
+    // 怒りモード発動時の追加エフェクト
+    createRageModeEffect() {
+        // 風神の周りに渦巻きエフェクトを作成
+        const centerX = this.x + this.width / 2;
+        const centerY = this.y + this.height / 2;
+        
+        // 渦巻き状のパーティクル
+        for (let i = 0; i < 36; i++) {
+            const angle = (i / 36) * Math.PI * 2;
+            const radius = 100 + Math.random() * 50;
+            const x = centerX + Math.cos(angle) * radius;
+            const y = centerY + Math.sin(angle) * radius;
+            this.game.particleManager.createParticle(x, y, 0, 0, '#9b59b6', 120, 0.8);
+        }
+        
+        // 中央からの放射状エフェクト
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2;
+            const x = centerX + Math.cos(angle) * 200;
+            const y = centerY + Math.sin(angle) * 200;
+            this.game.particleManager.createParticle(x, y, 0, 0, '#e8d5ff', 90, 0.6);
+        }
+    }
 
     // サイズ変更メソッド（将来的な拡張用）
     changeSize(newWidth, newHeight) {
@@ -91,7 +176,38 @@ export class BossOni4 extends BossOni {
             this._dy = 0;
             return;
         }
+        
+        // 移動前に他の敵との衝突をチェック
+        this.avoidCollisionWithOtherEnemies();
+        
         super.updateMovement();
+    }
+    
+    // 他の敵との衝突を避ける
+    avoidCollisionWithOtherEnemies() {
+        const enemies = this.game.enemyManager.getEnemies();
+        const minDistance = 160; // ボスの半径80 * 2
+        
+        for (const enemy of enemies) {
+            if (enemy === this) continue; // 自分は除外
+            
+            const dx = this.x - enemy.x;
+            const dy = this.y - enemy.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < minDistance) {
+                // 衝突を避けるために少し移動
+                const angle = Math.atan2(dy, dx);
+                const pushDistance = minDistance - distance + 10;
+                this.x += Math.cos(angle) * pushDistance;
+                this.y += Math.sin(angle) * pushDistance;
+                
+                // マップ境界内に収める
+                const { width: mapW, height: mapH } = this.game.cameraManager.getMapDimensions();
+                this.x = Math.max(80, Math.min(this.x, mapW - 80));
+                this.y = Math.max(80, Math.min(this.y, mapH - 80));
+            }
+        }
     }
 
     // Telegraph and effect helpers
@@ -119,7 +235,7 @@ export class BossOni4 extends BossOni {
                 const ang = dir + r + (Math.random() - 0.5) * 0.03;
                 const px = bx + Math.cos(ang) * t + (Math.random() - 0.5) * 8;
                 const py = by + Math.sin(ang) * t + (Math.random() - 0.5) * 8;
-                this.game.particleManager.createParticle(px, py, '#7ed6df');
+                this.game.particleManager.createParticle(px, py, 0, 0, '#7ed6df', 60, 1.0);
             }
         }
     }
@@ -153,7 +269,7 @@ export class BossOni4 extends BossOni {
                 const t = Math.random() * this.windRange;
                 const px2 = bx + (dx / dist) * t + (Math.random() - 0.5) * 20;
                 const py2 = by + (dy / dist) * t + (Math.random() - 0.5) * 20;
-                this.game.particleManager.createParticle(px2, py2, '#a7e0f5');
+                this.game.particleManager.createParticle(px2, py2, 0, 0, '#a7e0f5', 60, 1.0);
             }
         }
     }
@@ -167,7 +283,7 @@ export class BossOni4 extends BossOni {
             const rr = this.ringRadius + (Math.random() - 0.5) * (this.ringThickness * 0.6);
             const px = bx + Math.cos(ang) * rr;
             const py = by + Math.sin(ang) * rr;
-            this.game.particleManager.createParticle(px, py, '#7ed6df');
+            this.game.particleManager.createParticle(px, py, 0, 0, '#7ed6df', 60, 1.0);
         }
         // うっすら内側も
         for (let j = 0; j < 24; j++) {
@@ -175,7 +291,7 @@ export class BossOni4 extends BossOni {
             const rr = this.ringRadius + (Math.random() - 0.5) * this.ringThickness;
             const px = bx + Math.cos(ang) * rr;
             const py = by + Math.sin(ang) * rr;
-            this.game.particleManager.createParticle(px, py, '#bdeafe');
+            this.game.particleManager.createParticle(px, py, 0, 0, '#bdeafe', 60, 1.0);
         }
     }
 

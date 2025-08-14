@@ -984,6 +984,36 @@ export class BossOni2 extends BossOni {
         // 突進中はupdateで直接座標を動かす
         this._dx = 0;
         this._dy = 0;
+        
+        // 他の敵との衝突を避ける（位置調整のみ）
+        this.avoidCollisionWithOtherEnemies();
+    }
+    
+    // 他の敵との衝突を避ける（位置調整のみ）
+    avoidCollisionWithOtherEnemies() {
+        const enemies = this.game.enemyManager.getEnemies();
+        const minDistance = 300; // ボス2の半径150 * 2
+        
+        for (const enemy of enemies) {
+            if (enemy === this) continue; // 自分は除外
+            
+            const dx = this.x - enemy.x;
+            const dy = this.y - enemy.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < minDistance) {
+                // 衝突を避けるために少し移動
+                const angle = Math.atan2(dy, dx);
+                const pushDistance = minDistance - distance + 20;
+                this.x += Math.cos(angle) * pushDistance;
+                this.y += Math.sin(angle) * pushDistance;
+                
+                // マップ境界内に収める
+                const { width: mapW, height: mapH } = this.game.cameraManager.getMapDimensions();
+                this.x = Math.max(150, Math.min(this.x, mapW - 150));
+                this.y = Math.max(150, Math.min(this.y, mapH - 150));
+            }
+        }
     }
 
     draw(ctx, scrollX, scrollY) {
