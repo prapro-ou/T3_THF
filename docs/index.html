@@ -34,7 +34,7 @@
     <div id="stageSelectArea" class="hidden">
         <img id="backToStartButton" src="assets/UI/UI/button/modoru_button_UI.png" alt="スタート画面に戻る" class="image-btn"
             title="スタート画面に戻る">
-        <h2 class="wafu-title">ステージ選択</h2>
+        <img src="assets/UI/UI/stage_select.png" alt="ステージ選択" class="stage-select-title">
         <div class="boss-cards">
             <div class="boss-card" data-boss="1">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/cannon_oni_select_button_UI.png" alt="四天王1">
@@ -93,6 +93,10 @@
             <br> P : ポーズ
             <br> Ctrl+B : ボス鬼出現
         </div>
+        <!-- 桃太郎レベル表示 -->
+        <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span
+                id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span
+                id="otomoExpToLevelUpValue">10</span></div>
     </div>
 
     <!-- ボス出現演出用カットイン -->
@@ -123,9 +127,6 @@
             </div>
         </div>
     </div>
-    <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span
-            id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span
-            id="otomoExpToLevelUpValue">10</span></div>
 
     <!-- 照準カーソル -->
     <div id="crosshair" class="hidden">

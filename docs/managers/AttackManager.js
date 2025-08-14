@@ -30,7 +30,7 @@ export class AttackManager {
             x: mouseX,
             y: mouseY,
             radius: attackRadius,
-            timer: 10
+            timer: 22
         };
         let hitCount = 0;
         const level = this.game.otomoLevel || 1;
@@ -68,7 +68,7 @@ export class AttackManager {
             x: mouseX,
             y: mouseY,
             radius: attackRadius,
-            timer: 10
+            timer: 22
         };
         return this.processAttack(mouseX, mouseY, attackRadius);
     }

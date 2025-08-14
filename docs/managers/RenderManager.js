@@ -6,6 +6,14 @@
         this.VIEW_H = canvas.height;
         this.MAP_W = this.VIEW_W * 3;
         this.MAP_H = this.VIEW_H * 3;
+        
+        // エクスプロージョン画像をロード
+        this.explosionImage = new window.Image();
+        this.explosionImageLoaded = false;
+        this.explosionImage.onload = () => {
+            this.explosionImageLoaded = true;
+        };
+        this.explosionImage.src = 'assets/UI/UI/explosion.png';
     }
 
     clear() {
@@ -58,16 +66,34 @@
     drawAttackCircle(attackCircle, scrollX, scrollY) {
         if (attackCircle && attackCircle.timer > 0) {
             this.ctx.save();
-            this.ctx.globalAlpha = 0.3;
-            this.ctx.beginPath();
-            this.ctx.arc(
-                attackCircle.x - scrollX,
-                attackCircle.y - scrollY,
-                attackCircle.radius,
-                0, Math.PI * 2
-            );
-            this.ctx.fillStyle = '#0af';
-            this.ctx.fill();
+            
+            if (this.explosionImageLoaded) {
+                // 爆発画像エフェクト
+                const imageSize = attackCircle.radius * 3; // 攻撃範囲に合わせてサイズ調整（大きく）
+                const alpha = attackCircle.timer / 22; // タイマーに応じて透明度調整（22フレーム対応）
+                this.ctx.globalAlpha = alpha * 0.8;
+                
+                this.ctx.drawImage(
+                    this.explosionImage,
+                    attackCircle.x - scrollX - imageSize / 2,
+                    attackCircle.y - scrollY - imageSize / 2,
+                    imageSize,
+                    imageSize
+                );
+            } else {
+                // 画像がロードされていない場合は元の円形エフェクト
+                this.ctx.globalAlpha = 0.3;
+                this.ctx.beginPath();
+                this.ctx.arc(
+                    attackCircle.x - scrollX,
+                    attackCircle.y - scrollY,
+                    attackCircle.radius,
+                    0, Math.PI * 2
+                );
+                this.ctx.fillStyle = '#0af';
+                this.ctx.fill();
+            }
+            
             this.ctx.restore();
         }
     }
