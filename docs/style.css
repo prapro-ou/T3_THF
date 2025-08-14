@@ -294,6 +294,15 @@ h6 {
     margin: 2vw 0 1vw 0;
 }
 
+/* ステージ選択タイトル画像 */
+.stage-select-title {
+    display: block;
+    margin: 2vw auto 1vw auto;
+    max-width: 400px;
+    width: auto;
+    height: auto;
+}
+
 /* ===== ボタン ===== */
 button,
 .wafu-btn,
@@ -642,8 +651,8 @@ button:hover,
 
 #otomoLevelDisplay {
     position: absolute;
-    bottom: 320px;
-    right: 80px;
+    bottom: 210px;
+    left: 800px;
     min-width: 200px;
     min-height: 80px;
     font-size: 1em;
