@@ -64,6 +64,7 @@
                 <li><b>ゲームオーバー</b> HPが0になると終了</li>
                 <li><b>Pキー</b> ゲームの一時中断/再開</li>
                 <li><b>F12キー</b> 開発者ツール（ゲーム中のみ）</li>
+                <li><b>Ctrl+B</b> ボス鬼をすぐ出現（ゲーム中のみ）</li>
             </ul>
             <img id="closeHelp" src="assets/UI/UI/button/modoru_button_UI.png" alt="閉じる" class="image-btn">
         </div>
@@ -88,6 +89,7 @@
             <br> WASD : 移動
             <br> 左クリック : 攻撃
             <br> P : ポーズ
+            <br> Ctrl+B : ボス鬼出現
         </div>
     </div>
 
@@ -228,6 +230,9 @@
                 <div class="debug-control">
                     <label>ボス鬼1弾ダメージ:</label>
                     <input type="number" id="bossOni1ProjectileDamage" min="1" max="50" value="15">
+                </div>
+                <div class="debug-control">
+                    <button id="spawnBossNow" class="debug-btn">ボス鬼をすぐ出現</button>
                 </div>
             </div>
             <div class="debug-section">
