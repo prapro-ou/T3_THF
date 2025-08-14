@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeDebug = document.getElementById('closeDebug');
     const applyDebugSettings = document.getElementById('applyDebugSettings');
     const resetDebugSettings = document.getElementById('resetDebugSettings');
+    const spawnBossNow = document.getElementById('spawnBossNow');
 
     // ポーズ画面の要素
     const pauseMessage = document.getElementById('pauseMessage');
@@ -526,12 +527,77 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('playerHitboxSize').value = 0.8;
     });
 
-    // F12キーでデバッグパネルを開く
+    // ボス鬼をすぐ出現させるボタンのイベントハンドラー
+    spawnBossNow.addEventListener('click', () => {
+        if (!game) return;
+        
+        // ボスが既に出現している場合は何もしない
+        if (game.bossAppeared) {
+            console.log('ボスは既に出現しています');
+            return;
+        }
+        
+        console.log('ボス鬼をすぐ出現させます');
+        
+        // ボス出現処理を強制実行
+        game.bossAppeared = true;
+        game.bossCutInStartTime = Date.now();
+        const cutInMsg = (game.selectedBossType === 4) ? '風神・雷神、参上！！' : 'ボス鬼出現！！';
+        game.uiManager.showBossCutIn(cutInMsg);
+        game.enemyManager.clearEnemies(); // 通常敵を一掃
+        game.enemyManager.spawnBoss(game.selectedBossType);
+        game.bossStartTime = Date.now();
+        game.bossSpawnFrame = game.enemyManager.frame;
+        game.bossSpawnComplete = false;
+        
+        // BGM切り替え
+        if (game.bgmManager) {
+            if (game.selectedBossType === 5) {
+                game.bgmManager.play('lastbossBgm');
+            } else {
+                game.bgmManager.play('bossBgm');
+            }
+        }
+        
+        console.log('ボス鬼出現完了');
+    });
+
+    // F12キーでデバッグパネルを開く、Ctrl+Bでボス鬼をすぐ出現
     window.addEventListener('keydown', (e) => {
         if (e.key === 'F12') {
             e.preventDefault();
             if (game) {
                 debugPanel.classList.remove('hidden');
+            }
+        }
+        
+        // Ctrl+Bでボス鬼をすぐ出現
+        if (e.ctrlKey && e.key === 'b') {
+            e.preventDefault();
+            if (game && !game.bossAppeared) {
+                console.log('Ctrl+B: ボス鬼をすぐ出現させます');
+                
+                // ボス出現処理を強制実行
+                game.bossAppeared = true;
+                game.bossCutInStartTime = Date.now();
+                const cutInMsg = (game.selectedBossType === 4) ? '風神・雷神、参上！！' : 'ボス鬼出現！！';
+                game.uiManager.showBossCutIn(cutInMsg);
+                game.enemyManager.clearEnemies(); // 通常敵を一掃
+                game.enemyManager.spawnBoss(game.selectedBossType);
+                game.bossStartTime = Date.now();
+                game.bossSpawnFrame = game.enemyManager.frame;
+                game.bossSpawnComplete = false;
+                
+                // BGM切り替え
+                if (game.bgmManager) {
+                    if (game.selectedBossType === 5) {
+                        game.bgmManager.play('lastbossBgm');
+                    } else {
+                        game.bgmManager.play('bossBgm');
+                    }
+                }
+                
+                console.log('Ctrl+B: ボス鬼出現完了');
             }
         }
     });

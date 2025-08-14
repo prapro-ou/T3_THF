@@ -4,7 +4,7 @@ export class OfudaProjectile extends Projectile {
     constructor(game, x, y, targetX, targetY, effectType = 'slow') {
         // お札の速度とサイズを設定
         const speed = 6.0; // さらに速度を上げてプレイヤーに確実に到達させる
-        const size = 40; // さらにサイズを大きくして当たり判定を確実にする
+        const size = 35; // さらにサイズを大きくして当たり判定を確実にする
         
         // ダミーターゲットを作成（方向計算用）
         const dummyTarget = { x: targetX, y: targetY, width: 0, height: 0 };
