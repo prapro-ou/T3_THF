@@ -15,6 +15,7 @@ import { Otomo } from '../entities/Otomo.js';
 import { ProjectileManager } from '../managers/ProjectileManager.js';
 import { BgmManager } from '../managers/BgmManager.js';
 import { playSE } from '../managers/KoukaonManager.js';
+import { BossProgressManager } from '../managers/BossProgressManager.js';
 
 export class Game {
     constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0, bgmManager = null) {
@@ -36,6 +37,9 @@ export class Game {
         this.pauseManager = new PauseManager(this, this.uiManager);
         this.attackManager = new AttackManager(this);
         this.gameState = new GameState(this);
+
+        // BossProgressManagerの初期化
+        this.bossProgressManager = new BossProgressManager();
 
         // ProjectileManagerの初期化
         this.projectileManager = new ProjectileManager(this);
@@ -274,6 +278,15 @@ export class Game {
                 const boss = enemies.find(e => this.isBossEnemy(e));
                 if (!boss) {
                     this.bossDefeated = true;
+                    
+                    // ボス討伐の進捗を記録
+                    const clearTime = Math.floor((Date.now() - this.bossStartTime) / 1000);
+                    this.bossProgressManager.recordBossDefeat(
+                        this.selectedBossType, 
+                        this.gameState.getScore(), 
+                        clearTime
+                    );
+                    
                     this.gameState.setGameOver();
                     playSE("gameclear"); // ← ボス撃破時に効果音を鳴らす
                     const clearMsg = (this.selectedBossType === 4)
@@ -637,6 +650,14 @@ export class Game {
             this.uiManager.hidePauseMessage();
             this.uiManager.hideBossCutIn();
             this.uiManager.hideMinimap();
+        }
+
+        // ボス進捗の更新を通知（カスタムイベント）
+        if (this.bossProgressManager) {
+            const event = new CustomEvent('bossProgressUpdated', {
+                detail: { bossProgressManager: this.bossProgressManager }
+            });
+            window.dispatchEvent(event);
         }
 
         // オブジェクト参照をクリア

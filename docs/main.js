@@ -3,6 +3,7 @@ import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
 import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet, preloadFuzinSpriteSheet, preloadRaizinSpriteSheet, preloadWarpOniSpriteSheet } from './components/EnemyRenderer.js';
 import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
+import { BossProgressManager } from './managers/BossProgressManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // DOM取得
@@ -32,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const applyDebugSettings = document.getElementById('applyDebugSettings');
     const resetDebugSettings = document.getElementById('resetDebugSettings');
     const spawnBossNow = document.getElementById('spawnBossNow');
+    const resetBossProgress = document.getElementById('resetBossProgress');
+    const unlockAllBosses = document.getElementById('unlockAllBosses');
+    const bossProgressStatus = document.getElementById('bossProgressStatus');
 
     // ポーズ画面の要素
     const pauseMessage = document.getElementById('pauseMessage');
@@ -42,6 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
     const bgmManager = new BgmManager();
     bgmManager.play('mainBgm'); // ユーザー操作後まで保留される
+
+    // ボス進捗マネージャーの初期化
+    const bossProgressManager = new BossProgressManager();
 
     // 障子風アニメーション用の要素
     const shojiContainer = document.querySelector('.shoji-container');
@@ -176,9 +183,63 @@ document.addEventListener('DOMContentLoaded', () => {
     // ボス選択機能を追加
     const bossCardElements = document.querySelectorAll('.boss-card');
     console.log('ボスカード要素数:', bossCardElements.length);
+    
+    // ボスカードの進捗状況を更新する関数
+    function updateBossCardProgress() {
+        bossCardElements.forEach((card) => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossData = bossProgressManager.getAllBossData()[bossId];
+            
+            if (bossData) {
+                const defeatedElement = card.querySelector('.boss-progress.defeated');
+                const lockedElement = card.querySelector('.boss-progress.locked');
+                const unlockedElement = card.querySelector('.boss-progress.unlocked');
+                
+                // 既存の進捗表示を非表示
+                [defeatedElement, lockedElement, unlockedElement].forEach(el => {
+                    if (el) el.classList.add('hidden');
+                });
+                
+                if (bossData.defeated) {
+                    // 討伐済み
+                    if (defeatedElement) defeatedElement.classList.remove('hidden');
+                    card.style.opacity = '0.7';
+                    card.style.cursor = 'not-allowed';
+                } else if (bossData.unlocked) {
+                    // アンロック済み
+                    if (unlockedElement) unlockedElement.classList.remove('hidden');
+                    card.style.opacity = '1';
+                    card.style.cursor = 'pointer';
+                } else {
+                    // 未開放
+                    if (lockedElement) lockedElement.classList.remove('hidden');
+                    card.style.opacity = '0.5';
+                    card.style.cursor = 'not-allowed';
+                }
+            }
+        });
+    }
+    
+    // 初期表示時に進捗状況を更新
+    updateBossCardProgress();
+    
+    // ボス進捗更新イベントをリッスン
+    window.addEventListener('bossProgressUpdated', () => {
+        updateBossCardProgress();
+    });
+    
     bossCardElements.forEach((card, index) => {
         console.log(`ボスカード${index + 1}:`, card.dataset.boss);
         card.addEventListener('click', () => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossData = bossProgressManager.getAllBossData()[bossId];
+            
+            // 未開放または討伐済みのボスは選択できない
+            if (!bossData || !bossData.unlocked || bossData.defeated) {
+                console.log('このボスは選択できません:', bossId);
+                return;
+            }
+            
             console.log('ボスカードがクリックされました:', card.dataset.boss);
             // 他のカードの選択状態を解除
             bossCardElements.forEach(c => c.classList.remove('selected'));
@@ -663,10 +724,66 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ボス進捗状況を表示する関数
+    function updateBossProgressStatus() {
+        if (bossProgressStatus) {
+            const bossData = bossProgressManager.getAllBossData();
+            const defeatedCount = bossProgressManager.getDefeatedBossCount();
+            const unlockedCount = bossProgressManager.getUnlockedBossCount();
+            const otomoStatus = bossProgressManager.getOtomoUnlockStatus();
+            
+            let statusHTML = `<div>討伐済み: ${defeatedCount}/5</div>`;
+            statusHTML += `<div>アンロック済み: ${unlockedCount}/5</div>`;
+            statusHTML += `<div>お供開放状況:</div>`;
+            statusHTML += `<div>・犬: ${otomoStatus.dog ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・猿: ${otomoStatus.monkey ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・雉: ${otomoStatus.bird ? '✓' : '✗'}</div>`;
+            
+            bossProgressStatus.innerHTML = statusHTML;
+        }
+    }
+
+    // ボス進捗管理のデバッグ機能
+    if (resetBossProgress) {
+        resetBossProgress.addEventListener('click', () => {
+            if (confirm('全ボスの進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgress();
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('全ボス進捗をリセットしました');
+            }
+        });
+    }
+
+    if (unlockAllBosses) {
+        unlockAllBosses.addEventListener('click', () => {
+            if (confirm('全ボスをアンロックしますか？')) {
+                for (let i = 1; i <= 5; i++) {
+                    bossProgressManager.forceUnlockBoss(i);
+                }
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('全ボスをアンロックしました');
+            }
+        });
+    }
+
+    // 初期表示時にボス進捗状況を更新
+    updateBossProgressStatus();
+
     // ボスカード選択でゲーム開始
     const bossCards = document.querySelectorAll('.boss-card');
     bossCards.forEach(card => {
         card.addEventListener('click', () => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossData = bossProgressManager.getAllBossData()[bossId];
+            
+            // 未開放または討伐済みのボスは選択できない
+            if (!bossData || !bossData.unlocked || bossData.defeated) {
+                console.log('このボスは選択できません:', bossId);
+                return;
+            }
+            
             playSE("kettei"); // ← 決定音
             bossCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');

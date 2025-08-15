@@ -1110,6 +1110,44 @@ button:hover,
     margin-bottom: 0.2em;
 }
 
+.boss-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3em;
+    margin-top: 0.5em;
+}
+
+.boss-progress {
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 0.2em 0.6em;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.boss-progress.defeated {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: 2px solid #2E7D32;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.boss-progress.locked {
+    background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+    color: white;
+    border: 2px solid #424242;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.boss-progress.unlocked {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+    border: 2px solid #E65100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
 .boss-desc {
     font-size: 0.95em;
     color: #2d1a1a;
@@ -1399,6 +1437,19 @@ hr,
     background: #C1272D;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(193, 39, 45, 0.4);
+}
+
+.debug-info {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.4;
+    max-height: 120px;
+    overflow-y: auto;
+    color: #f7f7f7;
 }
 
 /* レスポンシブ対応 */
