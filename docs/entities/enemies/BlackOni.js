@@ -1,5 +1,6 @@
 import { Enemy } from '../base/Enemy.js';
 import { playSE } from '../../managers/KoukaonManager.js'; // 追加
+// ...existing code...
 
 /**
  * 黒鬼クラス
@@ -24,6 +25,10 @@ export class BlackOni extends Enemy {
         playSE("enemy-death"); // 死亡時に効果音
         if (this.game && typeof this.game.addOtomoExp === 'function') {
             this.game.addOtomoExp(3);
+        }
+        // 5%でスターパワーをドロップ
+        if (this.game && Math.random() < 0.05) {
+// ...existing code...
         }
         super.onDeath && super.onDeath();
     }

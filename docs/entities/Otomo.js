@@ -25,8 +25,8 @@ export class Otomo extends Character {
     }
 
     updateBehavior(player, deltaTime) {
-        // オトモの速度倍率を反映
-        this.speed = 140 * (this.game.otomoSpeedMultiplier || 1);
+        // オトモの速度はプレイヤーに追従
+        this.speed = (player && player.speed) ? player.speed * 40 : 140;
         this.behavior.update(player, deltaTime);
     }
 
@@ -35,19 +35,37 @@ export class Otomo extends Character {
         ctx.fillRect(this.x - scrollX, this.y - scrollY, this.width, this.height);
     }
 
-    shootAt(target) {
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist === 0) return;
-
-        const speed = 5 * 1.2; // 弾速1.2倍
-        // レベル・倍率に応じて攻撃力上昇
-        const level = this.game.otomoLevel || 1;
-        const base = 10 + (level - 1) * 5;
-        const damage = base * (this.game.otomoAttackMultiplier || 1);
-        const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
-        this.game.projectileManager.addProjectile(projectile);
+    // type: 'projectile' or 'charge'
+    attackTarget(target, type = 'projectile') {
+        if (!target) return;
+        if (type === 'projectile') {
+            const dx = target.x - this.x;
+            const dy = target.y - this.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist === 0) return;
+            const speed = 5 * 1.2;
+            const damage = 10;
+            const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
+            this.game.projectileManager.addProjectile(projectile);
+        } else if (type === 'charge') {
+            // 直接ダメージ
+            const damage = 10;
+            if (typeof target.takeDamage === 'function') {
+                target.takeDamage(damage);
+            } else if (typeof target.hp === 'number') {
+                target.hp -= damage;
+                if (target.hp <= 0) {
+                    target.markedForDeletion = true;
+                    this.game.particleManager.createExplosion(
+                        target.x + target.width / 2,
+                        target.y + target.height / 2,
+                        target.color
+                    );
+                }
+            } else {
+                target.markedForDeletion = true;
+            }
+        }
     }
 
     findEnemyNearPlayer(range) {

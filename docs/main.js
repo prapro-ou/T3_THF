@@ -5,6 +5,90 @@ import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 鬼HP上昇ログ用
+    const oniHpLogContainer = document.getElementById('oniHpLogContainer');
+    window.oniHpLogContainer = oniHpLogContainer;
+    // ステータス割り振りUI要素取得
+    const statusModal = document.getElementById('statusModal');
+    const statusPointsValue = document.getElementById('statusPointsValue');
+    const statusAttackValue = document.getElementById('statusAttackValue');
+    const statusSpeedValue = document.getElementById('statusSpeedValue');
+    const statusReloadValue = document.getElementById('statusReloadValue');
+    const addAttackBtn = document.getElementById('addAttackBtn');
+    const subAttackBtn = document.getElementById('subAttackBtn');
+    const addSpeedBtn = document.getElementById('addSpeedBtn');
+    const subSpeedBtn = document.getElementById('subSpeedBtn');
+    const addReloadBtn = document.getElementById('addReloadBtn');
+    const subReloadBtn = document.getElementById('subReloadBtn');
+    const statusApplyBtn = document.getElementById('statusApplyBtn');
+    const statusCancelBtn = document.getElementById('statusCancelBtn');
+
+    let tempAlloc = { attack: 0, speed: 0, reload: 0 };
+    let tempPoints = 0;
+
+    function openStatusModal() {
+    if (!game) return;
+    // 一時停止
+    if (!game.isPaused) game.togglePause();
+    // crosshair非表示
+    if (crosshair) crosshair.classList.add('hidden');
+    // 現在の割り振りをコピー
+    tempAlloc = { ...game.statusAlloc };
+    tempPoints = game.statusPoints;
+    updateStatusModalUI();
+    statusModal.classList.remove('hidden');
+    }
+    function closeStatusModal() {
+    statusModal.classList.add('hidden');
+    // crosshair再表示
+    if (crosshair) crosshair.classList.remove('hidden');
+    // 再開
+    if (game && game.isPaused) game.togglePause();
+    }
+    function updateStatusModalUI() {
+        statusPointsValue.textContent = tempPoints;
+        statusAttackValue.textContent = tempAlloc.attack;
+        statusSpeedValue.textContent = tempAlloc.speed;
+        statusReloadValue.textContent = tempAlloc.reload;
+    }
+    function tryAddStatus(type) {
+        if (tempPoints > 0) {
+            tempAlloc[type]++;
+            tempPoints--;
+            updateStatusModalUI();
+        }
+    }
+    function trySubStatus(type) {
+        if (tempAlloc[type] > 0) {
+            tempAlloc[type]--;
+            tempPoints++;
+            updateStatusModalUI();
+        }
+    }
+    addAttackBtn.onclick = () => tryAddStatus('attack');
+    subAttackBtn.onclick = () => trySubStatus('attack');
+    addSpeedBtn.onclick = () => tryAddStatus('speed');
+    subSpeedBtn.onclick = () => trySubStatus('speed');
+    addReloadBtn.onclick = () => tryAddStatus('reload');
+    subReloadBtn.onclick = () => trySubStatus('reload');
+    statusApplyBtn.onclick = () => {
+        if (!game) return;
+        // 割り振りを反映
+        game.statusAlloc = { ...tempAlloc };
+        game.statusPoints = tempPoints;
+        game.applyStatusAllocation();
+        closeStatusModal();
+    };
+    statusCancelBtn.onclick = () => closeStatusModal();
+
+    // "l"キーで開閉
+    window.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'l' && game && !statusModal.classList.contains('hidden')) {
+            closeStatusModal();
+        } else if (e.key.toLowerCase() === 'l' && game && statusModal.classList.contains('hidden')) {
+            openStatusModal();
+        }
+    });
     // DOM取得
     const gameCanvas = document.getElementById('gameCanvas');
     const scoreDisplay = document.getElementById('scoreDisplay');

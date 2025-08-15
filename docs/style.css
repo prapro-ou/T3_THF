@@ -1,3 +1,152 @@
+/* ===== ステータス割り振りモーダル ===== */
+#statusModal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.status-modal-card {
+    background: #fff8f0;
+    border-radius: 24px;
+    min-width: 340px;
+    max-width: 95vw;
+    box-shadow: 0 0 32px #0008, 0 0 0 8px #c1272d22;
+    padding: 2.2em 2.5em 1.5em 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    border: 4px solid #C1272D;
+    position: relative;
+}
+.status-modal-title {
+    color: #C1272D;
+    font-size: 2em;
+    margin-bottom: 0.7em;
+    letter-spacing: 0.08em;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff, 2px 2px 6px #c1272d33;
+}
+.status-points-row {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    font-size: 1.2em;
+    margin-bottom: 1.2em;
+}
+.status-points-label {
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.status-points-value {
+    background: #fff3;
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.3em;
+    border: 2px solid #C1272D;
+    border-radius: 8px;
+    padding: 0.1em 1.2em;
+}
+.status-alloc-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1em;
+    margin-bottom: 1.5em;
+}
+.status-alloc-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2em;
+    font-size: 1.15em;
+}
+.status-alloc-label {
+    min-width: 5.5em;
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.1em;
+    letter-spacing: 0.04em;
+}
+.status-alloc-btn {
+    font-size: 1.3em;
+    width: 2.2em;
+    height: 2.2em;
+    border-radius: 50%;
+    border: 2px solid #C1272D;
+    background: #fff;
+    color: #C1272D;
+    font-weight: bold;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.status-alloc-btn:hover {
+    background: #C1272D;
+    color: #fff;
+    transform: scale(1.1);
+}
+.status-alloc-value {
+    font-size: 1.2em;
+    min-width: 2.5em;
+    text-align: center;
+    color: #222;
+    font-weight: bold;
+    background: #fff3;
+    border-radius: 6px;
+    border: 1.5px solid #C1272D;
+    padding: 0.1em 0.7em;
+}
+.status-modal-btn-row {
+    display: flex;
+    gap: 2em;
+    margin-bottom: 0.7em;
+}
+.status-modal-btn {
+    font-size: 1.15em;
+    padding: 0.5em 2.5em;
+    border-radius: 12px;
+    border: 2px solid #C1272D;
+    background: #fff;
+    color: #C1272D;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+.status-modal-btn:hover {
+    background: #C1272D;
+    color: #fff;
+    transform: scale(1.05);
+}
+.status-modal-apply {
+    background: #C1272D;
+    color: #fff;
+}
+.status-modal-apply:hover {
+    background: #a01d23;
+    color: #fff;
+}
+.status-modal-cancel {
+    background: #fff;
+    color: #C1272D;
+}
+.status-modal-cancel:hover {
+    background: #c1272d22;
+    color: #C1272D;
+}
+.status-modal-hint {
+    margin-top: 0.7em;
+    color: #888;
+    font-size: 0.95em;
+    text-align: center;
+}
 /* ===== 桃太郎ゲーム スタイルシート ===== */
 
 /* ===== 基本レイアウト ===== */

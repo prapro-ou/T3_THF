@@ -17,9 +17,17 @@ import { BgmManager } from '../managers/BgmManager.js';
 import { playSE } from '../managers/KoukaonManager.js';
 
 export class Game {
+    // ...existing code...
+    // 鬼HP倍率管理
+    oniHpMultiplier = 1;
+    oniHpTimer = 0;
+    // ステータスポイント管理
+    statusPoints = 0;
+    statusAlloc = { attack: 0, speed: 0, reload: 0 };
     constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0, bgmManager = null) {
         console.log('Game constructor called with selectedBossType:', selectedBossType);
-
+        this.oniHpMultiplier = 1;
+        this.oniHpTimer = 0;
         this.canvas = canvas;
         this.ctx = ctx;
         this.bgmManager = bgmManager;
@@ -77,6 +85,7 @@ export class Game {
             showCollisionDebug: false
         };
 
+
         // 高速移動設定
         this.highSpeedThreshold = 10; // 高速移動判定の閾値
         this.maxSubframeSteps = 10; // サブフレーム更新の最大ステップ数
@@ -96,6 +105,27 @@ export class Game {
         this.projectileManager.preloadCannonBallSpriteSheet(() => {
             console.log('Cannon ball sprite sheet loaded in Game constructor');
         });
+    }
+
+    // 毎フレーム呼び出し用: HP倍率を10秒ごとに1.5倍
+    updateOniHpMultiplier(deltaTime) {
+        this.oniHpTimer += deltaTime;
+    if (this.oniHpTimer >= 20) {
+            this.oniHpMultiplier *= 1.5;
+            this.oniHpTimer = 0;
+            // ログ表示
+            if (window.oniHpLogContainer) {
+                const log = document.createElement('div');
+                log.textContent = `鬼のHPが上昇した！（現在倍率: x${this.oniHpMultiplier.toFixed(2)}）`;
+                log.style.color = 'red';
+                log.style.fontWeight = 'bold';
+                window.oniHpLogContainer.appendChild(log);
+                // 5秒後に自動で消す
+                setTimeout(() => {
+                    if (log.parentNode) log.parentNode.removeChild(log);
+                }, 5000);
+            }
+        }
     }
 
     setupEvents() {
@@ -655,6 +685,8 @@ export class Game {
         this.pauseManager = null;
         this.timer = null;
         this.attackManager = null;
+
+            // ...existing code...
         this.uiManager = null;
         this.cameraManager = null;
         this.renderer = null;
@@ -676,18 +708,11 @@ export class Game {
         while (this.otomoExp >= this.otomoExpToLevelUp) {
             this.otomoExp -= this.otomoExpToLevelUp;
             this.otomoLevel++;
-            // 必要経験値を1.3倍に（以前より少し減らす）
-            this.otomoExpToLevelUp = Math.floor(this.otomoExpToLevelUp * 1.3);
-            // レベルアップ時の各種上昇
-            this.otomoSpeedMultiplier *= 1.05; // オトモ速度5%アップ
-            this.playerAttackMultiplier *= 1.1; // プレイヤー攻撃力1.1倍
-            this.otomoAttackMultiplier *= 1.1; // オトモ攻撃力1.1倍
-            if (this.player && this.player.ammoManager) {
-                this.player.ammoManager.ammoRecoveryTime /= 1.1; // リロード速度1.1倍
-            }
+            this.otomoExpToLevelUp = Math.floor(this.otomoExpToLevelUp * 1.2);
+            // ステータスポイントを3加算
+            this.statusPoints += 3;
+            // レベルアップ時は割り振り画面を開くフラグを立てるなども可
             leveledUp = true;
-
-            // メインキャラ（プレイヤー）のレベルアップ時のみ効果音を鳴らす
             if (this.player) {
                 playSE("levelup");
             }
@@ -695,6 +720,23 @@ export class Game {
         // UI即時反映
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
         // レベルアップ演出が必要ならここで
+    }
+
+    // ステータス割り振り反映
+    applyStatusAllocation() {
+        if (!this.player) return;
+        // 攻撃力倍率: 1 + 0.1 × 割り振りポイント
+        this.player.statusAttackMultiplier = 1 + 0.1 * (this.statusAlloc.attack || 0);
+        // 移動速度倍率: 1 + 0.05 × 割り振りポイント
+        this.player.statusSpeedMultiplier = 1 + 0.05 * (this.statusAlloc.speed || 0);
+    // リロード速度倍率: 1ポイントごとに0.8倍
+    const reloadPoints = this.statusAlloc.reload || 0;
+    this.player.statusReloadMultiplier = Math.pow(0.8, reloadPoints);
+        // 実際の値に反映
+        this.player.speed = this.player.constructor.SPEED * this.player.statusSpeedMultiplier;
+        if (this.player.ammoManager) {
+            this.player.ammoManager.ammoRecoveryTime = 3 * this.player.statusReloadMultiplier;
+        }
     }
 
     // レベルに応じた攻撃クールダウン(ms)を返す
