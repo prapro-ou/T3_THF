@@ -25,11 +25,12 @@
         <div class="loader"></div>
     </div>
     <div id="startScreen" class="dark-bg">
-        <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
-        <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
-        <div id="audioNotice" class="audio-notice">
-            <p>🔊 最初のクリックでBGMが開始されます</p>
-        </div>
+                <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
+                <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
+                <div id="audioNotice" class="audio-notice">
+                        <p>🔊 最初のクリックでBGMが開始されます</p>
+                </div>
+
     </div>
     <div id="stageSelectArea" class="hidden">
         <img id="backToStartButton" src="assets/UI/UI/button/modoru_button_UI.png" alt="スタート画面に戻る" class="image-btn"
@@ -84,6 +85,7 @@
         <div id="minimapContainer" class="hidden wafu-panel wafu-shadow minimap-container">
             <div class="wafu-label">ミニマップ</div>
             <canvas id="minimapCanvas" width="120" height="90"></canvas>
+    <div id="oniHpLogContainer" style="color: red; font-weight: bold; margin-top: 4px;"></div>
         </div>
         <!-- ゲーム中の簡易操作説明-->
         <div id="quickHelp" class="hidden wafu-panel wafu-shadow">
@@ -93,10 +95,9 @@
             <br> P : ポーズ
             <br> Ctrl+B : ボス鬼出現
         </div>
-        <!-- 桃太郎レベル表示 -->
-        <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span
-                id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span
-                id="otomoExpToLevelUpValue">10</span></div>
+        <!-- 桃太郎レベル表示（操作説明UIの直後に配置） -->
+        <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow" style="margin-top:10px;"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
+        </div>
     </div>
 
     <!-- ボス出現演出用カットイン -->
@@ -106,6 +107,41 @@
     </div>
 
     <div id="pauseMessage" class="hidden">
+    <!-- ステータス割り振りモーダル -->
+        <div id="statusModal" class="hidden">
+            <div class="status-modal-card">
+                <h2 class="status-modal-title">ステータス割り振り</h2>
+                <div class="status-points-row">
+                    <span class="status-points-label">残りポイント</span>
+                    <span id="statusPointsValue" class="status-points-value">0</span>
+                </div>
+                <div class="status-alloc-list">
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">攻撃力</span>
+                        <button id="subAttackBtn" class="status-alloc-btn">－</button>
+                        <span id="statusAttackValue" class="status-alloc-value">0</span>
+                        <button id="addAttackBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">移動速度</span>
+                        <button id="subSpeedBtn" class="status-alloc-btn">－</button>
+                        <span id="statusSpeedValue" class="status-alloc-value">0</span>
+                        <button id="addSpeedBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">リロード速度</span>
+                        <button id="subReloadBtn" class="status-alloc-btn">－</button>
+                        <span id="statusReloadValue" class="status-alloc-value">0</span>
+                        <button id="addReloadBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                </div>
+                <div class="status-modal-btn-row">
+                    <button id="statusApplyBtn" class="status-modal-btn status-modal-apply">決定</button>
+                    <button id="statusCancelBtn" class="status-modal-btn status-modal-cancel">キャンセル</button>
+                </div>
+                <div class="status-modal-hint">※「L」キーでこの画面を開閉できます</div>
+            </div>
+        </div>
         <div class="pause-content">
             <span class="pause-text wafu-title">ポーズ</span>
             <div class="pause-buttons">

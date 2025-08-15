@@ -32,6 +32,10 @@ export class EnemyManager {
             this.spawnEnemy();
             this.spawnTimer = 0;
         }
+        // HP倍率更新（ゲーム側で管理）
+        if (this.game && typeof this.game.updateOniHpMultiplier === 'function') {
+            this.game.updateOniHpMultiplier(1/60); // 1フレーム=約1/60秒
+        }
 
         // 敵の更新
         this.enemies.forEach(enemy => {
@@ -81,17 +85,14 @@ export class EnemyManager {
         const enemyTypes = [RedOni, BlueOni, BlackOni];
         const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
         
-        // デバッグ設定がある場合は適用
-        let enemy;
-        if (this.game.enemyBaseHP && this.game.enemyBaseSpeed) {
-            // デバッグ設定を使用して敵を生成
-            enemy = this.spawnEnemyWithDebugSettings(randomType);
-        } else {
-            // 通常の敵生成
-            enemy = new randomType(this.game);
-        }
-        
-        this.enemies.push(enemy);
+    // HP倍率を反映
+    let baseHP = 20;
+    if (randomType === RedOni) baseHP = 20;
+    if (randomType === BlueOni) baseHP = 40;
+    if (randomType === BlackOni) baseHP = 60;
+    const hp = Math.round(baseHP * (this.game.oniHpMultiplier || 1));
+    const enemy = new randomType(this.game, undefined, hp);
+    this.enemies.push(enemy);
     }
 
     spawnEnemyWithDebugSettings(EnemyClass) {

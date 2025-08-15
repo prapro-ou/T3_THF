@@ -51,24 +51,8 @@ export class ChargeOtomoBehavior {
                 this.damageTimer += deltaTime;
                 if (this.damageTimer >= this.damageInterval) {
                     this.damageTimer = 0;
-                    const level = this.otomo.game.otomoLevel || 1;
-                    const base = 10 + (level - 1) * 5;
-                    const damage = base * (this.otomo.game.otomoAttackMultiplier || 1);
-                    if (typeof target.takeDamage === 'function') {
-                        target.takeDamage(damage);
-                    } else if (typeof target.hp === 'number') {
-                        target.hp -= damage;
-                        if (target.hp <= 0) {
-                            target.markedForDeletion = true;
-                            this.otomo.game.particleManager.createExplosion(
-                                target.x + target.width / 2,
-                                target.y + target.height / 2,
-                                target.color
-                            );
-                        }
-                    } else {
-                        target.markedForDeletion = true;
-                    }
+                    // 統一関数で攻撃
+                    this.otomo.attackTarget(target, 'charge');
                 }
                 // HPが0以下ならターゲット解除
                 if (target.markedForDeletion || target.hp <= 0) {

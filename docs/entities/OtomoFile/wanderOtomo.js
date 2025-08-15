@@ -31,7 +31,7 @@ export class WanderOtomoBehavior {
         const range = 150;
         const target = this.otomo.findEnemyNearSelf(range);
         if (target && this.otomo.canShoot) {
-            this.otomo.shootAt(target);
+            this.otomo.attackTarget(target, 'projectile');
             this.otomo.canShoot = false;
             setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }
