@@ -97,6 +97,11 @@
         </div>
         <!-- 桃太郎レベル表示（操作説明UIの直後に配置） -->
         <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow" style="margin-top:10px;"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
+        <!-- 回復アイテムカウンター -->
+        <div id="recoveryItemDisplay" class="hidden wafu-panel wafu-shadow recovery-item-counter">
+            <span class="wafu-label">回復アイテム</span> <span id="recoveryItemValue">0</span>
+            <div class="recovery-hint">Spaceで使用</div>
+        </div>
         </div>
     </div>
 
@@ -278,6 +283,17 @@
                 </div>
                 <div class="debug-control">
                     <button id="spawnBossNow" class="debug-btn">ボス鬼をすぐ出現</button>
+                </div>
+            </div>
+            <div class="debug-section">
+                <h4>回復アイテム設定</h4>
+                <div class="debug-control">
+                    <label>回復アイテムドロップ率(%):</label>
+                    <input type="number" id="recoveryItemDropRate" min="0" max="100" step="1" value="3">
+                </div>
+                <div class="debug-control">
+                    <label>回復アイテム回復率(%):</label>
+                    <input type="number" id="recoveryItemHealRate" min="1" max="100" step="1" value="30">
                 </div>
             </div>
             <div class="debug-section">

@@ -103,6 +103,15 @@
         }
     }
 
+    updateRecoveryItemCount(count) {
+        const recoveryDisplay = document.getElementById('recoveryItemDisplay');
+        const recoveryValue = document.getElementById('recoveryItemValue');
+        if (recoveryDisplay && recoveryValue) {
+            // hiddenクラスの状態を変更せず、値のみ更新
+            recoveryValue.textContent = count;
+        }
+    }
+
     // ミニマップ表示/非表示
     showMinimap() {
         if (this.minimapContainer) {
