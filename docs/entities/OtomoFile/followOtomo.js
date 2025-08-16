@@ -16,7 +16,7 @@ export class FollowOtomoBehavior {
         // プレイヤーの近くにいる敵だけを攻撃
         const target = this.otomo.findEnemyNearPlayer(200);
         if (target && this.otomo.canShoot) {
-            this.otomo.shootAt(target);
+            this.otomo.attackTarget(target, 'projectile');
             this.otomo.canShoot = false;
             setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }

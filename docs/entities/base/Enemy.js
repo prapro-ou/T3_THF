@@ -8,12 +8,12 @@ import { MovableEntity } from './MovableEntity.js';
  */
 export class Enemy extends Character {
     static BASE_HP = 30;
-    static BASE_SPEED = 1;
+    static BASE_SPEED = 1.5;
 
     constructor(game, color = '#888', maxHP = Enemy.BASE_HP) {
         // マップ端からランダムスポーン位置を計算（thisを使用しない）
-        const spawnPosition = Enemy.generateSpawnPosition(game);
-        const speed = Enemy.BASE_SPEED + Math.random();
+    const spawnPosition = Enemy.generateSpawnPosition(game);
+    const speed = Enemy.BASE_SPEED + Math.random() * 1.2;
         
         console.log('Enemy constructor - maxHP:', maxHP, 'color:', color); // デバッグログ
         

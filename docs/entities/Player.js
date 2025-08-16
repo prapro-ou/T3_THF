@@ -10,14 +10,25 @@ import { playSE } from '../managers/KoukaonManager.js'; // 追加
  * 継承: Characterから基本機能を継承
  */
 export class Player extends Character {
+    // ステータス割り振り用倍率
+    statusAttackMultiplier = 1;
+    statusSpeedMultiplier = 1;
+    statusReloadMultiplier = 1;
+    // プレイヤーのクリック攻撃用の攻撃力取得（レベルアップ倍率反映）
+    getClickAttackPower() {
+    // 攻撃力は20×割り振り倍率
+    return 20 * (this.statusAttackMultiplier || 1);
+    }
     static SPEED = 3.5; // クラス定数として定義
+    speed = Player.SPEED;
 
     constructor(game, x, y, controller) {
         super(game, x, y, 80, 80, '#ffb347', 100);
         this.attackRadius = 80;
         this.controller = controller;
         this.renderer = new PlayerRenderer(game.renderer);
-        this.ammoManager = new AmmoManager(this, 10);
+    this.ammoManager = new AmmoManager(this, 10, 20);
+    this.ammoManager.ammo = 10; // ゲーム開始時の残段数を10に明示的に設定
         this.direction = 'down';
         this.isMoving = false;
         this.moveFrame = 0;
@@ -26,8 +37,8 @@ export class Player extends Character {
         this.prevX = x;
         this.prevY = y;
 
-        // ammoManager初期化後にmaxAmmoを設定
-        this.maxAmmo = 10;
+    // ammoManager初期化後にmaxAmmoを設定
+    this.maxAmmo = 20;
         this.invincibleTimer = 0; // 無敵時間（秒）
 
         // 弾回復監視用
@@ -73,7 +84,7 @@ export class Player extends Character {
         // お札効果状態の更新
         this.updateEffectStates(deltaTime);
 
-        this.controller.updatePlayerMovement(this, deltaTime);
+    this.controller.updatePlayerMovement(this, deltaTime, this.speed);
         this.ammoManager.update(deltaTime);
         this.updateMovementState();
         if (this.invincibleTimer > 0) {
@@ -132,12 +143,6 @@ export class Player extends Character {
         return this.attackRadius;
     }
 
-    getAttackPower() {
-        // レベル・倍率に応じて攻撃力を返す
-        const level = this.game.otomoLevel || 1;
-        const base = 10 + (level - 1) * 5;
-        return base * (this.game.playerAttackMultiplier || 1);
-    }
 
     // 高速移動時の衝突判定を取得
     getPreviousPosition() {
@@ -156,10 +161,20 @@ export class Player extends Character {
 
     takeDamage(amount) {
         if (this.invincibleTimer > 0) return; // 無敵中はダメージ無効
+        
+        const prevHealthRatio = this.health / this.maxHP;
         const nextHp = this.health - amount;
+        const nextHealthRatio = nextHp / this.maxHP;
+        
         if (nextHp > 0) {
             playSE("receivedamage"); // 死なない場合のみ効果音
+            
+            // 体力が10%以下になった瞬間をチェック
+            if (prevHealthRatio > 0.1 && nextHealthRatio <= 0.1) {
+                playSE("law-hp"); // 体力警告音を再生
+            }
         }
+        
         this.health = nextHp;
         this.invincibleTimer = 1.0; // 1秒間無敵
         if (!this.isAlive) {

@@ -70,7 +70,9 @@ export class AttackManager {
             radius: attackRadius,
             timer: 22
         };
-        return this.processAttack(mouseX, mouseY, attackRadius);
+    // プレイヤーのクリック攻撃は常に1固定
+    this.damage = this.game.player.getClickAttackPower ? this.game.player.getClickAttackPower() : 1;
+    return this.processAttack(mouseX, mouseY, attackRadius);
     }
 
     // 既存のhandleAttackは用途に応じて呼び分ける（デフォルトは剣攻撃）
