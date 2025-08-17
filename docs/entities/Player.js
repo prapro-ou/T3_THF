@@ -60,6 +60,10 @@ export class Player extends Character {
         this.poisonDamage = 0;
         this.poisonInterval = 0;
         this.poisonTickTimer = 0;
+
+        // 回復アイテム機能
+        this.recoveryItemCount = 0;
+        this.recoveryHealRate = 0.3; // デフォルト30%回復
     }
 
     // カプセル化: プロパティへのアクセスを制御
@@ -186,6 +190,46 @@ export class Player extends Character {
         playSE("gameover"); // ← 死亡時に効果音
         // 必要ならここにゲームオーバー演出やUI処理を追加
         // 例:
+    }
+
+    // 回復アイテム関連メソッド
+    addRecoveryItem() {
+        this.recoveryItemCount++;
+        console.log(`Recovery item collected! Total: ${this.recoveryItemCount}`);
+    }
+
+    useRecoveryItem() {
+        if (this.recoveryItemCount <= 0) return false;
+        if (this.health >= this.maxHP) return false; // 既に満タンの場合は使用しない
+        
+        this.recoveryItemCount--;
+        const recoveryAmount = Math.floor(this.maxHP * this.recoveryHealRate); // 設定された回復率で回復
+        const previousHealth = this.health;
+        this.health += recoveryAmount;
+        
+        // 最大体力を超えないように制限
+        if (this.health > this.maxHP) {
+            this.health = this.maxHP;
+        }
+        
+        console.log(`Recovery item used! Health: ${previousHealth} -> ${this.health} (recovered ${recoveryAmount}, heal rate: ${(this.recoveryHealRate * 100).toFixed(0)}%)`);
+        playSE("recover"); // 回復成功音
+        return true;
+    }
+
+    // 回復率を設定（デバッグ用）
+    setRecoveryHealRate(ratePercent) {
+        this.recoveryHealRate = ratePercent / 100; // パーセンテージを割合に変換
+        console.log(`Recovery heal rate set to ${ratePercent}%`);
+    }
+
+    // 現在の回復率を取得（パーセンテージ）
+    getRecoveryHealRate() {
+        return this.recoveryHealRate * 100;
+    }
+
+    getRecoveryItemCount() {
+        return this.recoveryItemCount;
     }
 
     // スタン機能のメソッド

@@ -14,6 +14,7 @@ import { PlayerController } from '../components/PlayerController.js';
 import { Otomo } from '../entities/Otomo.js';
 import { ProjectileManager } from '../managers/ProjectileManager.js';
 import { BgmManager } from '../managers/BgmManager.js';
+import { RecoveryItemManager } from '../managers/RecoveryItemManager.js';
 import { playSE } from '../managers/KoukaonManager.js';
 import { BossProgressManager } from '../managers/BossProgressManager.js';
 
@@ -51,6 +52,9 @@ export class Game {
 
         // ProjectileManagerの初期化
         this.projectileManager = new ProjectileManager(this);
+
+        // RecoveryItemManagerの初期化
+        this.recoveryItemManager = new RecoveryItemManager(this);
 
         // プレイヤーの初期化
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
@@ -189,6 +193,19 @@ export class Game {
             }
         };
         window.addEventListener('keydown', this.eventHandlers.debugKeydown);
+
+        // 回復アイテム使用（スペースキー）
+        this.eventHandlers.recoveryKeydown = (e) => {
+            if (e.code === 'Space' && !this.pauseManager.isPaused && !this.gameState.isGameOver()) {
+                e.preventDefault();
+                const success = this.player.useRecoveryItem();
+                if (!success) {
+                    // 回復失敗時（アイテムなし、または体力満タン）
+                    playSE("miss");
+                }
+            }
+        };
+        window.addEventListener('keydown', this.eventHandlers.recoveryKeydown);
 
         this.uiManager.setRestartCallback(() => {
             this.initializeGame();
@@ -376,6 +393,10 @@ export class Game {
             this.enemyManager.draw(this.ctx, scrollX, scrollY);
         }
 
+        // 回復アイテムの更新・描画
+        this.recoveryItemManager.update();
+        this.recoveryItemManager.draw(this.ctx, scrollX, scrollY);
+
         // プレイヤーとの衝突判定
         this.enemyManager.getEnemies().forEach(enemy => {
             // ボス出現から2秒間はボスの当たり判定を無効化
@@ -415,6 +436,8 @@ export class Game {
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
         // オトモレベルUIを毎フレーム更新
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
+        // 回復アイテム数UIを毎フレーム更新
+        this.uiManager.updateRecoveryItemCount(this.player.getRecoveryItemCount());
 
         // ミニマップを更新（背景画像も含む）
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
@@ -604,6 +627,16 @@ export class Game {
             this.playerHitboxSize = settings.playerHitboxSize;
         }
 
+        // 回復アイテム設定
+        if (settings.recoveryItemDropRate !== undefined) {
+            console.log('Setting recovery item drop rate:', settings.recoveryItemDropRate + '%');
+            this.recoveryItemManager.setDropRate(settings.recoveryItemDropRate);
+        }
+        if (settings.recoveryItemHealRate !== undefined) {
+            console.log('Setting recovery item heal rate:', settings.recoveryItemHealRate + '%');
+            this.player.setRecoveryHealRate(settings.recoveryItemHealRate);
+        }
+
         console.log('Debug settings after apply:', this.debugSettings);
     }
 
@@ -641,6 +674,9 @@ export class Game {
             }
             if (this.eventHandlers.debugKeydown) {
                 window.removeEventListener('keydown', this.eventHandlers.debugKeydown);
+            }
+            if (this.eventHandlers.recoveryKeydown) {
+                window.removeEventListener('keydown', this.eventHandlers.recoveryKeydown);
             }
             if (this.eventHandlers.visibilitychange) {
                 document.removeEventListener('visibilitychange', this.eventHandlers.visibilitychange);
@@ -740,6 +776,7 @@ export class Game {
         }
         // UI即時反映
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
+        this.uiManager.updateRecoveryItemCount(this.player.getRecoveryItemCount());
         // レベルアップ演出が必要ならここで
     }
 

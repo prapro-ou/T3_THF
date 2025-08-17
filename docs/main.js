@@ -414,6 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.classList.remove('hidden'); // タイマー表示を維持
         minimapContainer.classList.remove('hidden'); // ミニマップ表示
         quickHelp.classList.remove('hidden'); // リスタート時も表示
+        
+        // 回復アイテムUIを表示
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) {
+            recoveryItemDisplay.classList.remove('hidden');
+        }
+        
         showCrosshair(); // 照準を表示
         // 選択されたボスの種類を使用
         console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
@@ -462,6 +469,13 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         gameOverMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        
+        // 回復アイテムUIを非表示
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) {
+            recoveryItemDisplay.classList.add('hidden');
+        }
+        
         hideCrosshair(); // 照準を非表示
 
         // otomoLevelDisplayも非表示にする
@@ -525,6 +539,13 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         pauseMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        
+        // 回復アイテムUIを非表示
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) {
+            recoveryItemDisplay.classList.add('hidden');
+        }
+        
         hideCrosshair(); // 照準を非表示
 
         // otomoLevelDisplayも非表示にする
@@ -594,6 +615,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const showCollisionDebug = document.getElementById('showCollisionDebug').checked;
         const playerHitboxSize = parseFloat(document.getElementById('playerHitboxSize').value);
 
+        // 回復アイテム設定を適用
+        const recoveryItemDropRate = parseInt(document.getElementById('recoveryItemDropRate').value);
+        const recoveryItemHealRate = parseInt(document.getElementById('recoveryItemHealRate').value);
+
         // デバッグ情報を出力
         console.log('UI values from debug panel:', {
             showPlayerHitbox,
@@ -602,7 +627,9 @@ document.addEventListener('DOMContentLoaded', () => {
             showAttackRange,
             showBossCollision,
             showCollisionDebug,
-            playerHitboxSize
+            playerHitboxSize,
+            recoveryItemDropRate,
+            recoveryItemHealRate
         });
 
         // 設定を適用
@@ -630,7 +657,9 @@ document.addEventListener('DOMContentLoaded', () => {
             bossOni1ProjectileSpeed,
             bossOni1ProjectileDamage,
             showCollisionDebug,
-            playerHitboxSize
+            playerHitboxSize,
+            recoveryItemDropRate,
+            recoveryItemHealRate
         };
 
         console.log('Applying settings to game:', settings);
@@ -674,6 +703,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // 当たり判定詳細設定をデフォルトにリセット
         document.getElementById('showCollisionDebug').checked = true;
         document.getElementById('playerHitboxSize').value = 0.8;
+
+        // 回復アイテム設定をデフォルトにリセット
+        document.getElementById('recoveryItemDropRate').value = 3;
+        document.getElementById('recoveryItemHealRate').value = 30;
     });
 
     // ボス鬼をすぐ出現させるボタンのイベントハンドラー
@@ -945,6 +978,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 timerDisplay.classList.remove('hidden');
                 minimapContainer.classList.remove('hidden'); // ミニマップ表示
                 quickHelp.classList.remove('hidden');
+                
+                // 回復アイテムUIを表示
+                const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+                if (recoveryItemDisplay) {
+                    recoveryItemDisplay.classList.remove('hidden');
+                }
+                
                 showCrosshair(); // 照準を表示
 
                 // 新しいゲームインスタンスを作成
