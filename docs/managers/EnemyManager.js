@@ -86,10 +86,16 @@ export class EnemyManager {
         const randomType = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
         
     // HP倍率を反映
-    let baseHP = 20;
-    if (randomType === RedOni) baseHP = 20;
-    if (randomType === BlueOni) baseHP = 40;
-    if (randomType === BlackOni) baseHP = 60;
+    // 敵HP定数
+    const ENEMY_HP = {
+        RedOni: 20,
+        BlueOni: 40,
+        BlackOni: 60
+    };
+    let baseHP = ENEMY_HP.RedOni;
+    if (randomType === RedOni) baseHP = ENEMY_HP.RedOni;
+    if (randomType === BlueOni) baseHP = ENEMY_HP.BlueOni;
+    if (randomType === BlackOni) baseHP = ENEMY_HP.BlackOni;
     const hp = Math.round(baseHP * (this.game.oniHpMultiplier || 1));
     const enemy = new randomType(this.game, undefined, hp);
     this.enemies.push(enemy);

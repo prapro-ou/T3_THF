@@ -1,6 +1,7 @@
 export class FollowOtomoBehavior {
     constructor(otomo) {
         this.otomo = otomo;
+        this.imageName = 'monkey'; // サルの画像
     }
 
     update(player, deltaTime) {
@@ -23,6 +24,10 @@ export class FollowOtomoBehavior {
     }
 
     getColor() {
-        return '#4682B4';
+        return '#8B4513'; // 茶色（サルの色）
+    }
+
+    getImageName() {
+        return this.imageName;
     }
 }

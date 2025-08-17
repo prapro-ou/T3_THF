@@ -2,6 +2,7 @@ export class WanderOtomoBehavior {
     constructor(otomo) {
         this.otomo = otomo;
         this.wanderTarget = null;
+        this.imageName = 'bird'; // キジの画像
     }
 
     update(player, deltaTime) {
@@ -38,6 +39,10 @@ export class WanderOtomoBehavior {
     }
 
     getColor() {
-        return '#32CD32'; // ライムグリーン
+        return '#8B4513'; // 茶色（キジの色）
+    }
+
+    getImageName() {
+        return this.imageName;
     }
 }
