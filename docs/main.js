@@ -285,10 +285,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
                 
                 if (bossData.defeated) {
-                    // 討伐済み
+                    // 討伐済み（選択可能）
                     if (defeatedElement) defeatedElement.classList.remove('hidden');
-                    card.style.opacity = '0.7';
-                    card.style.cursor = 'not-allowed';
+                    card.style.opacity = '1';
+                    card.style.cursor = 'pointer';
                 } else if (bossData.unlocked) {
                     // アンロック済み
                     if (unlockedElement) unlockedElement.classList.remove('hidden');
@@ -318,8 +318,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const bossId = parseInt(card.dataset.boss, 10);
             const bossData = bossProgressManager.getAllBossData()[bossId];
             
-            // 未開放または討伐済みのボスは選択できない
-            if (!bossData || !bossData.unlocked || bossData.defeated) {
+            // 未開放のボスは選択できない（討伐済みでも選択可能）
+            if (!bossData || !bossData.unlocked) {
                 console.log('このボスは選択できません:', bossId);
                 return;
             }
@@ -818,6 +818,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let statusHTML = `<div>討伐済み: ${defeatedCount}/5</div>`;
             statusHTML += `<div>アンロック済み: ${unlockedCount}/5</div>`;
+            statusHTML += `<div>最終ステージ解放条件:</div>`;
+            statusHTML += `<div>・砲鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・バイク鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・ワープ鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・風神・雷神: ${bossData[4]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>お供開放状況:</div>`;
             statusHTML += `<div>・犬: ${otomoStatus.dog ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・猿: ${otomoStatus.monkey ? '✓' : '✗'}</div>`;
@@ -835,6 +840,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 updateBossCardProgress();
                 updateBossProgressStatus();
                 console.log('全ボス進捗をリセットしました');
+            }
+        });
+    }
+
+    // 個別ボスの進捗リセット機能
+    const resetBoss1 = document.getElementById('resetBoss1');
+    const resetBoss2 = document.getElementById('resetBoss2');
+    const resetBoss3 = document.getElementById('resetBoss3');
+    const resetBoss4 = document.getElementById('resetBoss4');
+
+    if (resetBoss1) {
+        resetBoss1.addEventListener('click', () => {
+            if (confirm('砲鬼の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(1);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('砲鬼の進捗をリセットしました');
+            }
+        });
+    }
+
+    if (resetBoss2) {
+        resetBoss2.addEventListener('click', () => {
+            if (confirm('バイク鬼の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(2);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('バイク鬼の進捗をリセットしました');
+            }
+        });
+    }
+
+    if (resetBoss3) {
+        resetBoss3.addEventListener('click', () => {
+            if (confirm('ワープ鬼の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(3);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('ワープ鬼の進捗をリセットしました');
+            }
+        });
+    }
+
+    if (resetBoss4) {
+        resetBoss4.addEventListener('click', () => {
+            if (confirm('風神・雷神の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(4);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('風神・雷神の進捗をリセットしました');
             }
         });
     }
@@ -862,8 +917,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const bossId = parseInt(card.dataset.boss, 10);
             const bossData = bossProgressManager.getAllBossData()[bossId];
             
-            // 未開放または討伐済みのボスは選択できない
-            if (!bossData || !bossData.unlocked || bossData.defeated) {
+            // 未開放のボスは選択できない（討伐済みでも選択可能）
+            if (!bossData || !bossData.unlocked) {
                 console.log('このボスは選択できません:', bossId);
                 return;
             }

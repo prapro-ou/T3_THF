@@ -41,7 +41,7 @@
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/cannon_oni_select_button_UI.png" alt="四天王1">
                 <div class="boss-status">
                     <div class="boss-name">砲鬼</div>
-                    <div class="boss-progress defeated hidden">討伐済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
                     <div class="boss-progress locked hidden">未開放</div>
                     <div class="boss-progress unlocked hidden">アンロック済み</div>
                 </div>
@@ -50,7 +50,7 @@
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/bike_oni_select_button_UI.png" alt="四天王2">
                 <div class="boss-status">
                     <div class="boss-name">バイク鬼</div>
-                    <div class="boss-progress defeated hidden">討伐済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
                     <div class="boss-progress locked hidden">未開放</div>
                     <div class="boss-progress unlocked hidden">アンロック済み</div>
                 </div>
@@ -59,7 +59,7 @@
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/warp_oni_select_button_UI.png" alt="四天王3">
                 <div class="boss-status">
                     <div class="boss-name">ワープ鬼</div>
-                    <div class="boss-progress defeated hidden">討伐済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
                     <div class="boss-progress locked hidden">未開放</div>
                     <div class="boss-progress unlocked hidden">アンロック済み</div>
                 </div>
@@ -68,7 +68,7 @@
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/fuzin_raizin_select_button_UI.png" alt="四天王4">
                 <div class="boss-status">
                     <div class="boss-name">風神・雷神</div>
-                    <div class="boss-progress defeated hidden">討伐済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
                     <div class="boss-progress locked hidden">未開放</div>
                     <div class="boss-progress unlocked hidden">アンロック済み</div>
                 </div>
@@ -77,8 +77,8 @@
                 <div class="boss-placeholder">ラスボス</div>
                 <div class="boss-status">
                     <div class="boss-name">ラスボス</div>
-                    <div class="boss-progress defeated hidden">討伐済み</div>
-                    <div class="boss-progress locked hidden">未開放</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
+                    <div class="boss-progress locked hidden">4体のボスを倒すと解放</div>
                     <div class="boss-progress unlocked hidden">アンロック済み</div>
                 </div>
             </div>
@@ -326,6 +326,15 @@
                 </div>
                 <div class="debug-control">
                     <button id="unlockAllBosses" class="debug-btn">全ボスアンロック</button>
+                </div>
+                <div class="debug-control">
+                    <label>個別ボス進捗リセット:</label>
+                    <div class="debug-control">
+                        <button id="resetBoss1" class="debug-btn">砲鬼リセット</button>
+                        <button id="resetBoss2" class="debug-btn">バイク鬼リセット</button>
+                        <button id="resetBoss3" class="debug-btn">ワープ鬼リセット</button>
+                        <button id="resetBoss4" class="debug-btn">風神・雷神リセット</button>
+                    </div>
                 </div>
                 <div class="debug-control">
                     <label>ボス進捗状況:</label>

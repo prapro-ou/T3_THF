@@ -4,6 +4,7 @@ export class ChargeOtomoBehavior {
         this.chargeTarget = null;
         this.damageInterval = 0.2; // ダメージ間隔（秒）
         this.damageTimer = 0;
+        this.imageName = 'dog'; // 犬の画像
     }
 
     update(player, deltaTime) {
@@ -76,6 +77,10 @@ export class ChargeOtomoBehavior {
     }
 
     getColor() {
-        return '#FF4500'; // オレンジレッド
+        return '#8B4513'; // 茶色（犬の色）
+    }
+
+    getImageName() {
+        return this.imageName;
     }
 }

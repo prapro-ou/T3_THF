@@ -31,6 +31,9 @@ export class BossProgressManager {
             }
         }
 
+        // 最終ステージ（ラスボス）の解放条件をチェック
+        this.checkFinalStageUnlock();
+
         this.saveBossProgress();
     }
 
@@ -65,6 +68,28 @@ export class BossProgressManager {
             this.bossData[nextBossId].unlocked = true;
             console.log(`ボス${nextBossId}（${this.bossData[nextBossId].name}）をアンロックしました`);
         }
+        
+        // 最終ステージの解放条件をチェック
+        this.checkFinalStageUnlock();
+    }
+
+    /**
+     * 最終ステージ（ラスボス）の解放条件をチェック
+     * 4体のボスすべてを倒すと解放される
+     */
+    checkFinalStageUnlock() {
+        const boss1Defeated = this.bossData[1]?.defeated || false;
+        const boss2Defeated = this.bossData[2]?.defeated || false;
+        const boss3Defeated = this.bossData[3]?.defeated || false;
+        const boss4Defeated = this.bossData[4]?.defeated || false;
+        
+        // 4体のボスすべてを倒した場合、最終ステージを解放
+        if (boss1Defeated && boss2Defeated && boss3Defeated && boss4Defeated) {
+            if (this.bossData[5]) {
+                this.bossData[5].unlocked = true;
+                console.log('最終ステージ（ラスボス）が解放されました！');
+            }
+        }
     }
 
     /**
@@ -74,6 +99,15 @@ export class BossProgressManager {
      */
     isBossDefeated(bossId) {
         return this.bossData[bossId]?.defeated || false;
+    }
+
+    /**
+     * ボスが選択可能かチェック（討伐済みでも選択可能）
+     * @param {number} bossId - ボスID
+     * @returns {boolean} 選択可能かどうか
+     */
+    isBossSelectable(bossId) {
+        return this.bossData[bossId]?.unlocked || false;
     }
 
     /**
@@ -94,6 +128,9 @@ export class BossProgressManager {
             this.bossData[bossId].unlocked = true;
             this.saveBossProgress();
             console.log(`ボス${bossId}（${this.bossData[bossId].name}）を強制アンロックしました`);
+            
+            // 最終ステージの解放条件をチェック
+            this.checkFinalStageUnlock();
         }
     }
 
@@ -182,6 +219,9 @@ export class BossProgressManager {
             this.bossData[bossId].clearTime = 0;
             this.saveBossProgress();
             console.log(`ボス${bossId}の進捗をリセットしました`);
+            
+            // 最終ステージの解放条件をチェック
+            this.checkFinalStageUnlock();
         }
     }
 }
