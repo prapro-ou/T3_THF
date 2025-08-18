@@ -30,7 +30,7 @@ export class AttackManager {
             x: mouseX,
             y: mouseY,
             radius: attackRadius,
-            timer: 10
+            timer: 22
         };
         let hitCount = 0;
         const level = this.game.otomoLevel || 1;
@@ -68,9 +68,11 @@ export class AttackManager {
             x: mouseX,
             y: mouseY,
             radius: attackRadius,
-            timer: 10
+            timer: 22
         };
-        return this.processAttack(mouseX, mouseY, attackRadius);
+    // プレイヤーのクリック攻撃は常に1固定
+    this.damage = this.game.player.getClickAttackPower ? this.game.player.getClickAttackPower() : 1;
+    return this.processAttack(mouseX, mouseY, attackRadius);
     }
 
     // 既存のhandleAttackは用途に応じて呼び分ける（デフォルトは剣攻撃）

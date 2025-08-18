@@ -20,6 +20,14 @@ export class RedOni extends Enemy {
 
     onDeath() {
         playSE("enemy-death"); // 死亡時に効果音
+        
+        // 回復アイテムドロップ処理
+        if (this.game && this.game.recoveryItemManager) {
+            const centerX = this.x + this.width / 2;
+            const centerY = this.y + this.height / 2;
+            this.game.recoveryItemManager.tryDropItem(centerX, centerY, 'red');
+        }
+        
         if (this.game && typeof this.game.addOtomoExp === 'function') {
             this.game.addOtomoExp(1);
         }

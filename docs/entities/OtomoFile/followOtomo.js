@@ -1,6 +1,7 @@
 export class FollowOtomoBehavior {
     constructor(otomo) {
         this.otomo = otomo;
+        this.imageName = 'monkey'; // サルの画像
     }
 
     update(player, deltaTime) {
@@ -16,13 +17,17 @@ export class FollowOtomoBehavior {
         // プレイヤーの近くにいる敵だけを攻撃
         const target = this.otomo.findEnemyNearPlayer(200);
         if (target && this.otomo.canShoot) {
-            this.otomo.shootAt(target);
+            this.otomo.attackTarget(target, 'projectile');
             this.otomo.canShoot = false;
             setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }
     }
 
     getColor() {
-        return '#4682B4';
+        return '#8B4513'; // 茶色（サルの色）
+    }
+
+    getImageName() {
+        return this.imageName;
     }
 }

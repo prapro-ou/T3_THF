@@ -14,14 +14,17 @@ export class BgmManager {
             lastbossBgm: { start: 2.5, end: 45.7, intro: 2.5 }
         };
         this.currentKey = null;
-        this.volume = 0.7;
+       
         this.loopInterval = null;
         this.introTimeout = null;
         this.isUserInteracted = false; // ユーザーの最初の相互作用フラグ
         this.pendingPlay = null; // 保留中の再生要求
+        this.bgms.mainBgm.volume = 1;
+        this.bgms.battleBgm.volume = 0.7;
+        this.bgms.bossBgm.volume = 0.7;
+        this.bgms.lastbossBgm.volume = 0.5;
         Object.values(this.bgms).forEach(bgm => {
             bgm.loop = true;
-            bgm.volume = this.volume;
         });
 
         // 初回クリック/タップでオーディオコンテキストを有効化

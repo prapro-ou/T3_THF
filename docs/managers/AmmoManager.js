@@ -1,9 +1,9 @@
 ﻿export class AmmoManager {
-    constructor(player, initialMaxAmmo = 10) {
+    constructor(player, initialMaxAmmo = 10, maxAmmoLimit = 20) {
         this.player = player;
-        this.maxAmmo = initialMaxAmmo;
-        this.ammo = this.maxAmmo;
-        this.ammoRecoveryTime = 3;
+        this.maxAmmo = maxAmmoLimit;
+        this.ammo = initialMaxAmmo;
+    this.ammoRecoveryTime = 3;
         this.ammoRecoveryTimer = 0;
     }
 

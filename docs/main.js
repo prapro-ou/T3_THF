@@ -3,8 +3,93 @@ import { preloadMomotaroSpriteSheet } from './components/PlayerRenderer.js';
 import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpriteSheet, preloadBossOni2SpriteSheet, preloadFuzinSpriteSheet, preloadRaizinSpriteSheet, preloadWarpOniSpriteSheet } from './components/EnemyRenderer.js';
 import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
+import { BossProgressManager } from './managers/BossProgressManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 鬼HP上昇ログ用
+    const oniHpLogContainer = document.getElementById('oniHpLogContainer');
+    window.oniHpLogContainer = oniHpLogContainer;
+    // ステータス割り振りUI要素取得
+    const statusModal = document.getElementById('statusModal');
+    const statusPointsValue = document.getElementById('statusPointsValue');
+    const statusAttackValue = document.getElementById('statusAttackValue');
+    const statusSpeedValue = document.getElementById('statusSpeedValue');
+    const statusReloadValue = document.getElementById('statusReloadValue');
+    const addAttackBtn = document.getElementById('addAttackBtn');
+    const subAttackBtn = document.getElementById('subAttackBtn');
+    const addSpeedBtn = document.getElementById('addSpeedBtn');
+    const subSpeedBtn = document.getElementById('subSpeedBtn');
+    const addReloadBtn = document.getElementById('addReloadBtn');
+    const subReloadBtn = document.getElementById('subReloadBtn');
+    const statusApplyBtn = document.getElementById('statusApplyBtn');
+    const statusCancelBtn = document.getElementById('statusCancelBtn');
+
+    let tempAlloc = { attack: 0, speed: 0, reload: 0 };
+    let tempPoints = 0;
+
+    function openStatusModal() {
+    if (!game) return;
+    // 一時停止
+    if (!game.isPaused) game.togglePause();
+    // crosshair非表示
+    if (crosshair) crosshair.classList.add('hidden');
+    // 現在の割り振りをコピー
+    tempAlloc = { ...game.statusAlloc };
+    tempPoints = game.statusPoints;
+    updateStatusModalUI();
+    statusModal.classList.remove('hidden');
+    }
+    function closeStatusModal() {
+    statusModal.classList.add('hidden');
+    // crosshair再表示
+    if (crosshair) crosshair.classList.remove('hidden');
+    // 再開
+    if (game && game.isPaused) game.togglePause();
+    }
+    function updateStatusModalUI() {
+        statusPointsValue.textContent = tempPoints;
+        statusAttackValue.textContent = tempAlloc.attack;
+        statusSpeedValue.textContent = tempAlloc.speed;
+        statusReloadValue.textContent = tempAlloc.reload;
+    }
+    function tryAddStatus(type) {
+        if (tempPoints > 0) {
+            tempAlloc[type]++;
+            tempPoints--;
+            updateStatusModalUI();
+        }
+    }
+    function trySubStatus(type) {
+        if (tempAlloc[type] > 0) {
+            tempAlloc[type]--;
+            tempPoints++;
+            updateStatusModalUI();
+        }
+    }
+    addAttackBtn.onclick = () => tryAddStatus('attack');
+    subAttackBtn.onclick = () => trySubStatus('attack');
+    addSpeedBtn.onclick = () => tryAddStatus('speed');
+    subSpeedBtn.onclick = () => trySubStatus('speed');
+    addReloadBtn.onclick = () => tryAddStatus('reload');
+    subReloadBtn.onclick = () => trySubStatus('reload');
+    statusApplyBtn.onclick = () => {
+        if (!game) return;
+        // 割り振りを反映
+        game.statusAlloc = { ...tempAlloc };
+        game.statusPoints = tempPoints;
+        game.applyStatusAllocation();
+        closeStatusModal();
+    };
+    statusCancelBtn.onclick = () => closeStatusModal();
+
+    // "l"キーで開閉
+    window.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'l' && game && !statusModal.classList.contains('hidden')) {
+            closeStatusModal();
+        } else if (e.key.toLowerCase() === 'l' && game && statusModal.classList.contains('hidden')) {
+            openStatusModal();
+        }
+    });
     // DOM取得
     const gameCanvas = document.getElementById('gameCanvas');
     const scoreDisplay = document.getElementById('scoreDisplay');
@@ -31,6 +116,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeDebug = document.getElementById('closeDebug');
     const applyDebugSettings = document.getElementById('applyDebugSettings');
     const resetDebugSettings = document.getElementById('resetDebugSettings');
+    const spawnBossNow = document.getElementById('spawnBossNow');
+    const resetBossProgress = document.getElementById('resetBossProgress');
+    const unlockAllBosses = document.getElementById('unlockAllBosses');
+    const bossProgressStatus = document.getElementById('bossProgressStatus');
 
     // ポーズ画面の要素
     const pauseMessage = document.getElementById('pauseMessage');
@@ -41,6 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
     const bgmManager = new BgmManager();
     bgmManager.play('mainBgm'); // ユーザー操作後まで保留される
+
+    // ボス進捗マネージャーの初期化
+    const bossProgressManager = new BossProgressManager();
 
     // 障子風アニメーション用の要素
     const shojiContainer = document.querySelector('.shoji-container');
@@ -175,9 +267,63 @@ document.addEventListener('DOMContentLoaded', () => {
     // ボス選択機能を追加
     const bossCardElements = document.querySelectorAll('.boss-card');
     console.log('ボスカード要素数:', bossCardElements.length);
+    
+    // ボスカードの進捗状況を更新する関数
+    function updateBossCardProgress() {
+        bossCardElements.forEach((card) => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossData = bossProgressManager.getAllBossData()[bossId];
+            
+            if (bossData) {
+                const defeatedElement = card.querySelector('.boss-progress.defeated');
+                const lockedElement = card.querySelector('.boss-progress.locked');
+                const unlockedElement = card.querySelector('.boss-progress.unlocked');
+                
+                // 既存の進捗表示を非表示
+                [defeatedElement, lockedElement, unlockedElement].forEach(el => {
+                    if (el) el.classList.add('hidden');
+                });
+                
+                if (bossData.defeated) {
+                    // 討伐済み（選択可能）
+                    if (defeatedElement) defeatedElement.classList.remove('hidden');
+                    card.style.opacity = '1';
+                    card.style.cursor = 'pointer';
+                } else if (bossData.unlocked) {
+                    // アンロック済み
+                    if (unlockedElement) unlockedElement.classList.remove('hidden');
+                    card.style.opacity = '1';
+                    card.style.cursor = 'pointer';
+                } else {
+                    // 未開放
+                    if (lockedElement) lockedElement.classList.remove('hidden');
+                    card.style.opacity = '0.5';
+                    card.style.cursor = 'not-allowed';
+                }
+            }
+        });
+    }
+    
+    // 初期表示時に進捗状況を更新
+    updateBossCardProgress();
+    
+    // ボス進捗更新イベントをリッスン
+    window.addEventListener('bossProgressUpdated', () => {
+        updateBossCardProgress();
+    });
+    
     bossCardElements.forEach((card, index) => {
         console.log(`ボスカード${index + 1}:`, card.dataset.boss);
         card.addEventListener('click', () => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossData = bossProgressManager.getAllBossData()[bossId];
+            
+            // 未開放のボスは選択できない（討伐済みでも選択可能）
+            if (!bossData || !bossData.unlocked) {
+                console.log('このボスは選択できません:', bossId);
+                return;
+            }
+            
             console.log('ボスカードがクリックされました:', card.dataset.boss);
             // 他のカードの選択状態を解除
             bossCardElements.forEach(c => c.classList.remove('selected'));
@@ -268,6 +414,13 @@ document.addEventListener('DOMContentLoaded', () => {
         timerDisplay.classList.remove('hidden'); // タイマー表示を維持
         minimapContainer.classList.remove('hidden'); // ミニマップ表示
         quickHelp.classList.remove('hidden'); // リスタート時も表示
+        
+        // 回復アイテムUIを表示
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) {
+            recoveryItemDisplay.classList.remove('hidden');
+        }
+        
         showCrosshair(); // 照準を表示
         // 選択されたボスの種類を使用
         console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
@@ -316,6 +469,13 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         gameOverMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        
+        // 回復アイテムUIを非表示
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) {
+            recoveryItemDisplay.classList.add('hidden');
+        }
+        
         hideCrosshair(); // 照準を非表示
 
         // otomoLevelDisplayも非表示にする
@@ -379,6 +539,13 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.add('hidden'); // ミニマップ非表示
         pauseMessage.classList.add('hidden');
         quickHelp.classList.add('hidden');
+        
+        // 回復アイテムUIを非表示
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) {
+            recoveryItemDisplay.classList.add('hidden');
+        }
+        
         hideCrosshair(); // 照準を非表示
 
         // otomoLevelDisplayも非表示にする
@@ -433,6 +600,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const showEnemyHitbox = document.getElementById('showEnemyHitbox').checked;
         const showProjectileHitbox = document.getElementById('showProjectileHitbox').checked;
         const showAttackRange = document.getElementById('showAttackRange').checked;
+        const showBossCollision = document.getElementById('showBossCollision').checked;
 
         // 高速移動設定を適用
         const highSpeedThreshold = parseInt(document.getElementById('highSpeedThreshold').value);
@@ -447,14 +615,21 @@ document.addEventListener('DOMContentLoaded', () => {
         const showCollisionDebug = document.getElementById('showCollisionDebug').checked;
         const playerHitboxSize = parseFloat(document.getElementById('playerHitboxSize').value);
 
+        // 回復アイテム設定を適用
+        const recoveryItemDropRate = parseInt(document.getElementById('recoveryItemDropRate').value);
+        const recoveryItemHealRate = parseInt(document.getElementById('recoveryItemHealRate').value);
+
         // デバッグ情報を出力
         console.log('UI values from debug panel:', {
             showPlayerHitbox,
             showEnemyHitbox,
             showProjectileHitbox,
             showAttackRange,
+            showBossCollision,
             showCollisionDebug,
-            playerHitboxSize
+            playerHitboxSize,
+            recoveryItemDropRate,
+            recoveryItemHealRate
         });
 
         // 設定を適用
@@ -475,13 +650,16 @@ document.addEventListener('DOMContentLoaded', () => {
             showEnemyHitbox,
             showProjectileHitbox,
             showAttackRange,
+            showBossCollision,
             highSpeedThreshold,
             maxSubframeSteps,
             enableLineIntersection,
             bossOni1ProjectileSpeed,
             bossOni1ProjectileDamage,
             showCollisionDebug,
-            playerHitboxSize
+            playerHitboxSize,
+            recoveryItemDropRate,
+            recoveryItemHealRate
         };
 
         console.log('Applying settings to game:', settings);
@@ -510,6 +688,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('showEnemyHitbox').checked = false;
         document.getElementById('showProjectileHitbox').checked = false;
         document.getElementById('showAttackRange').checked = false;
+        document.getElementById('showBossCollision').checked = false;
         document.getElementById('showCollisionDebug').checked = false; // デバッグ情報もOFF
 
         // 高速移動設定をデフォルトにリセット
@@ -524,14 +703,83 @@ document.addEventListener('DOMContentLoaded', () => {
         // 当たり判定詳細設定をデフォルトにリセット
         document.getElementById('showCollisionDebug').checked = true;
         document.getElementById('playerHitboxSize').value = 0.8;
+
+        // 回復アイテム設定をデフォルトにリセット
+        document.getElementById('recoveryItemDropRate').value = 3;
+        document.getElementById('recoveryItemHealRate').value = 30;
     });
 
-    // F12キーでデバッグパネルを開く
+    // ボス鬼をすぐ出現させるボタンのイベントハンドラー
+    spawnBossNow.addEventListener('click', () => {
+        if (!game) return;
+        
+        // ボスが既に出現している場合は何もしない
+        if (game.bossAppeared) {
+            console.log('ボスは既に出現しています');
+            return;
+        }
+        
+        console.log('ボス鬼をすぐ出現させます');
+        
+        // ボス出現処理を強制実行
+        game.bossAppeared = true;
+        game.bossCutInStartTime = Date.now();
+        const cutInMsg = (game.selectedBossType === 4) ? '風神・雷神、参上！！' : 'ボス鬼出現！！';
+        game.uiManager.showBossCutIn(cutInMsg);
+        game.enemyManager.clearEnemies(); // 通常敵を一掃
+        game.enemyManager.spawnBoss(game.selectedBossType);
+        game.bossStartTime = Date.now();
+        game.bossSpawnFrame = game.enemyManager.frame;
+        game.bossSpawnComplete = false;
+        
+        // BGM切り替え
+        if (game.bgmManager) {
+            if (game.selectedBossType === 5) {
+                game.bgmManager.play('lastbossBgm');
+            } else {
+                game.bgmManager.play('bossBgm');
+            }
+        }
+        
+        console.log('ボス鬼出現完了');
+    });
+
+    // F12キーでデバッグパネルを開く、Ctrl+Bでボス鬼をすぐ出現
     window.addEventListener('keydown', (e) => {
         if (e.key === 'F12') {
             e.preventDefault();
             if (game) {
                 debugPanel.classList.remove('hidden');
+            }
+        }
+        
+        // Ctrl+Bでボス鬼をすぐ出現
+        if (e.ctrlKey && e.key === 'b') {
+            e.preventDefault();
+            if (game && !game.bossAppeared) {
+                console.log('Ctrl+B: ボス鬼をすぐ出現させます');
+                
+                // ボス出現処理を強制実行
+                game.bossAppeared = true;
+                game.bossCutInStartTime = Date.now();
+                const cutInMsg = (game.selectedBossType === 4) ? '風神・雷神、参上！！' : 'ボス鬼出現！！';
+                game.uiManager.showBossCutIn(cutInMsg);
+                game.enemyManager.clearEnemies(); // 通常敵を一掃
+                game.enemyManager.spawnBoss(game.selectedBossType);
+                game.bossStartTime = Date.now();
+                game.bossSpawnFrame = game.enemyManager.frame;
+                game.bossSpawnComplete = false;
+                
+                // BGM切り替え
+                if (game.bgmManager) {
+                    if (game.selectedBossType === 5) {
+                        game.bgmManager.play('lastbossBgm');
+                    } else {
+                        game.bgmManager.play('bossBgm');
+                    }
+                }
+                
+                console.log('Ctrl+B: ボス鬼出現完了');
             }
         }
     });
@@ -593,10 +841,121 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ボス進捗状況を表示する関数
+    function updateBossProgressStatus() {
+        if (bossProgressStatus) {
+            const bossData = bossProgressManager.getAllBossData();
+            const defeatedCount = bossProgressManager.getDefeatedBossCount();
+            const unlockedCount = bossProgressManager.getUnlockedBossCount();
+            const otomoStatus = bossProgressManager.getOtomoUnlockStatus();
+            
+            let statusHTML = `<div>討伐済み: ${defeatedCount}/5</div>`;
+            statusHTML += `<div>アンロック済み: ${unlockedCount}/5</div>`;
+            statusHTML += `<div>最終ステージ解放条件:</div>`;
+            statusHTML += `<div>・砲鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・バイク鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・ワープ鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・風神・雷神: ${bossData[4]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>お供開放状況:</div>`;
+            statusHTML += `<div>・犬: ${otomoStatus.dog ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・猿: ${otomoStatus.monkey ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・雉: ${otomoStatus.bird ? '✓' : '✗'}</div>`;
+            
+            bossProgressStatus.innerHTML = statusHTML;
+        }
+    }
+
+    // ボス進捗管理のデバッグ機能
+    if (resetBossProgress) {
+        resetBossProgress.addEventListener('click', () => {
+            if (confirm('全ボスの進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgress();
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('全ボス進捗をリセットしました');
+            }
+        });
+    }
+
+    // 個別ボスの進捗リセット機能
+    const resetBoss1 = document.getElementById('resetBoss1');
+    const resetBoss2 = document.getElementById('resetBoss2');
+    const resetBoss3 = document.getElementById('resetBoss3');
+    const resetBoss4 = document.getElementById('resetBoss4');
+
+    if (resetBoss1) {
+        resetBoss1.addEventListener('click', () => {
+            if (confirm('砲鬼の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(1);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('砲鬼の進捗をリセットしました');
+            }
+        });
+    }
+
+    if (resetBoss2) {
+        resetBoss2.addEventListener('click', () => {
+            if (confirm('バイク鬼の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(2);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('バイク鬼の進捗をリセットしました');
+            }
+        });
+    }
+
+    if (resetBoss3) {
+        resetBoss3.addEventListener('click', () => {
+            if (confirm('ワープ鬼の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(3);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('ワープ鬼の進捗をリセットしました');
+            }
+        });
+    }
+
+    if (resetBoss4) {
+        resetBoss4.addEventListener('click', () => {
+            if (confirm('風神・雷神の進捗をリセットしますか？')) {
+                bossProgressManager.resetBossProgressById(4);
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('風神・雷神の進捗をリセットしました');
+            }
+        });
+    }
+
+    if (unlockAllBosses) {
+        unlockAllBosses.addEventListener('click', () => {
+            if (confirm('全ボスをアンロックしますか？')) {
+                for (let i = 1; i <= 5; i++) {
+                    bossProgressManager.forceUnlockBoss(i);
+                }
+                updateBossCardProgress();
+                updateBossProgressStatus();
+                console.log('全ボスをアンロックしました');
+            }
+        });
+    }
+
+    // 初期表示時にボス進捗状況を更新
+    updateBossProgressStatus();
+
     // ボスカード選択でゲーム開始
     const bossCards = document.querySelectorAll('.boss-card');
     bossCards.forEach(card => {
         card.addEventListener('click', () => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossData = bossProgressManager.getAllBossData()[bossId];
+            
+            // 未開放のボスは選択できない（討伐済みでも選択可能）
+            if (!bossData || !bossData.unlocked) {
+                console.log('このボスは選択できません:', bossId);
+                return;
+            }
+            
             playSE("kettei"); // ← 決定音
             bossCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
@@ -619,6 +978,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 timerDisplay.classList.remove('hidden');
                 minimapContainer.classList.remove('hidden'); // ミニマップ表示
                 quickHelp.classList.remove('hidden');
+                
+                // 回復アイテムUIを表示
+                const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+                if (recoveryItemDisplay) {
+                    recoveryItemDisplay.classList.remove('hidden');
+                }
+                
                 showCrosshair(); // 照準を表示
 
                 // 新しいゲームインスタンスを作成

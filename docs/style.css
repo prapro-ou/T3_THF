@@ -1,3 +1,152 @@
+/* ===== ステータス割り振りモーダル ===== */
+#statusModal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.status-modal-card {
+    background: #fff8f0;
+    border-radius: 24px;
+    min-width: 340px;
+    max-width: 95vw;
+    box-shadow: 0 0 32px #0008, 0 0 0 8px #c1272d22;
+    padding: 2.2em 2.5em 1.5em 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    border: 4px solid #C1272D;
+    position: relative;
+}
+.status-modal-title {
+    color: #C1272D;
+    font-size: 2em;
+    margin-bottom: 0.7em;
+    letter-spacing: 0.08em;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff, 2px 2px 6px #c1272d33;
+}
+.status-points-row {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    font-size: 1.2em;
+    margin-bottom: 1.2em;
+}
+.status-points-label {
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.status-points-value {
+    background: #fff3;
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.3em;
+    border: 2px solid #C1272D;
+    border-radius: 8px;
+    padding: 0.1em 1.2em;
+}
+.status-alloc-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1em;
+    margin-bottom: 1.5em;
+}
+.status-alloc-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2em;
+    font-size: 1.15em;
+}
+.status-alloc-label {
+    min-width: 5.5em;
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.1em;
+    letter-spacing: 0.04em;
+}
+.status-alloc-btn {
+    font-size: 1.3em;
+    width: 2.2em;
+    height: 2.2em;
+    border-radius: 50%;
+    border: 2px solid #C1272D;
+    background: #fff;
+    color: #C1272D;
+    font-weight: bold;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.status-alloc-btn:hover {
+    background: #C1272D;
+    color: #fff;
+    transform: scale(1.1);
+}
+.status-alloc-value {
+    font-size: 1.2em;
+    min-width: 2.5em;
+    text-align: center;
+    color: #222;
+    font-weight: bold;
+    background: #fff3;
+    border-radius: 6px;
+    border: 1.5px solid #C1272D;
+    padding: 0.1em 0.7em;
+}
+.status-modal-btn-row {
+    display: flex;
+    gap: 2em;
+    margin-bottom: 0.7em;
+}
+.status-modal-btn {
+    font-size: 1.15em;
+    padding: 0.5em 2.5em;
+    border-radius: 12px;
+    border: 2px solid #C1272D;
+    background: #fff;
+    color: #C1272D;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+.status-modal-btn:hover {
+    background: #C1272D;
+    color: #fff;
+    transform: scale(1.05);
+}
+.status-modal-apply {
+    background: #C1272D;
+    color: #fff;
+}
+.status-modal-apply:hover {
+    background: #a01d23;
+    color: #fff;
+}
+.status-modal-cancel {
+    background: #fff;
+    color: #C1272D;
+}
+.status-modal-cancel:hover {
+    background: #c1272d22;
+    color: #C1272D;
+}
+.status-modal-hint {
+    margin-top: 0.7em;
+    color: #888;
+    font-size: 0.95em;
+    text-align: center;
+}
 /* ===== 桃太郎ゲーム スタイルシート ===== */
 
 /* ===== 基本レイアウト ===== */
@@ -35,8 +184,8 @@ canvas {
 /* ===== ゲームコンテナ ===== */
 .game-container {
     position: relative;
-    width: 800px;
-    height: 600px;
+    width: 1000px;
+    height: 800px;
     margin: 0 auto;
 }
 
@@ -221,6 +370,26 @@ canvas {
     opacity: 1;
     transform: scale(1) translateY(0);
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-height: 100vh;
+}
+
+/* 開始画面のボタンを右下に配置 */
+#startScreen #startButton,
+#startScreen #help {
+    position: absolute;
+    max-width: 250px;
+    height: auto;
+    right: 12em;
+}
+
+#startScreen #startButton {
+    bottom: 10em;
+}
+
+#startScreen #help {
+
+    bottom: 5em;
 }
 
 /* 音声案内スタイル */
@@ -272,6 +441,15 @@ h6 {
 .wafu-title {
     font-size: 2.2em;
     margin: 2vw 0 1vw 0;
+}
+
+/* ステージ選択タイトル画像 */
+.stage-select-title {
+    display: block;
+    margin: 2vw auto 1vw auto;
+    max-width: 400px;
+    width: auto;
+    height: auto;
 }
 
 /* ===== ボタン ===== */
@@ -480,6 +658,7 @@ button:hover,
     border-radius: 10px;
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
 }
 
 #scoreDisplay {
@@ -554,6 +733,45 @@ button:hover,
     padding-top: 40px;
 }
 
+/* 回復アイテムカウンター */
+.recovery-item-counter {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    min-width: 150px;
+    min-height: 60px;
+    font-size: 0.9em;
+    padding: 10px 15px;
+    z-index: 10;
+    background: url('assets/UI/UI/recover_bags_gauge.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    color: white;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.recovery-item-counter .wafu-label {
+    color: white;
+}
+
+.recovery-hint {
+    font-size: 0.75em;
+    color: white;
+    margin-top: 2px;
+}
+
 /* ===== ミニマップ ===== */
 .minimap-container {
     position: absolute;
@@ -565,6 +783,7 @@ button:hover,
     padding: 8px;
     z-index: 15;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
 }
 
 .minimap-container .wafu-label {
@@ -622,8 +841,9 @@ button:hover,
 
 #otomoLevelDisplay {
     position: absolute;
-    bottom: 320px;
-    right: 80px;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
     min-width: 200px;
     min-height: 80px;
     font-size: 1em;
@@ -699,7 +919,7 @@ button:hover,
 /* ===== スタート画面 ===== */
 #startScreen,
 .dark-bg {
-    background: url('assets/UI/title1.png') center center no-repeat;
+    background: url('assets/UI/kibidango_title.png') center center no-repeat;
     background-size: contain;
     min-height: 100vh;
     width: 100vw;
@@ -914,7 +1134,8 @@ button:hover,
     max-height: 100vh;
     margin: 0 auto;
     padding: 0;
-    background: linear-gradient(120deg, #181818 60%, #232323 100%);
+    background: url('assets/UI/kibidango_home.png') no-repeat center center;
+    background-size: cover;
     border-radius: 0;
     box-shadow: none;
     display: flex;
@@ -1078,6 +1299,60 @@ button:hover,
     font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
     font-weight: 700;
     margin-bottom: 0.2em;
+}
+
+.boss-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3em;
+    margin-top: 0.5em;
+}
+
+.boss-progress {
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 0.2em 0.6em;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.boss-progress.defeated {
+    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+    color: white;
+    border: 2px solid #2E7D32;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.boss-progress.defeated::after {
+    content: "再挑戦可能";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(78, 205, 196, 0.9);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.7em;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.boss-progress.locked {
+    background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+    color: white;
+    border: 2px solid #424242;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.boss-progress.unlocked {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+    border: 2px solid #E65100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .boss-desc {
@@ -1369,6 +1644,19 @@ hr,
     background: #C1272D;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(193, 39, 45, 0.4);
+}
+
+.debug-info {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.4;
+    max-height: 120px;
+    overflow-y: auto;
+    color: #f7f7f7;
 }
 
 /* レスポンシブ対応 */
