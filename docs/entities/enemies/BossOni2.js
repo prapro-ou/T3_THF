@@ -27,8 +27,8 @@ export class BossOni2 extends BossOni {
             // 円形当たり判定の半径を設定
             this.setCircularCollision(40);
 
-                    // 状態管理（拡張）
-        this.state = 'idle'; // idle, charge, dashing, consecutive_charge, recover, special_attack, rage_mode
+            // 状態管理（拡張）
+            this.state = 'idle'; // idle, charge, dashing, consecutive_charge, recover, special_attack, rage_mode
             this.stateTimer = 0;
             this.dashDirection = { x: 0, y: 0 };
             this.dashSpeed = 18; // 突進速度向上

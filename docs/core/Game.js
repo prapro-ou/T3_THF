@@ -23,6 +23,9 @@ export class Game {
     // 鬼HP倍率管理
     oniHpMultiplier = 1;
     oniHpTimer = 0;
+    // 敵移動速度倍率管理
+    enemySpeedMultiplier = 1.0;
+    enemySpeedTimer = 0;
     // ステータスポイント管理
     statusPoints = 0;
     statusAlloc = { attack: 0, speed: 0, reload: 0 };
@@ -115,20 +118,36 @@ export class Game {
         });
     }
 
-    // 毎フレーム呼び出し用: HP倍率を10秒ごとに1.5倍
+    // 毎フレーム呼び出し用: HP倍率を20秒ごとに+1、速度倍率を60秒ごとに+0.1
     updateOniHpMultiplier(deltaTime) {
+        // HP倍率
         this.oniHpTimer += deltaTime;
-    if (this.oniHpTimer >= 20) {
-            this.oniHpMultiplier *= 1.5;
+        if (this.oniHpTimer >= 20) {
+            this.oniHpMultiplier += 1;
             this.oniHpTimer = 0;
             // ログ表示
             if (window.oniHpLogContainer) {
                 const log = document.createElement('div');
-                log.textContent = `鬼のHPが上昇した！（現在倍率: x${this.oniHpMultiplier.toFixed(2)}）`;
+                log.textContent = `鬼のHPが上昇した！（現在倍率: x${this.oniHpMultiplier}）`;
                 log.style.color = 'red';
                 log.style.fontWeight = 'bold';
                 window.oniHpLogContainer.appendChild(log);
-                // 5秒後に自動で消す
+                setTimeout(() => {
+                    if (log.parentNode) log.parentNode.removeChild(log);
+                }, 5000);
+            }
+        }
+        // 敵移動速度倍率
+        this.enemySpeedTimer += deltaTime;
+        if (this.enemySpeedTimer >= 60) {
+            this.enemySpeedMultiplier = Math.round((this.enemySpeedMultiplier + 0.1) * 10) / 10;
+            this.enemySpeedTimer = 0;
+            if (window.oniHpLogContainer) {
+                const log = document.createElement('div');
+                log.textContent = `赤鬼・青鬼・黒鬼の移動速度が上昇！（現在倍率: x${this.enemySpeedMultiplier.toFixed(1)}）`;
+                log.style.color = 'blue';
+                log.style.fontWeight = 'bold';
+                window.oniHpLogContainer.appendChild(log);
                 setTimeout(() => {
                     if (log.parentNode) log.parentNode.removeChild(log);
                 }, 5000);
