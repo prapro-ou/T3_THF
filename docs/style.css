@@ -1283,6 +1283,14 @@ button:hover,
     min-height: 80px;
 }
 
+/* ラスボスカードの画像スタイル */
+.boss-card[data-boss="5"] .boss-select-btn {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
 .boss-card.selected,
 .boss-card:hover {
     border: none !important;

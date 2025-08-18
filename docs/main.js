@@ -278,11 +278,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const defeatedElement = card.querySelector('.boss-progress.defeated');
                 const lockedElement = card.querySelector('.boss-progress.locked');
                 const unlockedElement = card.querySelector('.boss-progress.unlocked');
+                const bossImage = card.querySelector('.boss-select-btn');
                 
                 // 既存の進捗表示を非表示
                 [defeatedElement, lockedElement, unlockedElement].forEach(el => {
                     if (el) el.classList.add('hidden');
                 });
+                
+                // ボスの画像を状態に応じて更新
+                if (bossImage) {
+                    const displayImage = bossProgressManager.getBossDisplayImage(bossId);
+                    if (displayImage) {
+                        bossImage.src = `assets/UI/UI/boss_select/${displayImage}`;
+                    }
+                }
                 
                 if (bossData.defeated) {
                     // 討伐済み（選択可能）
@@ -307,9 +316,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初期表示時に進捗状況を更新
     updateBossCardProgress();
     
+    // 初期表示時にボス画像を更新
+    bossCardElements.forEach((card) => {
+        const bossId = parseInt(card.dataset.boss, 10);
+        const bossImage = card.querySelector('.boss-select-btn');
+        if (bossImage) {
+            const displayImage = bossProgressManager.getBossDisplayImage(bossId);
+            if (displayImage) {
+                bossImage.src = `assets/UI/UI/boss_select/${displayImage}`;
+            }
+        }
+    });
+    
     // ボス進捗更新イベントをリッスン
     window.addEventListener('bossProgressUpdated', () => {
         updateBossCardProgress();
+        
+        // ボス画像も更新
+        bossCardElements.forEach((card) => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossImage = card.querySelector('.boss-select-btn');
+            if (bossImage) {
+                const displayImage = bossProgressManager.getBossDisplayImage(bossId);
+                if (displayImage) {
+                    bossImage.src = `assets/UI/UI/boss_select/${displayImage}`;
+                }
+            }
+        });
     });
     
     bossCardElements.forEach((card, index) => {
@@ -851,11 +884,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let statusHTML = `<div>討伐済み: ${defeatedCount}/5</div>`;
             statusHTML += `<div>アンロック済み: ${unlockedCount}/5</div>`;
-            statusHTML += `<div>最終ステージ解放条件:</div>`;
+            statusHTML += `<div>ラスボス解放条件:</div>`;
             statusHTML += `<div>・砲鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・バイク鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・ワープ鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・風神・雷神: ${bossData[4]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>ラスボス: ${bossData[5]?.unlocked ? '✓ アンロック済み' : '✗ 未解放'}</div>`;
             statusHTML += `<div>お供開放状況:</div>`;
             statusHTML += `<div>・犬: ${otomoStatus.dog ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・猿: ${otomoStatus.monkey ? '✓' : '✗'}</div>`;

@@ -14,11 +14,46 @@ export class BossProgressManager {
      */
     initializeBossData() {
         const defaultBosses = {
-            1: { name: '砲鬼', defeated: false, unlocked: true, icon: 'cannon_oni_select_button_UI.png' },
-            2: { name: 'バイク鬼', defeated: false, unlocked: true, icon: 'bike_oni_select_button_UI.png' },
-            3: { name: 'ワープ鬼', defeated: false, unlocked: true, icon: 'warp_oni_select_button_UI.png' },
-            4: { name: '風神・雷神', defeated: false, unlocked: true, icon: 'fuzin_raizin_select_button_UI.png' },
-            5: { name: 'ラスボス', defeated: false, unlocked: false, icon: null }
+            1: { 
+                name: '砲鬼', 
+                defeated: false, 
+                unlocked: true, 
+                icon: 'cannon_oni_select_button_UI.png',
+                shadowIcon: 'cannon_oni_select_button_shadow_UI.png',
+                shadowIcon2: 'cannon_oni_select_button_shadow_UI_2.png'
+            },
+            2: { 
+                name: 'バイク鬼', 
+                defeated: false, 
+                unlocked: true, 
+                icon: 'bike_oni_select_button_UI.png',
+                shadowIcon: 'bike_oni_select_button_shadow_UI.png',
+                shadowIcon2: 'bike_oni_select_button_shadow_UI_2.png'
+            },
+            3: { 
+                name: 'ワープ鬼', 
+                defeated: false, 
+                unlocked: true, 
+                icon: 'warp_oni_select_button_UI.png',
+                shadowIcon: 'warp_oni_select_button_shadow_UI.png',
+                shadowIcon2: 'warp_oni_select_button_shadow_UI_2.png'
+            },
+            4: { 
+                name: '風神・雷神', 
+                defeated: false, 
+                unlocked: true, 
+                icon: 'fuzin_raizin_select_button_UI.png',
+                shadowIcon: 'fuzin_raizin_select_button_shadow_UI.png',
+                shadowIcon2: 'fuzin_raizin_select_button_shadow_UI_2.png'
+            },
+            5: { 
+                name: 'ラスボス', 
+                defeated: false, 
+                unlocked: false, 
+                icon: 'last_stage_select_button_UI.png',
+                shadowIcon: 'last_stage_select_button_shadow_UI.png',
+                shadowIcon2: 'last_stage_select_button_shadow_UI_2.png'
+            }
         };
 
         // 既存データとマージ
@@ -63,11 +98,8 @@ export class BossProgressManager {
      * @param {number} defeatedBossId - 倒したボスのID
      */
     unlockNextBoss(defeatedBossId) {
-        const nextBossId = defeatedBossId + 1;
-        if (this.bossData[nextBossId]) {
-            this.bossData[nextBossId].unlocked = true;
-            console.log(`ボス${nextBossId}（${this.bossData[nextBossId].name}）をアンロックしました`);
-        }
+        // 次のボスをアンロックする処理を削除
+        // 4体のボスは最初からアンロック済み、ラスボスは4体クリア後にアンロック
         
         // 最終ステージの解放条件をチェック
         this.checkFinalStageUnlock();
@@ -75,7 +107,7 @@ export class BossProgressManager {
 
     /**
      * 最終ステージ（ラスボス）の解放条件をチェック
-     * 4体のボスすべてを倒すと解放される
+     * 4体のボスすべてを倒すとラスボスがアンロックされる
      */
     checkFinalStageUnlock() {
         const boss1Defeated = this.bossData[1]?.defeated || false;
@@ -88,6 +120,11 @@ export class BossProgressManager {
             if (this.bossData[5]) {
                 this.bossData[5].unlocked = true;
                 console.log('最終ステージ（ラスボス）が解放されました！');
+                
+                // UIの更新を促すイベントを発火
+                if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('bossProgressUpdated'));
+                }
             }
         }
     }
@@ -117,6 +154,44 @@ export class BossProgressManager {
      */
     isBossUnlocked(bossId) {
         return this.bossData[bossId]?.unlocked || false;
+    }
+
+    /**
+     * ボスの表示用画像を取得
+     * @param {number} bossId - ボスID
+     * @returns {string} 画像パス
+     */
+    getBossDisplayImage(bossId) {
+        const bossData = this.bossData[bossId];
+        if (!bossData) return '';
+        
+        if (bossId === 5) {
+            // ラスボスの場合の特別な処理
+            const boss1Defeated = this.bossData[1]?.defeated || false;
+            const boss2Defeated = this.bossData[2]?.defeated || false;
+            const boss3Defeated = this.bossData[3]?.defeated || false;
+            const boss4Defeated = this.bossData[4]?.defeated || false;
+            
+            if (boss1Defeated && boss2Defeated && boss3Defeated && boss4Defeated) {
+                // 4体のボスすべてを倒した場合は通常画像
+                return bossData.icon;
+            } else {
+                // まだ解放されていない場合は2番目のシルエット画像
+                return bossData.shadowIcon2;
+            }
+        } else {
+            // 通常のボスの処理
+            if (bossData.defeated) {
+                // 討伐済みの場合は通常の画像
+                return bossData.icon;
+            } else if (bossData.unlocked) {
+                // アンロック済みだが未討伐の場合はシルエット画像
+                return bossData.shadowIcon;
+            } else {
+                // 未開放の場合は2番目のシルエット画像
+                return bossData.shadowIcon2;
+            }
+        }
     }
 
     /**
