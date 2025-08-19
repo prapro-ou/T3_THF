@@ -15,8 +15,8 @@ export class PlayerController {
     updatePlayerMovement(player, deltaTime) {
         this._isMoving = false;
         
-        // 減速効果を考慮した移動速度を計算
-        const currentSpeed = player.constructor.SPEED * (player.slowStrength || 1);
+    // レベルアップや減速効果を考慮した移動速度を計算
+    const currentSpeed = (player.speed || player.constructor.SPEED) * (player.slowStrength || 1);
         
         // デバッグ用：減速効果が適用されている場合のみログ出力
         if (player.slowStrength && player.slowStrength !== 1) {

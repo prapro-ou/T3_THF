@@ -25,11 +25,12 @@
         <div class="loader"></div>
     </div>
     <div id="startScreen" class="dark-bg">
-        <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
-        <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
-        <div id="audioNotice" class="audio-notice">
-            <p>🔊 最初のクリックでBGMが開始されます</p>
-        </div>
+                <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
+                <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
+                <div id="audioNotice" class="audio-notice">
+                        <p>🔊 最初のクリックでBGMが開始されます</p>
+                </div>
+
     </div>
     <div id="stageSelectArea" class="hidden">
         <img id="backToStartButton" src="assets/UI/UI/button/modoru_button_UI.png" alt="スタート画面に戻る" class="image-btn"
@@ -38,19 +39,48 @@
         <div class="boss-cards">
             <div class="boss-card" data-boss="1">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/cannon_oni_select_button_UI.png" alt="四天王1">
+                <div class="boss-status">
+                    <div class="boss-name">砲鬼</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
+                    <div class="boss-progress locked hidden">未開放</div>
+                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                </div>
             </div>
             <div class="boss-card" data-boss="2">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/bike_oni_select_button_UI.png" alt="四天王2">
+                <div class="boss-status">
+                    <div class="boss-name">バイク鬼</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
+                    <div class="boss-progress locked hidden">未開放</div>
+                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                </div>
             </div>
             <div class="boss-card" data-boss="3">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/warp_oni_select_button_UI.png" alt="四天王3">
+                <div class="boss-status">
+                    <div class="boss-name">ワープ鬼</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
+                    <div class="boss-progress locked hidden">未開放</div>
+                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                </div>
             </div>
             <div class="boss-card" data-boss="4">
-                <img class="boss-select-btn" src="assets/UI/UI/boss_select/fuzin_raizin_select_button_UI.png"
-                    alt="四天王4">
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/fuzin_raizin_select_button_UI.png" alt="四天王4">
+                <div class="boss-status">
+                    <div class="boss-name">風神・雷神</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
+                    <div class="boss-progress locked hidden">未開放</div>
+                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                </div>
             </div>
             <div class="boss-card" data-boss="5">
                 <div class="boss-placeholder">ラスボス</div>
+                <div class="boss-status">
+                    <div class="boss-name">ラスボス</div>
+                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
+                    <div class="boss-progress locked hidden">4体のボスを倒すと解放</div>
+                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                </div>
             </div>
         </div>
     </div>
@@ -84,6 +114,7 @@
         <div id="minimapContainer" class="hidden wafu-panel wafu-shadow minimap-container">
             <div class="wafu-label">ミニマップ</div>
             <canvas id="minimapCanvas" width="120" height="90"></canvas>
+    <div id="oniHpLogContainer" style="color: red; font-weight: bold; margin-top: 4px;"></div>
         </div>
         <!-- ゲーム中の簡易操作説明-->
         <div id="quickHelp" class="hidden wafu-panel wafu-shadow">
@@ -93,10 +124,14 @@
             <br> P : ポーズ
             <br> Ctrl+B : ボス鬼出現
         </div>
-        <!-- 桃太郎レベル表示 -->
-        <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span
-                id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span
-                id="otomoExpToLevelUpValue">10</span></div>
+        <!-- 桃太郎レベル表示（操作説明UIの直後に配置） -->
+        <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow" style="margin-top:10px;"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
+        <!-- 回復アイテムカウンター -->
+        <div id="recoveryItemDisplay" class="hidden wafu-panel wafu-shadow recovery-item-counter">
+            <span class="wafu-label">回復アイテム</span> <span id="recoveryItemValue">0</span>
+            <div class="recovery-hint">Spaceで使用</div>
+        </div>
+        </div>
     </div>
 
     <!-- ボス出現演出用カットイン -->
@@ -106,6 +141,41 @@
     </div>
 
     <div id="pauseMessage" class="hidden">
+    <!-- ステータス割り振りモーダル -->
+        <div id="statusModal" class="hidden">
+            <div class="status-modal-card">
+                <h2 class="status-modal-title">ステータス割り振り</h2>
+                <div class="status-points-row">
+                    <span class="status-points-label">残りポイント</span>
+                    <span id="statusPointsValue" class="status-points-value">0</span>
+                </div>
+                <div class="status-alloc-list">
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">攻撃力</span>
+                        <button id="subAttackBtn" class="status-alloc-btn">－</button>
+                        <span id="statusAttackValue" class="status-alloc-value">0</span>
+                        <button id="addAttackBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">移動速度</span>
+                        <button id="subSpeedBtn" class="status-alloc-btn">－</button>
+                        <span id="statusSpeedValue" class="status-alloc-value">0</span>
+                        <button id="addSpeedBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">リロード速度</span>
+                        <button id="subReloadBtn" class="status-alloc-btn">－</button>
+                        <span id="statusReloadValue" class="status-alloc-value">0</span>
+                        <button id="addReloadBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                </div>
+                <div class="status-modal-btn-row">
+                    <button id="statusApplyBtn" class="status-modal-btn status-modal-apply">決定</button>
+                    <button id="statusCancelBtn" class="status-modal-btn status-modal-cancel">キャンセル</button>
+                </div>
+                <div class="status-modal-hint">※「L」キーでこの画面を開閉できます</div>
+            </div>
+        </div>
         <div class="pause-content">
             <span class="pause-text wafu-title">ポーズ</span>
             <div class="pause-buttons">
@@ -245,6 +315,17 @@
                 </div>
             </div>
             <div class="debug-section">
+                <h4>回復アイテム設定</h4>
+                <div class="debug-control">
+                    <label>回復アイテムドロップ率(%):</label>
+                    <input type="number" id="recoveryItemDropRate" min="0" max="100" step="1" value="3">
+                </div>
+                <div class="debug-control">
+                    <label>回復アイテム回復率(%):</label>
+                    <input type="number" id="recoveryItemHealRate" min="1" max="100" step="1" value="30">
+                </div>
+            </div>
+            <div class="debug-section">
                 <h4>当たり判定詳細</h4>
                 <div class="debug-control">
                     <label><input type="checkbox" id="showCollisionDebug"> 当たり判定デバッグ情報を表示</label>
@@ -252,6 +333,28 @@
                 <div class="debug-control">
                     <label>プレイヤー当たり判定サイズ:</label>
                     <input type="number" id="playerHitboxSize" min="0.1" max="2.0" step="0.1" value="0.8">
+                </div>
+            </div>
+            <div class="debug-section">
+                <h4>ボス進捗管理</h4>
+                <div class="debug-control">
+                    <button id="resetBossProgress" class="debug-btn">全ボス進捗リセット</button>
+                </div>
+                <div class="debug-control">
+                    <button id="unlockAllBosses" class="debug-btn">全ボスアンロック</button>
+                </div>
+                <div class="debug-control">
+                    <label>個別ボス進捗リセット:</label>
+                    <div class="debug-control">
+                        <button id="resetBoss1" class="debug-btn">砲鬼リセット</button>
+                        <button id="resetBoss2" class="debug-btn">バイク鬼リセット</button>
+                        <button id="resetBoss3" class="debug-btn">ワープ鬼リセット</button>
+                        <button id="resetBoss4" class="debug-btn">風神・雷神リセット</button>
+                    </div>
+                </div>
+                <div class="debug-control">
+                    <label>ボス進捗状況:</label>
+                    <div id="bossProgressStatus" class="debug-info"></div>
                 </div>
             </div>
             <div class="debug-actions">

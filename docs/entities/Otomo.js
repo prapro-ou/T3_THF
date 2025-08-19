@@ -6,10 +6,25 @@ import { ChargeOtomoBehavior } from './OtomoFile/chargeOtomo.js';
 
 export class Otomo extends Character {
     constructor(game, x, y) {
-        super(game, x, y, 20, 20, '#8B4513', 20);
+        super(game, x, y, 50, 50, '#8B4513', 20);
         this.speed = 140;
         this.wanderRadius = 200;
         this.canShoot = true;
+
+        // 移動方向を追跡（1: 右向き, -1: 左向き）
+        this.direction = 1;
+        this.lastX = x;
+
+        // 画像の読み込み
+        this.images = {
+            dog: new Image(),
+            monkey: new Image(),
+            bird: new Image()
+        };
+        
+        this.images.dog.src = 'assets/characters/otomo/dog.png';
+        this.images.monkey.src = 'assets/characters/otomo/monkey.png';
+        this.images.bird.src = 'assets/characters/otomo/bird.png';
 
         this.behaviors = {
             follow: new FollowOtomoBehavior(this),
@@ -25,29 +40,99 @@ export class Otomo extends Character {
     }
 
     updateBehavior(player, deltaTime) {
-        // オトモの速度倍率を反映
-        this.speed = 140 * (this.game.otomoSpeedMultiplier || 1);
+        // 移動方向を更新
+        if (this.x !== this.lastX) {
+            this.direction = this.x > this.lastX ? 1 : -1;
+            this.lastX = this.x;
+        }
+        
+        // オトモの速度はプレイヤーに追従
+        this.speed = (player && player.speed) ? player.speed * 40 : 140;
         this.behavior.update(player, deltaTime);
     }
 
     draw(ctx, scrollX, scrollY) {
-        ctx.fillStyle = this.behavior.getColor();
-        ctx.fillRect(this.x - scrollX, this.y - scrollY, this.width, this.height);
+        // 動作モードに応じて画像を選択
+        let image;
+        const imageName = this.behavior.getImageName ? this.behavior.getImageName() : 'monkey';
+        
+        switch (imageName) {
+            case 'dog':
+                image = this.images.dog;
+                break;
+            case 'monkey':
+                image = this.images.monkey;
+                break;
+            case 'bird':
+                image = this.images.bird;
+                break;
+            default:
+                image = this.images.monkey;
+        }
+
+        // 画像が読み込まれている場合は画像を描画、そうでなければ色付きの矩形を描画
+        if (image && image.complete) {
+            // 方向に応じて画像を反転
+            ctx.save();
+            if (this.direction === -1) {
+                // 左向きの場合は画像を反転
+                ctx.scale(-1, 1);
+                ctx.drawImage(
+                    image,
+                    -(this.x - scrollX + this.width / 2),
+                    this.y - scrollY - this.height / 2,
+                    this.width,
+                    this.height
+                );
+            } else {
+                // 右向きの場合は通常描画
+                ctx.drawImage(
+                    image,
+                    this.x - scrollX - this.width / 2,
+                    this.y - scrollY - this.height / 2,
+                    this.width,
+                    this.height
+                );
+            }
+            ctx.restore();
+        } else {
+            // 画像が読み込まれていない場合は従来の色付き矩形を描画
+            ctx.fillStyle = this.behavior.getColor();
+            ctx.fillRect(this.x - scrollX, this.y - scrollY, this.width, this.height);
+        }
     }
 
-    shootAt(target) {
-        const dx = target.x - this.x;
-        const dy = target.y - this.y;
-        const dist = Math.hypot(dx, dy);
-        if (dist === 0) return;
-
-        const speed = 5 * 1.2; // 弾速1.2倍
-        // レベル・倍率に応じて攻撃力上昇
-        const level = this.game.otomoLevel || 1;
-        const base = 10 + (level - 1) * 5;
-        const damage = base * (this.game.otomoAttackMultiplier || 1);
-        const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
-        this.game.projectileManager.addProjectile(projectile);
+    // type: 'projectile' or 'charge'
+    attackTarget(target, type = 'projectile') {
+        if (!target) return;
+        if (type === 'projectile') {
+            const dx = target.x - this.x;
+            const dy = target.y - this.y;
+            const dist = Math.hypot(dx, dy);
+            if (dist === 0) return;
+            const speed = 5 * 1.2;
+            const damage = 10;
+            const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
+            this.game.projectileManager.addProjectile(projectile);
+        } else if (type === 'charge') {
+            // 直接ダメージ
+            const damage = 10;
+            if (typeof target.takeDamage === 'function') {
+                target.takeDamage(damage);
+            } else if (typeof target.hp === 'number') {
+                target.hp -= damage;
+                if (target.hp <= 0) {
+                    target.markedForDeletion = true;
+                    this.game.particleManager.createExplosion(
+                        target.x + target.width / 2,
+                        target.y + target.height / 2,
+                        target.color
+                    );
+                }
+            } else {
+                target.markedForDeletion = true;
+            }
+        }
     }
 
     findEnemyNearPlayer(range) {

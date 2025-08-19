@@ -14,12 +14,25 @@ import { PlayerController } from '../components/PlayerController.js';
 import { Otomo } from '../entities/Otomo.js';
 import { ProjectileManager } from '../managers/ProjectileManager.js';
 import { BgmManager } from '../managers/BgmManager.js';
+import { RecoveryItemManager } from '../managers/RecoveryItemManager.js';
 import { playSE } from '../managers/KoukaonManager.js';
+import { BossProgressManager } from '../managers/BossProgressManager.js';
 
 export class Game {
+    // ...existing code...
+    // 鬼HP倍率管理
+    oniHpMultiplier = 1;
+    oniHpTimer = 0;
+    // 敵移動速度倍率管理
+    enemySpeedMultiplier = 1.0;
+    enemySpeedTimer = 0;
+    // ステータスポイント管理
+    statusPoints = 0;
+    statusAlloc = { attack: 0, speed: 0, reload: 0 };
     constructor(canvas, ctx, scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType = 0, bgmManager = null) {
         console.log('Game constructor called with selectedBossType:', selectedBossType);
-
+        this.oniHpMultiplier = 1;
+        this.oniHpTimer = 0;
         this.canvas = canvas;
         this.ctx = ctx;
         this.bgmManager = bgmManager;
@@ -37,8 +50,14 @@ export class Game {
         this.attackManager = new AttackManager(this);
         this.gameState = new GameState(this);
 
+        // BossProgressManagerの初期化
+        this.bossProgressManager = new BossProgressManager();
+
         // ProjectileManagerの初期化
         this.projectileManager = new ProjectileManager(this);
+
+        // RecoveryItemManagerの初期化
+        this.recoveryItemManager = new RecoveryItemManager(this);
 
         // プレイヤーの初期化
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
@@ -77,6 +96,7 @@ export class Game {
             showCollisionDebug: false
         };
 
+
         // 高速移動設定
         this.highSpeedThreshold = 10; // 高速移動判定の閾値
         this.maxSubframeSteps = 10; // サブフレーム更新の最大ステップ数
@@ -96,6 +116,43 @@ export class Game {
         this.projectileManager.preloadCannonBallSpriteSheet(() => {
             console.log('Cannon ball sprite sheet loaded in Game constructor');
         });
+    }
+
+    // 毎フレーム呼び出し用: HP倍率を20秒ごとに+1、速度倍率を60秒ごとに+0.1
+    updateOniHpMultiplier(deltaTime) {
+        // HP倍率
+        this.oniHpTimer += deltaTime;
+        if (this.oniHpTimer >= 20) {
+            this.oniHpMultiplier += 1;
+            this.oniHpTimer = 0;
+            // ログ表示
+            if (window.oniHpLogContainer) {
+                const log = document.createElement('div');
+                log.textContent = `鬼のHPが上昇した！（現在倍率: x${this.oniHpMultiplier}）`;
+                log.style.color = 'red';
+                log.style.fontWeight = 'bold';
+                window.oniHpLogContainer.appendChild(log);
+                setTimeout(() => {
+                    if (log.parentNode) log.parentNode.removeChild(log);
+                }, 5000);
+            }
+        }
+        // 敵移動速度倍率
+        this.enemySpeedTimer += deltaTime;
+        if (this.enemySpeedTimer >= 60) {
+            this.enemySpeedMultiplier = Math.round((this.enemySpeedMultiplier + 0.1) * 10) / 10;
+            this.enemySpeedTimer = 0;
+            if (window.oniHpLogContainer) {
+                const log = document.createElement('div');
+                log.textContent = `赤鬼・青鬼・黒鬼の移動速度が上昇！（現在倍率: x${this.enemySpeedMultiplier.toFixed(1)}）`;
+                log.style.color = 'blue';
+                log.style.fontWeight = 'bold';
+                window.oniHpLogContainer.appendChild(log);
+                setTimeout(() => {
+                    if (log.parentNode) log.parentNode.removeChild(log);
+                }, 5000);
+            }
+        }
     }
 
     setupEvents() {
@@ -155,6 +212,19 @@ export class Game {
             }
         };
         window.addEventListener('keydown', this.eventHandlers.debugKeydown);
+
+        // 回復アイテム使用（スペースキー）
+        this.eventHandlers.recoveryKeydown = (e) => {
+            if (e.code === 'Space' && !this.pauseManager.isPaused && !this.gameState.isGameOver()) {
+                e.preventDefault();
+                const success = this.player.useRecoveryItem();
+                if (!success) {
+                    // 回復失敗時（アイテムなし、または体力満タン）
+                    playSE("miss");
+                }
+            }
+        };
+        window.addEventListener('keydown', this.eventHandlers.recoveryKeydown);
 
         this.uiManager.setRestartCallback(() => {
             this.initializeGame();
@@ -278,6 +348,15 @@ export class Game {
                 const boss = enemies.find(e => this.isBossEnemy(e));
                 if (!boss) {
                     this.bossDefeated = true;
+                    
+                    // ボス討伐の進捗を記録
+                    const clearTime = Math.floor((Date.now() - this.bossStartTime) / 1000);
+                    this.bossProgressManager.recordBossDefeat(
+                        this.selectedBossType, 
+                        this.gameState.getScore(), 
+                        clearTime
+                    );
+                    
                     this.gameState.setGameOver();
                     playSE("gameclear"); // ← ボス撃破時に効果音を鳴らす
                     const clearMsg = (this.selectedBossType === 4)
@@ -333,6 +412,10 @@ export class Game {
             this.enemyManager.draw(this.ctx, scrollX, scrollY);
         }
 
+        // 回復アイテムの更新・描画
+        this.recoveryItemManager.update();
+        this.recoveryItemManager.draw(this.ctx, scrollX, scrollY);
+
         // プレイヤーとの衝突判定
         this.enemyManager.getEnemies().forEach(enemy => {
             // ボス出現から2秒間はボスの当たり判定を無効化
@@ -372,6 +455,8 @@ export class Game {
         this.uiManager.updateAmmo(this.player.ammoManager.getAmmo(), this.player.ammoManager.getMaxAmmo());
         // オトモレベルUIを毎フレーム更新
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
+        // 回復アイテム数UIを毎フレーム更新
+        this.uiManager.updateRecoveryItemCount(this.player.getRecoveryItemCount());
 
         // ミニマップを更新（背景画像も含む）
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
@@ -561,6 +646,16 @@ export class Game {
             this.playerHitboxSize = settings.playerHitboxSize;
         }
 
+        // 回復アイテム設定
+        if (settings.recoveryItemDropRate !== undefined) {
+            console.log('Setting recovery item drop rate:', settings.recoveryItemDropRate + '%');
+            this.recoveryItemManager.setDropRate(settings.recoveryItemDropRate);
+        }
+        if (settings.recoveryItemHealRate !== undefined) {
+            console.log('Setting recovery item heal rate:', settings.recoveryItemHealRate + '%');
+            this.player.setRecoveryHealRate(settings.recoveryItemHealRate);
+        }
+
         console.log('Debug settings after apply:', this.debugSettings);
     }
 
@@ -598,6 +693,9 @@ export class Game {
             }
             if (this.eventHandlers.debugKeydown) {
                 window.removeEventListener('keydown', this.eventHandlers.debugKeydown);
+            }
+            if (this.eventHandlers.recoveryKeydown) {
+                window.removeEventListener('keydown', this.eventHandlers.recoveryKeydown);
             }
             if (this.eventHandlers.visibilitychange) {
                 document.removeEventListener('visibilitychange', this.eventHandlers.visibilitychange);
@@ -643,6 +741,14 @@ export class Game {
             this.uiManager.hideMinimap();
         }
 
+        // ボス進捗の更新を通知（カスタムイベント）
+        if (this.bossProgressManager) {
+            const event = new CustomEvent('bossProgressUpdated', {
+                detail: { bossProgressManager: this.bossProgressManager }
+            });
+            window.dispatchEvent(event);
+        }
+
         // オブジェクト参照をクリア
         this.player = null;
         this.otomo = null;
@@ -655,6 +761,8 @@ export class Game {
         this.pauseManager = null;
         this.timer = null;
         this.attackManager = null;
+
+            // ...existing code...
         this.uiManager = null;
         this.cameraManager = null;
         this.renderer = null;
@@ -676,25 +784,36 @@ export class Game {
         while (this.otomoExp >= this.otomoExpToLevelUp) {
             this.otomoExp -= this.otomoExpToLevelUp;
             this.otomoLevel++;
-            // 必要経験値を1.3倍に（以前より少し減らす）
-            this.otomoExpToLevelUp = Math.floor(this.otomoExpToLevelUp * 1.3);
-            // レベルアップ時の各種上昇
-            this.otomoSpeedMultiplier *= 1.05; // オトモ速度5%アップ
-            this.playerAttackMultiplier *= 1.1; // プレイヤー攻撃力1.1倍
-            this.otomoAttackMultiplier *= 1.1; // オトモ攻撃力1.1倍
-            if (this.player && this.player.ammoManager) {
-                this.player.ammoManager.ammoRecoveryTime /= 1.1; // リロード速度1.1倍
-            }
+            this.otomoExpToLevelUp = Math.floor(this.otomoExpToLevelUp * 1.2);
+            // ステータスポイントを3加算
+            this.statusPoints += 3;
+            // レベルアップ時は割り振り画面を開くフラグを立てるなども可
             leveledUp = true;
-
-            // メインキャラ（プレイヤー）のレベルアップ時のみ効果音を鳴らす
             if (this.player) {
                 playSE("levelup");
             }
         }
         // UI即時反映
         this.uiManager.updateOtomoLevel(this.otomoLevel, this.otomoExp, this.otomoExpToLevelUp);
+        this.uiManager.updateRecoveryItemCount(this.player.getRecoveryItemCount());
         // レベルアップ演出が必要ならここで
+    }
+
+    // ステータス割り振り反映
+    applyStatusAllocation() {
+        if (!this.player) return;
+        // 攻撃力倍率: 1 + 0.1 × 割り振りポイント
+        this.player.statusAttackMultiplier = 1 + 0.1 * (this.statusAlloc.attack || 0);
+        // 移動速度倍率: 1 + 0.05 × 割り振りポイント
+        this.player.statusSpeedMultiplier = 1 + 0.05 * (this.statusAlloc.speed || 0);
+    // リロード速度倍率: 1ポイントごとに0.8倍
+    const reloadPoints = this.statusAlloc.reload || 0;
+    this.player.statusReloadMultiplier = Math.pow(0.8, reloadPoints);
+        // 実際の値に反映
+        this.player.speed = this.player.constructor.SPEED * this.player.statusSpeedMultiplier;
+        if (this.player.ammoManager) {
+            this.player.ammoManager.ammoRecoveryTime = 3 * this.player.statusReloadMultiplier;
+        }
     }
 
     // レベルに応じた攻撃クールダウン(ms)を返す
