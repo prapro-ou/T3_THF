@@ -5,7 +5,7 @@ export class BossOni5 extends BossOni {
     constructor(game, x = null, y = null) {
         super(game, x, y);
         this.color = '#e67e22'; // オレンジ系（雷）
-        this._baseMaxHP = 500;
+    this._baseMaxHP = 1000;
         this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
         this._hp = this._maxHP;
         this.name = 'BossOni5';

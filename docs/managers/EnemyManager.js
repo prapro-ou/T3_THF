@@ -184,13 +184,59 @@ export class EnemyManager {
     spawnBoss(bossType = 0) {
         console.log('ボス生成開始:', { bossType });
         
-        // マップ中央の位置を計算
-        const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
-        const centerX = mapWidth / 2;
+    // マップ中央の位置を計算
+    const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
+    const centerX = mapWidth / 2;
+    const centerY = mapHeight / 2;
         let boss;
         switch (bossType) {
+            case 1: {
+                // BossOni1 単体
+                console.log('BossOni1を生成中...');
+                boss = new BossOni1(this.game, centerX, centerY);
+                if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
+                if (boss._hp) boss._hp = boss._maxHP;
+                this.enemies.push(boss);
+                return;
+            }
+            case 2: {
+                // BossOni2 単体
+                console.log('BossOni2を生成中...');
+                boss = new BossOni2(this.game, centerX, centerY);
+                if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
+                if (boss._hp) boss._hp = boss._maxHP;
+                this.enemies.push(boss);
+                return;
+            }
+            case 3: {
+                // BossOni3 単体
+                console.log('BossOni3を生成中...');
+                boss = new BossOni3(this.game, centerX, centerY);
+                if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
+                if (boss._hp) boss._hp = boss._maxHP;
+                this.enemies.push(boss);
+                return;
+            }
             case 4: {
-                // ステージ4: 風神(4)と雷神(5)を同時出現
+                // BossOni4 単体
+                console.log('BossOni4を生成中...');
+                boss = new BossOni4(this.game, centerX, centerY);
+                if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
+                if (boss._hp) boss._hp = boss._maxHP;
+                this.enemies.push(boss);
+                return;
+            }
+            case 5: {
+                // BossOni5 単体
+                console.log('BossOni5を生成中...');
+                boss = new BossOni5(this.game, centerX, centerY);
+                if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
+                if (boss._hp) boss._hp = boss._maxHP;
+                this.enemies.push(boss);
+                return;
+            }
+            case 6: {
+                // 風神・雷神同時出現
                 console.log('BossOni4/BossOni5(風神・雷神)を同時生成中...');
                 // 風神（左側）
                 const fuzinX = centerX - 300;
@@ -220,7 +266,7 @@ export class EnemyManager {
                 console.log('雷神位置:', { x: raizin.x, y: raizin.y });
                 return;
             }
-            case 5: {
+            case 7: {
                 // ラスボスステージ: BossOni1〜5を同時出現
                 console.log('ラスボスステージ: BossOni1〜5を同時生成中...');
                 const positions = [
@@ -243,11 +289,12 @@ export class EnemyManager {
                 return;
             }
             default: {
-                console.log('デフォルトボスを生成中...');
-                boss = new BossOni(this.game, centerX, centerY);
+                console.log('デフォルトボス（BossOni1）を生成中...');
+                boss = new BossOni1(this.game, centerX, centerY);
                 if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
                 if (boss._hp) boss._hp = boss._maxHP;
-                break;
+                this.enemies.push(boss);
+                return;
             }
         }
     // 不要な重複コードを削除
