@@ -434,6 +434,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const showEnemyHitbox = document.getElementById('showEnemyHitbox').checked;
         const showProjectileHitbox = document.getElementById('showProjectileHitbox').checked;
         const showAttackRange = document.getElementById('showAttackRange').checked;
+        const showBossCollision = document.getElementById('showBossCollision').checked;
 
         // 高速移動設定を適用
         const highSpeedThreshold = parseInt(document.getElementById('highSpeedThreshold').value);
@@ -454,6 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showEnemyHitbox,
             showProjectileHitbox,
             showAttackRange,
+            showBossCollision,
             showCollisionDebug,
             playerHitboxSize
         });
@@ -476,6 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showEnemyHitbox,
             showProjectileHitbox,
             showAttackRange,
+            showBossCollision,
             highSpeedThreshold,
             maxSubframeSteps,
             enableLineIntersection,
@@ -511,6 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('showEnemyHitbox').checked = false;
         document.getElementById('showProjectileHitbox').checked = false;
         document.getElementById('showAttackRange').checked = false;
+        document.getElementById('showBossCollision').checked = false;
         document.getElementById('showCollisionDebug').checked = false; // デバッグ情報もOFF
 
         // 高速移動設定をデフォルトにリセット

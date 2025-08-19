@@ -118,6 +118,57 @@ export class EnemyManager {
         return enemy;
     }
 
+    // 敵同士の衝突判定
+    checkCollision(enemy1, enemy2) {
+        const dx = enemy1.x - enemy2.x;
+        const dy = enemy1.y - enemy2.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        const minDistance = 160; // ボスの半径80 * 2
+        return distance < minDistance;
+    }
+
+    // 安全な位置を見つける
+    findSafePosition(x, y, existingEnemies, minDistance = 160) {
+        let attempts = 0;
+        let testX = x;
+        let testY = y;
+        
+        while (attempts < 50) {
+            let collision = false;
+            
+            for (const enemy of existingEnemies) {
+                const dx = testX - enemy.x;
+                const dy = testY - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < minDistance) {
+                    collision = true;
+                    break;
+                }
+            }
+            
+            if (!collision) {
+                return { x: testX, y: testY };
+            }
+            
+            // ランダムな方向に少し移動
+            const angle = Math.random() * Math.PI * 2;
+            const distance = minDistance + Math.random() * 50;
+            testX = x + Math.cos(angle) * distance;
+            testY = y + Math.sin(angle) * distance;
+            
+            // マップ境界内に収める
+            const { width: mapW, height: mapH } = this.game.cameraManager.getMapDimensions();
+            testX = Math.max(80, Math.min(testX, mapW - 80));
+            testY = Math.max(80, Math.min(testY, mapH - 80));
+            
+            attempts++;
+        }
+        
+        // 最後の手段：元の位置から十分離れた場所
+        return { x: x + 200, y: y + 200 };
+    }
+
     spawnBoss(bossType = 0) {
         console.log('ボス生成開始:', { bossType });
         
@@ -140,16 +191,33 @@ export class EnemyManager {
             case 4:
                 // ステージ4: 風神(4)と雷神(5)を同時出現
                 console.log('BossOni4/BossOni5(風神・雷神)を同時生成中...');
-                const offset = 300;
-                const fuzinX = centerX - offset;
-                const raizinX = centerX + offset;
-                const fuzin = new BossOni4(this.game, fuzinX, centerY);
-                const raizin = new BossOni5(this.game, raizinX, centerY);
+                
+                // 風神（左側）を生成
+                const fuzinX = centerX - 300;
+                const fuzinY = centerY;
+                const fuzin = new BossOni4(this.game, fuzinX, fuzinY);
+                
+                // 雷神（右側）を生成 - 風神と重ならない位置を確保
+                const raizinX = centerX + 300;
+                const raizinY = centerY;
+                const raizin = new BossOni5(this.game, raizinX, raizinY);
+                
+                // 衝突判定で位置を調整
+                if (this.checkCollision(fuzin, raizin)) {
+                    console.log('風神・雷神が重なっているため位置を調整します');
+                    const safePos = this.findSafePosition(raizinX, raizinY, [fuzin], 200);
+                    raizin.x = safePos.x;
+                    raizin.y = safePos.y;
+                }
+                
                 // 登場ギミック（簡易演出）
-                this.game.particleManager.createExplosion(fuzinX, centerY, '#7ed6df'); // 風: 淡い青
-                this.game.particleManager.createExplosion(raizinX, centerY, '#f9ca24'); // 雷: 黄
+                this.game.particleManager.createExplosion(fuzin.x, fuzin.y, '#7ed6df'); // 風: 淡い青
+                this.game.particleManager.createExplosion(raizin.x, raizin.y, '#f9ca24'); // 雷: 黄
+                
                 this.enemies.push(fuzin, raizin);
                 console.log('風神・雷神を追加後敵数:', this.enemies.length);
+                console.log('風神位置:', { x: fuzin.x, y: fuzin.y });
+                console.log('雷神位置:', { x: raizin.x, y: raizin.y });
                 return; // ここで終了（以降の単体ボス処理は不要）
             case 5:
                 // ラスボスステージ: BossOni1〜5を同時出現

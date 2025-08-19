@@ -156,18 +156,18 @@ export class Player extends Character {
 
     takeDamage(amount) {
         if (this.invincibleTimer > 0) return; // 無敵中はダメージ無効
-        const prevHpRatio = this.health / this.maxHP;
+
+        const prevHealthRatio = this.health / this.maxHP;
         const nextHp = this.health - amount;
-        const nextHpRatio = nextHp / this.maxHP;
+        const nextHealthRatio = nextHp / this.maxHP;
 
-        // 死なない場合のみ効果音
         if (nextHp > 0) {
-            playSE("receivedamage");
-        }
+            playSE("receivedamage"); // 死なない場合のみ効果音
 
-        // HPが10%以上から10%未満になった瞬間だけ効果音
-        if (prevHpRatio >= 0.1 && nextHpRatio < 0.1) {
-            playSE("lawhp");
+            // 体力が10%以下になった瞬間をチェック
+            if (prevHealthRatio > 0.1 && nextHealthRatio <= 0.1) {
+                playSE("law-hp"); // 体力警告音を再生
+            }
         }
 
         this.health = nextHp;

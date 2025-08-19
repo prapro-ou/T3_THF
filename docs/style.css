@@ -35,8 +35,8 @@ canvas {
 /* ===== ゲームコンテナ ===== */
 .game-container {
     position: relative;
-    width: 800px;
-    height: 600px;
+    width: 1000px;
+    height: 800px;
     margin: 0 auto;
 }
 
@@ -292,6 +292,15 @@ h6 {
 .wafu-title {
     font-size: 2.2em;
     margin: 2vw 0 1vw 0;
+}
+
+/* ステージ選択タイトル画像 */
+.stage-select-title {
+    display: block;
+    margin: 2vw auto 1vw auto;
+    max-width: 400px;
+    width: auto;
+    height: auto;
 }
 
 /* ===== ボタン ===== */
@@ -642,8 +651,8 @@ button:hover,
 
 #otomoLevelDisplay {
     position: absolute;
-    bottom: 320px;
-    right: 80px;
+    bottom: 210px;
+    left: 800px;
     min-width: 200px;
     min-height: 80px;
     font-size: 1em;

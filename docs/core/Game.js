@@ -113,7 +113,11 @@ export class Game {
             if (event.button !== 0) return;
             if (this.gameState.isGameOver()) return;
             if (this.pauseManager.isPaused) return;
-            if (this.player.ammo <= 0) return;
+            if (this.player.ammo <= 0) {
+                // 弾数が0の時に効果音を再生
+                playSE("can'ttouch");
+                return;
+            }
 
             // playerのprojectile攻撃
             const hitCount = this.attackManager.handleAttack(event, 'projectile');
@@ -331,6 +335,13 @@ export class Game {
 
         // プレイヤーとの衝突判定
         this.enemyManager.getEnemies().forEach(enemy => {
+            // ボス出現から2秒間はボスの当たり判定を無効化
+            if (this.bossAppeared) {
+                const now = Date.now();
+                if (now - this.bossStartTime < 2000){
+                    return;
+                }
+            }
             if (this.collisionManager.checkPlayerEnemyCollision(this.player, enemy)) {
                 if (!enemy.markedForDeletion) {
                     const damage = this.isBossEnemy(enemy) ? 40 : 20;

@@ -169,6 +169,9 @@ export class BossOni3 extends BossOni {
             return;
         }
 
+        // 移動前に他の敵との衝突をチェック
+        this.avoidCollisionWithOtherEnemies();
+
         const player = this.game.player;
         if (!player) return;
 
@@ -204,6 +207,33 @@ export class BossOni3 extends BossOni {
             this.warpToRandomPosition();
             console.log("BossOni3 reached edge and starting warp delay!");
             return;
+        }
+    }
+    
+    // 他の敵との衝突を避ける
+    avoidCollisionWithOtherEnemies() {
+        const enemies = this.game.enemyManager.getEnemies();
+        const minDistance = 160; // ボスの半径80 * 2
+        
+        for (const enemy of enemies) {
+            if (enemy === this) continue; // 自分は除外
+            
+            const dx = this.x - enemy.x;
+            const dy = this.y - enemy.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < minDistance) {
+                // 衝突を避けるために少し移動
+                const angle = Math.atan2(dy, dx);
+                const pushDistance = minDistance - distance + 10;
+                this.x += Math.cos(angle) * pushDistance;
+                this.y += Math.sin(angle) * pushDistance;
+                
+                // マップ境界内に収める
+                const { width: mapW, height: mapH } = this.game.cameraManager.getMapDimensions();
+                this.x = Math.max(80, Math.min(this.x, mapW - 80));
+                this.y = Math.max(80, Math.min(this.y, mapH - 80));
+            }
         }
     }
 
