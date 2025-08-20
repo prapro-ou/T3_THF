@@ -1,3 +1,5 @@
+import { playSE } from '../../managers/KoukaonManager.js'; // 追加
+
 export class FollowOtomoBehavior {
     constructor(otomo) {
         this.otomo = otomo;
@@ -18,6 +20,8 @@ export class FollowOtomoBehavior {
         const target = this.otomo.findEnemyNearPlayer(200);
         if (target && this.otomo.canShoot) {
             this.otomo.attackTarget(target, 'projectile');
+            playSE('monkey1'); // 攻撃時に効果音monkey1を鳴らす
+
             this.otomo.canShoot = false;
             setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }

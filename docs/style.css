@@ -867,54 +867,7 @@ button:hover,
     line-height: 1.2;
 }
 
-/* ヘルプモーダル */
-#helpModal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 150;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#helpModal.hidden {
-    display: none;
-}
-
-.help-content {
-    background: #1a1a1a;
-    color: #fff;
-    padding: 36px 48px;
-    border-radius: 14px;
-    text-align: left;
-    min-width: 320px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    border: 2px solid #C1272D;
-    position: relative;
-}
-
-.help-content h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-    margin-bottom: 18px;
-    text-align: center;
-    letter-spacing: 1px;
-}
-
-.help-content ul {
-    margin: 0 0 18px 0;
-    padding-left: 22px;
-    font-size: 1.1em;
-}
-
-.help-content ul li {
-    margin-bottom: 8px;
-    line-height: 1.6;
-}
+/* 操作説明関連のスタイルは docs/help/help.css に移動しました */
 
 /* ===== スタート画面 ===== */
 #startScreen,
@@ -1281,6 +1234,14 @@ button:hover,
     font-size: 1.2em;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
     min-height: 80px;
+}
+
+/* ラスボスカードの画像スタイル */
+.boss-card[data-boss="5"] .boss-select-btn {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
 }
 
 .boss-card.selected,
@@ -1689,4 +1650,45 @@ hr,
         width: 100%;
         max-width: 200px;
     }
+}
+
+/* ボス討伐状況切り替えボタンのスタイル */
+.boss-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding: 4px 0;
+}
+
+.boss-toggle-row span {
+    font-weight: 600;
+    color: #f7f7f7;
+    min-width: 80px;
+}
+
+.boss-toggle-btn {
+    min-width: 80px;
+    font-size: 0.8em;
+    padding: 6px 12px;
+}
+
+.boss-toggle-btn.defeated {
+    background: #4ecdc4;
+    border-color: #4ecdc4;
+}
+
+.boss-toggle-btn.defeated:hover {
+    background: #44a08d;
+    border-color: #44a08d;
+}
+
+.boss-toggle-btn.unlocked {
+    background: #FF9800;
+    border-color: #FF9800;
+}
+
+.boss-toggle-btn.unlocked:hover {
+    background: #F57C00;
+    border-color: #F57C00;
 }

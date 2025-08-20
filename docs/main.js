@@ -4,6 +4,7 @@ import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpri
 import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
 import { BossProgressManager } from './managers/BossProgressManager.js';
+import { HelpManager } from './help/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 鬼HP上昇ログ用
@@ -278,11 +279,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const defeatedElement = card.querySelector('.boss-progress.defeated');
                 const lockedElement = card.querySelector('.boss-progress.locked');
                 const unlockedElement = card.querySelector('.boss-progress.unlocked');
+                const bossImage = card.querySelector('.boss-select-btn');
                 
                 // 既存の進捗表示を非表示
                 [defeatedElement, lockedElement, unlockedElement].forEach(el => {
                     if (el) el.classList.add('hidden');
                 });
+                
+                // ボスの画像を状態に応じて更新
+                if (bossImage) {
+                    const displayImage = bossProgressManager.getBossDisplayImage(bossId);
+                    if (displayImage) {
+                        bossImage.src = `assets/UI/UI/boss_select/${displayImage}`;
+                    }
+                }
                 
                 if (bossData.defeated) {
                     // 討伐済み（選択可能）
@@ -307,9 +317,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // 初期表示時に進捗状況を更新
     updateBossCardProgress();
     
+    // 初期表示時にボス画像を更新
+    bossCardElements.forEach((card) => {
+        const bossId = parseInt(card.dataset.boss, 10);
+        const bossImage = card.querySelector('.boss-select-btn');
+        if (bossImage) {
+            const displayImage = bossProgressManager.getBossDisplayImage(bossId);
+            if (displayImage) {
+                bossImage.src = `assets/UI/UI/boss_select/${displayImage}`;
+            }
+        }
+    });
+    
     // ボス進捗更新イベントをリッスン
     window.addEventListener('bossProgressUpdated', () => {
         updateBossCardProgress();
+        
+        // ボス画像も更新
+        bossCardElements.forEach((card) => {
+            const bossId = parseInt(card.dataset.boss, 10);
+            const bossImage = card.querySelector('.boss-select-btn');
+            if (bossImage) {
+                const displayImage = bossProgressManager.getBossDisplayImage(bossId);
+                if (displayImage) {
+                    bossImage.src = `assets/UI/UI/boss_select/${displayImage}`;
+                }
+            }
+        });
     });
     
     bossCardElements.forEach((card, index) => {
@@ -437,15 +471,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100); // 100ms間隔で監視
     });
 
+    // 操作説明マネージャーの初期化
+    const helpManager = new HelpManager();
+    
     // 操作説明表示
     helpButton.addEventListener('click', () => {
         playSE("kettei"); // ← 決定音
-        helpModal.classList.remove('hidden');
-    });
-    // 操作説明閉じる
-    closeHelp.addEventListener('click', () => {
-        playSE("kasoruidou"); // ← 戻り音
-        helpModal.classList.add('hidden');
+        helpManager.show();
     });
 
     // ボス選択画面からスタート画面へ戻る
@@ -499,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key.toLowerCase() === 'h') {
             // ゲームインスタンスが存在し、ポーズ中のみ許可
             if (game && game.pauseManager.isPaused) {
-                helpModal.classList.remove('hidden');
+                helpManager.show();
             }
         }
 
@@ -527,7 +559,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     pauseHelpButton.addEventListener('click', () => {
-        helpModal.classList.remove('hidden');
+        playSE("kettei"); // 決定音を追加
+        helpManager.show();
     });
 
     pauseBackToStartButton.addEventListener('click', () => {
@@ -851,11 +884,12 @@ document.addEventListener('DOMContentLoaded', () => {
             
             let statusHTML = `<div>討伐済み: ${defeatedCount}/5</div>`;
             statusHTML += `<div>アンロック済み: ${unlockedCount}/5</div>`;
-            statusHTML += `<div>最終ステージ解放条件:</div>`;
+            statusHTML += `<div>ラスボス解放条件:</div>`;
             statusHTML += `<div>・砲鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・バイク鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・ワープ鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・風神・雷神: ${bossData[4]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>ラスボス: ${bossData[5]?.unlocked ? '✓ アンロック済み' : '✗ 未解放'}</div>`;
             statusHTML += `<div>お供開放状況:</div>`;
             statusHTML += `<div>・犬: ${otomoStatus.dog ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・猿: ${otomoStatus.monkey ? '✓' : '✗'}</div>`;
@@ -933,15 +967,142 @@ document.addEventListener('DOMContentLoaded', () => {
                 for (let i = 1; i <= 5; i++) {
                     bossProgressManager.forceUnlockBoss(i);
                 }
+                // ラストステージ（ボスID 7）もアンロック
+                bossProgressManager.forceUnlockBoss(7);
                 updateBossCardProgress();
                 updateBossProgressStatus();
+                updateBossToggleButtons();
                 console.log('全ボスをアンロックしました');
             }
         });
     }
 
+    // 個別ボスの討伐状況切り替え機能
+    const toggleBoss1 = document.getElementById('toggleBoss1');
+    const toggleBoss2 = document.getElementById('toggleBoss2');
+    const toggleBoss3 = document.getElementById('toggleBoss3');
+    const toggleBoss4 = document.getElementById('toggleBoss4');
+    const toggleBoss5 = document.getElementById('toggleBoss5');
+    const toggleBoss7 = document.getElementById('toggleBoss7');
+
+    // ボス討伐状況切り替えボタンの初期化
+    function updateBossToggleButtons() {
+        const bosses = [
+            { id: 1, button: toggleBoss1, name: '砲鬼' },
+            { id: 2, button: toggleBoss2, name: 'バイク鬼' },
+            { id: 3, button: toggleBoss3, name: 'ワープ鬼' },
+            { id: 4, button: toggleBoss4, name: '風神・雷神' },
+            { id: 5, button: toggleBoss5, name: 'ラスボス' },
+            { id: 7, button: toggleBoss7, name: 'ラストステージ' }
+        ];
+
+        bosses.forEach(boss => {
+            if (boss.button) {
+                const bossData = bossProgressManager.getAllBossData()[boss.id];
+                if (bossData) {
+                    if (bossData.defeated) {
+                        boss.button.textContent = '討伐済み';
+                        boss.button.className = 'debug-btn boss-toggle-btn defeated';
+                    } else if (bossData.unlocked) {
+                        boss.button.textContent = '未討伐';
+                        boss.button.className = 'debug-btn boss-toggle-btn unlocked';
+                    } else {
+                        boss.button.textContent = '未開放';
+                        boss.button.className = 'debug-btn boss-toggle-btn';
+                    }
+                }
+            }
+        });
+    }
+
+    // ボス討伐状況切り替えボタンのイベントリスナー
+    if (toggleBoss1) {
+        toggleBoss1.addEventListener('click', () => {
+            const bossData = bossProgressManager.getAllBossData()[1];
+            if (bossData.defeated) {
+                bossProgressManager.resetBossProgressById(1);
+            } else {
+                bossProgressManager.forceDefeatBoss(1);
+            }
+            updateBossCardProgress();
+            updateBossProgressStatus();
+            updateBossToggleButtons();
+        });
+    }
+
+    if (toggleBoss2) {
+        toggleBoss2.addEventListener('click', () => {
+            const bossData = bossProgressManager.getAllBossData()[2];
+            if (bossData.defeated) {
+                bossProgressManager.resetBossProgressById(2);
+            } else {
+                bossProgressManager.forceDefeatBoss(2);
+            }
+            updateBossCardProgress();
+            updateBossProgressStatus();
+            updateBossToggleButtons();
+        });
+    }
+
+    if (toggleBoss3) {
+        toggleBoss3.addEventListener('click', () => {
+            const bossData = bossProgressManager.getAllBossData()[3];
+            if (bossData.defeated) {
+                bossProgressManager.resetBossProgressById(3);
+            } else {
+                bossProgressManager.forceDefeatBoss(3);
+            }
+            updateBossCardProgress();
+            updateBossProgressStatus();
+            updateBossToggleButtons();
+        });
+    }
+
+    if (toggleBoss4) {
+        toggleBoss4.addEventListener('click', () => {
+            const bossData = bossProgressManager.getAllBossData()[4];
+            if (bossData.defeated) {
+                bossProgressManager.resetBossProgressById(4);
+            } else {
+                bossProgressManager.forceDefeatBoss(4);
+            }
+            updateBossCardProgress();
+            updateBossProgressStatus();
+            updateBossToggleButtons();
+        });
+    }
+
+    if (toggleBoss5) {
+        toggleBoss5.addEventListener('click', () => {
+            const bossData = bossProgressManager.getAllBossData()[5];
+            if (bossData.defeated) {
+                bossProgressManager.resetBossProgressById(5);
+            } else {
+                bossProgressManager.forceDefeatBoss(5);
+            }
+            updateBossCardProgress();
+            updateBossProgressStatus();
+            updateBossToggleButtons();
+        });
+    }
+
+    if (toggleBoss7) {
+        toggleBoss7.addEventListener('click', () => {
+            const bossData = bossProgressManager.getAllBossData()[7];
+            if (bossData.defeated) {
+                bossProgressManager.resetBossProgressById(7);
+            } else {
+                bossProgressManager.forceDefeatBoss(7);
+            }
+            updateBossCardProgress();
+            updateBossProgressStatus();
+            updateBossToggleButtons();
+        });
+    }
+
     // 初期表示時にボス進捗状況を更新
     updateBossProgressStatus();
+    updateBossToggleButtons();
 
     // ボスカード選択でゲーム開始
     const bossCards = document.querySelectorAll('.boss-card');

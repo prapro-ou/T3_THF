@@ -6,8 +6,8 @@ export class BossOni4 extends BossOni {
     constructor(game, x = null, y = null) {
         super(game, x, y);
         this.color = '#9b59b6'; // 紫系
-        this._maxHP = 400;
-        this._hp = 400;
+    this._maxHP = 800;
+    this._hp = 800;
         this.name = 'BossOni4';
         // 視覚的サイズを設定
         this.setSize(250, 250);
@@ -101,7 +101,9 @@ export class BossOni4 extends BossOni {
                     this._attackPhase = 'active';
                     this._phaseTimer = this.getActiveFrames();
                     this._startedAtFrame = this.game.enemyManager.frame || 0;
-                    playSE("Wind"); // ← 攻撃開始時にWind効果音を鳴らす
+                    // 攻撃開始時
+                    const windSE = playSE("Wind");
+                    if (windSE) windSE.volume = 0.9; // 例: 音量を90%に
                 }
             } else if (this._attackPhase === 'active') {
                 this.applyAttackEffect();
