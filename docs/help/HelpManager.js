@@ -2,19 +2,10 @@
  * 操作説明管理クラス
  * 単一責任: 操作説明画面の表示、ページング、画像管理
  */
+import { helpConfig } from './helpConfig.js';
+
 export class HelpManager {
     constructor() {
-        this.config = {
-            // 操作説明のページ数をここで変更
-            totalPages: 3,
-            // 各ページの画像パス（1920x1080pxの画像を想定）
-            images: [
-                'assets/help/help_01.png',  // ページ1
-                'assets/help/help_02.png',  // ページ2
-                'assets/help/help_03.png'   // ページ3
-            ]
-        };
-        
         this.currentPage = 1;
         this.isVisible = false;
         
@@ -129,7 +120,7 @@ export class HelpManager {
      * 次のページへ移動
      */
     goToNextPage() {
-        if (this.currentPage < this.config.totalPages) {
+        if (this.currentPage < helpConfig.totalPages) {
             this.currentPage++;
             this.updatePage();
         }
@@ -153,7 +144,7 @@ export class HelpManager {
         }
         
         if (this.elements.totalPagesSpan) {
-            this.elements.totalPagesSpan.textContent = this.config.totalPages;
+            this.elements.totalPagesSpan.textContent = helpConfig.totalPages;
         }
     }
     
@@ -161,8 +152,8 @@ export class HelpManager {
      * 画像の更新
      */
     updateImage() {
-        if (this.elements.image && this.config.images[this.currentPage - 1]) {
-            this.elements.image.src = this.config.images[this.currentPage - 1];
+        if (this.elements.image && helpConfig.images[this.currentPage - 1]) {
+            this.elements.image.src = helpConfig.images[this.currentPage - 1];
         }
     }
     
@@ -175,53 +166,21 @@ export class HelpManager {
         }
         
         if (this.elements.nextBtn) {
-            this.elements.nextBtn.disabled = this.currentPage >= this.config.totalPages;
+            this.elements.nextBtn.disabled = this.currentPage >= helpConfig.totalPages;
         }
     }
     
     /**
-     * 設定の更新
-     * @param {Object} newConfig - 新しい設定
-     */
-    updateConfig(newConfig) {
-        this.config = { ...this.config, ...newConfig };
-        this.updatePage();
-    }
-    
-    /**
-     * ページ数の変更
+     * ページ数の変更（helpConfigを直接更新するため、このメソッドは不要）
+     * 互換性のために残しているが、helpConfig.setTotalPages() を使用することを推奨
      * @param {number} totalPages - 新しいページ数
      */
     setTotalPages(totalPages) {
-        this.config.totalPages = totalPages;
+        // helpConfigを直接更新
+        helpConfig.totalPages = totalPages;
         if (this.currentPage > totalPages) {
             this.currentPage = totalPages;
         }
         this.updatePage();
-    }
-    
-    /**
-     * 画像パスの追加
-     * @param {string} imagePath - 新しい画像パス
-     */
-    addImage(imagePath) {
-        this.config.images.push(imagePath);
-        this.config.totalPages = this.config.images.length;
-        this.updatePage();
-    }
-    
-    /**
-     * 画像パスの削除
-     * @param {number} index - 削除する画像のインデックス
-     */
-    removeImage(index) {
-        if (index >= 0 && index < this.config.images.length) {
-            this.config.images.splice(index, 1);
-            this.config.totalPages = this.config.images.length;
-            if (this.currentPage > this.config.totalPages) {
-                this.currentPage = this.config.totalPages;
-            }
-            this.updatePage();
-        }
     }
 }
