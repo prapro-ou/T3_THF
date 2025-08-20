@@ -184,6 +184,7 @@ export class EnemyManager {
     spawnBoss(bossType = 0) {
         console.log('ボス生成開始:', { bossType });
         
+
     // マップ中央の位置を計算
     const { width: mapWidth, height: mapHeight } = this.game.cameraManager.getMapDimensions();
     const centerX = mapWidth / 2;
@@ -237,6 +238,7 @@ export class EnemyManager {
             }
             case 6: {
                 // 風神・雷神同時出現
+
                 console.log('BossOni4/BossOni5(風神・雷神)を同時生成中...');
                 // 風神（左側）
                 const fuzinX = centerX - 300;
@@ -266,7 +268,9 @@ export class EnemyManager {
                 console.log('雷神位置:', { x: raizin.x, y: raizin.y });
                 return;
             }
+
             case 7: {
+
                 // ラスボスステージ: BossOni1〜5を同時出現
                 console.log('ラスボスステージ: BossOni1〜5を同時生成中...');
                 const positions = [

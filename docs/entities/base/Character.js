@@ -1,4 +1,5 @@
 import { GameEntity } from './GameEntity.js';
+import { playSE } from '../../managers/KoukaonManager.js'; // 追加
 
 /**
  * キャラクターの基底クラス
@@ -34,7 +35,15 @@ export class Character extends GameEntity {
 
     // 多態性: サブクラスでオーバーライド可能なメソッド
     takeDamage(amount) {
+        const prevHpRatio = this.health / this.maxHP;
         this.health -= amount;
+        const nextHpRatio = this.health / this.maxHP;
+
+        // HPが10%以上から10%未満になった瞬間だけ効果音
+        if (prevHpRatio >= 0.1 && nextHpRatio < 0.1) {
+            playSE("lawhp");
+        }
+
         if (!this.isAlive) {
             this.onDeath();
         }

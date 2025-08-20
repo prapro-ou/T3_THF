@@ -108,6 +108,7 @@ export class Otomo extends Character {
         // ボス鬼判定
         const isBoss = target && (typeof target.constructor === 'function') &&
             (/BossOni/.test(target.constructor.name));
+
         if (type === 'projectile') {
             const dx = target.x - this.x;
             const dy = target.y - this.y;
@@ -115,11 +116,13 @@ export class Otomo extends Character {
             if (dist === 0) return;
             const speed = 5 * 1.2;
             const damage = isBoss ? 5 : 10;
+
             const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
             this.game.projectileManager.addProjectile(projectile);
         } else if (type === 'charge') {
             // 直接ダメージ
             const damage = isBoss ? 5 : 10;
+
             if (typeof target.takeDamage === 'function') {
                 target.takeDamage(damage);
             } else if (typeof target.hp === 'number') {
