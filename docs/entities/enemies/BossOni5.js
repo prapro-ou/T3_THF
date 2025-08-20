@@ -5,8 +5,9 @@ export class BossOni5 extends BossOni {
     constructor(game, x = null, y = null) {
         super(game, x, y);
         this.color = '#e67e22'; // オレンジ系（雷）
-        this._maxHP = 500;
-        this._hp = 500;
+    this._baseMaxHP = 1000;
+        this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
+        this._hp = this._maxHP;
         this.name = 'BossOni5';
         // 視覚的サイズを設定
         this.setSize(250, 250);
@@ -43,17 +44,19 @@ export class BossOni5 extends BossOni {
         this.rageAttackDurationFrames = 150; // 落雷連打時間大幅延長（90 → 150、67%延長）
         this.rageStrikeEveryFrames = 12;     // 落雷間隔大幅短縮（25 → 12、52%短縮）
         this.rageStrikesPerWave = 18;        // 落雷回数大幅増加（10 → 18、80%増加）
+
+        // 怒りモード時の追加パラメータ
         this.rageStrikeRadius = 140;         // 落雷半径大幅拡大（90 → 140、56%拡大）
         this.rageDamagePerStrike = 35;       // ダメージ大幅増加（18 → 35、94%増加）
         this.rageTelegraphLeadFrames = 15;   // 予兆時間大幅短縮（30 → 15、50%短縮）
-        
+
         // 新攻撃パターン: 直線稲妻ビーム攻撃
         this.lightningBeamTelegraphFrames = 25;
         this.lightningBeamActiveFrames = 60;
         this.lightningBeamDamage = 25;
         this.lightningBeamWidth = 40; // ビームの幅
         this.lightningBeamRange = 600; // ビームの射程
-        
+
         // 怒りモード時のビーム強化
         this.rageLightningBeamDamage = 40;      // ビームダメージ増加（25 → 40、60%増加）
         this.rageLightningBeamWidth = 60;       // ビーム幅拡大（40 → 60、50%増加）

@@ -5,6 +5,7 @@ import { SpriteSheet } from '../../utils/SpriteSheet.js';
 import { OfudaProjectile } from '../OfudaProjectile.js';
 
 export class BossOni3 extends BossOni {
+
     constructor(game, x = null, y = null) {
         try {
             console.log('BossOni3: Constructor called');
@@ -12,8 +13,8 @@ export class BossOni3 extends BossOni {
             console.log('BossOni3: Super constructor completed');
 
             this.color = '#9b59b6'; // 紫系（ワープのイメージ）
-            this._maxHP = 400;
-            this._hp = 400;
+            this._maxHP = 800;
+            this._hp = 800;
             this.name = 'BossOni3';
 
             // warp_oni画像のサイズに合わせて調整
@@ -68,7 +69,6 @@ export class BossOni3 extends BossOni {
             console.log('BossOni3: Constructor completed successfully');
         } catch (error) {
             console.error('BossOni3 constructor error:', error);
-            throw error;
         }
     }
 

@@ -2,11 +2,12 @@ import { BossOni } from './BossOni.js';
 import { playSE } from '../../managers/KoukaonManager.js'; // 効果音をインポート
 
 export class BossOni4 extends BossOni {
+
     constructor(game, x = null, y = null) {
         super(game, x, y);
         this.color = '#9b59b6'; // 紫系
-        this._maxHP = 400;
-        this._hp = 400;
+    this._maxHP = 800;
+    this._hp = 800;
         this.name = 'BossOni4';
         // 視覚的サイズを設定
         this.setSize(250, 250);
@@ -61,7 +62,6 @@ export class BossOni4 extends BossOni {
         this.rageConeHalfAngleRad = this.degToRad(60); // 扇の角度大幅拡大（35° → 60°、71%拡大）
         this.rageRingRadius = 350;           // リング半径大幅拡大（220 → 350、59%拡大）
         this.rageRingThickness = 120;        // リング幅大幅拡大（80 → 120、50%増加）
-        
         // 怒りモード時の引き寄せ攻撃強化
         this.ragePullRange = 600;            // 引き寄せ範囲大幅拡大（450 → 600、33%増加）
         this.ragePullStrength = 6.0;        // 引き寄せ強度増加（3.0 → 6.0、100%増加）
