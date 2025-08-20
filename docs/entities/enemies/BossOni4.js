@@ -101,7 +101,9 @@ export class BossOni4 extends BossOni {
                     this._attackPhase = 'active';
                     this._phaseTimer = this.getActiveFrames();
                     this._startedAtFrame = this.game.enemyManager.frame || 0;
-                    playSE("Wind"); // ← 攻撃開始時にWind効果音を鳴らす
+                    // 攻撃開始時
+                    const windSE = playSE("Wind");
+                    if (windSE) windSE.volume = 0.9; // 例: 音量を90%に
                 }
             } else if (this._attackPhase === 'active') {
                 this.applyAttackEffect();

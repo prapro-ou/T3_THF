@@ -5,7 +5,10 @@ export class BossOni5 extends BossOni {
     constructor(game, x = null, y = null) {
         super(game, x, y);
         this.color = '#e67e22'; // オレンジ系（雷）
+        
+
     this._baseMaxHP = 1000;
+
         this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
         this._hp = this._maxHP;
         this.name = 'BossOni5';
@@ -88,7 +91,8 @@ export class BossOni5 extends BossOni {
                 this._attackPhase = 'telegraph';
                 this._phaseTimer = this.getTelegraphFrames();
                 this._attackCooldown = this.attackCooldownFrames; // 次回用
-                playSE("Thunder"); // ← 攻撃開始時にThunder効果音を鳴らす
+                const thunderSE = playSE("Thunder");
+                if (thunderSE) thunderSE.volume = 1.0; // 最大音量
             }
         } else {
             if (this._attackPhase === 'telegraph') {

@@ -1698,3 +1698,44 @@ hr,
         max-width: 200px;
     }
 }
+
+/* ボス討伐状況切り替えボタンのスタイル */
+.boss-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding: 4px 0;
+}
+
+.boss-toggle-row span {
+    font-weight: 600;
+    color: #f7f7f7;
+    min-width: 80px;
+}
+
+.boss-toggle-btn {
+    min-width: 80px;
+    font-size: 0.8em;
+    padding: 6px 12px;
+}
+
+.boss-toggle-btn.defeated {
+    background: #4ecdc4;
+    border-color: #4ecdc4;
+}
+
+.boss-toggle-btn.defeated:hover {
+    background: #44a08d;
+    border-color: #44a08d;
+}
+
+.boss-toggle-btn.unlocked {
+    background: #FF9800;
+    border-color: #FF9800;
+}
+
+.boss-toggle-btn.unlocked:hover {
+    background: #F57C00;
+    border-color: #F57C00;
+}

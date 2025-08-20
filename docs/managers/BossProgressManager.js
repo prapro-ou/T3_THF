@@ -53,6 +53,14 @@ export class BossProgressManager {
                 icon: 'last_stage_select_button_UI.png',
                 shadowIcon: 'last_stage_select_button_shadow_UI.png',
                 shadowIcon2: 'last_stage_select_button_shadow_UI_2.png'
+            },
+            7: { 
+                name: 'ラストステージ', 
+                defeated: false, 
+                unlocked: false, 
+                icon: 'last_stage_select_button_UI.png',
+                shadowIcon: 'last_stage_select_button_shadow_UI.png',
+                shadowIcon2: 'last_stage_select_button_shadow_UI_2.png'
             }
         };
 
@@ -120,11 +128,15 @@ export class BossProgressManager {
             if (this.bossData[5]) {
                 this.bossData[5].unlocked = true;
                 console.log('最終ステージ（ラスボス）が解放されました！');
-                
-                // UIの更新を促すイベントを発火
-                if (typeof window !== 'undefined') {
-                    window.dispatchEvent(new CustomEvent('bossProgressUpdated'));
-                }
+            }
+            if (this.bossData[7]) {
+                this.bossData[7].unlocked = true;
+                console.log('ラストステージ（全ボス同時出現）が解放されました！');
+            }
+            
+            // UIの更新を促すイベントを発火
+            if (typeof window !== 'undefined') {
+                window.dispatchEvent(new CustomEvent('bossProgressUpdated'));
             }
         }
     }
@@ -165,8 +177,8 @@ export class BossProgressManager {
         const bossData = this.bossData[bossId];
         if (!bossData) return '';
         
-        if (bossId === 5) {
-            // ラスボスの場合の特別な処理
+        if (bossId === 5 || bossId === 7) {
+            // ラスボスまたはラストステージの場合の特別な処理
             const boss1Defeated = this.bossData[1]?.defeated || false;
             const boss2Defeated = this.bossData[2]?.defeated || false;
             const boss3Defeated = this.bossData[3]?.defeated || false;
@@ -294,6 +306,24 @@ export class BossProgressManager {
             this.bossData[bossId].clearTime = 0;
             this.saveBossProgress();
             console.log(`ボス${bossId}の進捗をリセットしました`);
+            
+            // 最終ステージの解放条件をチェック
+            this.checkFinalStageUnlock();
+        }
+    }
+
+    /**
+     * 特定のボスを強制討伐済みにする
+     * @param {number} bossId - ボスID
+     */
+    forceDefeatBoss(bossId) {
+        if (this.bossData[bossId]) {
+            this.bossData[bossId].defeated = true;
+            this.bossData[bossId].defeatedAt = new Date().toISOString();
+            this.bossData[bossId].score = 1000;
+            this.bossData[bossId].clearTime = 60;
+            this.saveBossProgress();
+            console.log(`ボス${bossId}を強制討伐済みにしました`);
             
             // 最終ステージの解放条件をチェック
             this.checkFinalStageUnlock();
