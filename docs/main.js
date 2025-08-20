@@ -559,7 +559,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     pauseHelpButton.addEventListener('click', () => {
-        helpModal.classList.remove('hidden');
+        playSE("kettei"); // 決定音を追加
+        helpManager.show();
     });
 
     pauseBackToStartButton.addEventListener('click', () => {
