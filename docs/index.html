@@ -8,6 +8,7 @@
     <!-- ファビコン設定 -->
     <link rel="icon" type="image/png" href="assets/UI/UI/peach_tab_icon.png">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="help/help.css">
     <!-- 和風Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Serif+JP:wght@700&display=swap"
         rel="stylesheet">
@@ -86,19 +87,24 @@
     </div>
     <div id="helpModal" class="hidden">
         <div class="help-content">
-            <h2>操作説明</h2>
-            <ul>
-                <li><b>W/A/S/Dキー</b> プレイヤーを上下左右に移動</li>
-                <li><b>マウス左クリック</b> 攻撃（弾1つ消費）</li>
-                <li><b>弾</b> 最大10発。時間経過で自動回復</li>
-                <li><b>敵</b> 近づいてくる敵を攻撃して倒そう</li>
-                <li><b>スコア</b> 敵を倒すとスコアが増える</li>
-                <li><b>ゲームオーバー</b> HPが0になると終了</li>
-                <li><b>Pキー</b> ゲームの一時中断/再開</li>
-                <li><b>F12キー</b> 開発者ツール（ゲーム中のみ）</li>
-                <li><b>Ctrl+B</b> ボス鬼をすぐ出現（ゲーム中のみ）</li>
-            </ul>
-            <img id="closeHelp" src="assets/UI/UI/button/modoru_button_UI.png" alt="閉じる" class="image-btn">
+            <div class="help-header">
+                <h2>操作説明</h2>
+                <button id="closeHelp" class="help-close-btn">×</button>
+            </div>
+            <div class="help-image-container">
+                <img id="helpImage" src="" alt="操作説明画像" class="help-image">
+            </div>
+            <div class="help-navigation">
+                <button id="prevHelpPage" class="help-nav-btn help-prev-btn" disabled>
+                    <span class="nav-arrow">←</span>
+                </button>
+                <div class="help-page-info">
+                    <span id="currentHelpPage">1</span> / <span id="totalHelpPages">1</span>
+                </div>
+                <button id="nextHelpPage" class="help-nav-btn help-next-btn">
+                    <span class="nav-arrow">→</span>
+                </button>
+            </div>
         </div>
     </div>
 

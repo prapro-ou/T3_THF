@@ -4,6 +4,7 @@ import { preloadRedOniSpriteSheet, preloadEnemySpriteSheet, preloadCannonOniSpri
 import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
 import { BossProgressManager } from './managers/BossProgressManager.js';
+import { HelpManager } from './help/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 鬼HP上昇ログ用
@@ -470,15 +471,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100); // 100ms間隔で監視
     });
 
+    // 操作説明マネージャーの初期化
+    const helpManager = new HelpManager();
+    
     // 操作説明表示
     helpButton.addEventListener('click', () => {
         playSE("kettei"); // ← 決定音
-        helpModal.classList.remove('hidden');
-    });
-    // 操作説明閉じる
-    closeHelp.addEventListener('click', () => {
-        playSE("kasoruidou"); // ← 戻り音
-        helpModal.classList.add('hidden');
+        helpManager.show();
     });
 
     // ボス選択画面からスタート画面へ戻る
@@ -532,7 +531,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.key.toLowerCase() === 'h') {
             // ゲームインスタンスが存在し、ポーズ中のみ許可
             if (game && game.pauseManager.isPaused) {
-                helpModal.classList.remove('hidden');
+                helpManager.show();
             }
         }
 
