@@ -35,7 +35,9 @@ export class WanderOtomoBehavior {
         const target = this.otomo.findEnemyNearSelf(range);
         if (target && this.otomo.canShoot) {
             this.otomo.attackTarget(target, 'projectile');
+
             playSE('pheasant1'); // 攻撃時に効果音pheasantを鳴らす
+
             this.otomo.canShoot = false;
             setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }

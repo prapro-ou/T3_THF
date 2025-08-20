@@ -19,8 +19,8 @@ export class BossOni2 extends BossOni {
             console.log('BossOni2: Super constructor completed');
 
             this.color = '#3498db'; // 青系
-            this._maxHP = 400; // HP増加
-            this._hp = 400;
+            this._maxHP = 800; // HP増加（2倍）
+            this._hp = 800;
             this.name = 'BossOni2';
             // 視覚的サイズを設定
             this.setSize(120, 120);
@@ -115,8 +115,8 @@ export class BossOni2 extends BossOni {
         switch (this.difficulty) {
             case 'easy':
                 this.dashSpeed = 14;
-                this._maxHP = 300;
-                this._hp = 300;
+                this._maxHP = 600;
+                this._hp = 600;
                 this.specialAttackMaxCooldown = 240;
                 this.knockbackStrength = 15; // 弱いノックバック
                 this.noteAttackMaxCooldown = 180; // 音符攻撃のクールダウン長め
@@ -126,8 +126,8 @@ export class BossOni2 extends BossOni {
                 break;
             case 'normal':
                 this.dashSpeed = 18;
-                this._maxHP = 400;
-                this._hp = 400;
+                this._maxHP = 800;
+                this._hp = 800;
                 this.specialAttackMaxCooldown = 180;
                 this.knockbackStrength = 18; // 通常のノックバック
                 this.noteAttackMaxCooldown = 120; // 音符攻撃のクールダウン通常
@@ -137,8 +137,8 @@ export class BossOni2 extends BossOni {
                 break;
             case 'hard':
                 this.dashSpeed = 22;
-                this._maxHP = 500;
-                this._hp = 500;
+                this._maxHP = 1000;
+                this._hp = 1000;
                 this.specialAttackMaxCooldown = 120;
                 this.predictionLevel = 0.9;
                 this.knockbackStrength = 22; // 強いノックバック
@@ -149,8 +149,8 @@ export class BossOni2 extends BossOni {
                 break;
             case 'extreme':
                 this.dashSpeed = 26;
-                this._maxHP = 600;
-                this._hp = 600;
+                this._maxHP = 1200;
+                this._hp = 1200;
                 this.specialAttackMaxCooldown = 90;
                 this.predictionLevel = 1.0;
                 this.rageModeThreshold = 0.5; // HP50%以下で怒りモード

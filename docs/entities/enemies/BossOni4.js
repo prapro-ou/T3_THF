@@ -6,8 +6,8 @@ export class BossOni4 extends BossOni {
     constructor(game, x = null, y = null) {
         super(game, x, y);
         this.color = '#9b59b6'; // 紫系
-        this._maxHP = 400;
-        this._hp = 400;
+    this._maxHP = 800;
+    this._hp = 800;
         this.name = 'BossOni4';
         // 視覚的サイズを設定
         this.setSize(250, 250);
