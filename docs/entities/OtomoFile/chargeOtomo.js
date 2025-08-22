@@ -56,9 +56,10 @@ export class ChargeOtomoBehavior {
                     this.damageTimer = 0;
                     // 統一関数で攻撃
                     this.otomo.attackTarget(target, 'charge');
-                  
-                    playSE('dog'); // 攻撃時に効果音dogを鳴らす
-
+                    this.otomo.attackSECount = (this.otomo.attackSECount || 0) + 1;
+                    if (this.otomo.attackSECount % 5 === 0) {
+                        playSE('dog'); // 5回に1回だけ鳴らす
+                    }
                 }
                 // HPが0以下ならターゲット解除
                 if (target.markedForDeletion || target.hp <= 0) {

@@ -8,6 +8,8 @@ export class Projectile {
         this.damage = damage;
         this.markedForDeletion = false;
         this.type = type; // 弾の種類
+        // すでに当たった敵リスト
+        this.hitEnemies = new Set();
         
         // 弾の種類に応じてサイズと当たり判定を設定
         if (type === 'cannon_ball') {
@@ -295,47 +297,61 @@ export class Projectile {
 
     // 通常の当たり判定
     checkCollision() {
+        // 標的が無効なら削除
         if (!this.target || this.target.markedForDeletion) {
-            console.log("Projectile deleted: invalid target");
             this.markedForDeletion = true;
             return;
         }
 
-        const ex = this.target.x + (this.target.width || 0) / 2;
-        const ey = this.target.y + (this.target.height || 0) / 2;
-        const dist = Math.hypot(this.x - ex, this.y - ey);
+        // ゲーム内の全敵を取得
+        const enemies = (this.game.enemyManager && typeof this.game.enemyManager.getEnemies === 'function')
+            ? this.game.enemyManager.getEnemies()
+            : [];
 
-        // プレイヤーの場合、実際の円形当たり判定サイズを使用
-        let targetRadius;
-        if (this.target.constructor.name === 'Player') {
-            targetRadius = Math.min(this.target.width, this.target.height) / 2 * 0.8;
-        } else {
-            targetRadius = Math.max(this.target.width || 0, this.target.height || 0) / 2;
+        let hitAny = false;
+        for (const enemy of enemies) {
+            if (!enemy || enemy.markedForDeletion) continue;
+            if (this.hitEnemies.has(enemy)) continue;
+            // プレイヤーは除外
+            if (enemy.constructor && enemy.constructor.name === 'Player') continue;
+
+            // 当たり判定
+            const ex = enemy.x + (enemy.width || 0) / 2;
+            const ey = enemy.y + (enemy.height || 0) / 2;
+            const targetRadius = Math.max(enemy.width || 0, enemy.height || 0) / 2;
+            const dist = Math.hypot(this.x - ex, this.y - ey);
+            if (dist < this.radius + targetRadius) {
+                if (typeof enemy.takeDamage === 'function') {
+                    enemy.takeDamage(this.damage);
+                }
+                this.hitEnemies.add(enemy);
+                hitAny = true;
+                // 弾を1体ヒットで消す場合はここでbreak; 複数ヒット可ならbreakしない
+            }
         }
 
-        if (dist < this.radius + targetRadius) {
-            // デバッグ情報を出力（cannon_ballの場合のみ）
-            if (this.type === 'cannon_ball') {
-                console.log('Cannon ball collision detected:', {
-                    projectileX: this.x,
-                    projectileY: this.y,
-                    projectileRadius: this.radius,
-                    targetX: this.target.x,
-                    targetY: this.target.y,
-                    targetCenterX: ex,
-                    targetCenterY: ey,
-                    targetRadius: targetRadius,
-                    distance: dist,
-                    collisionDistance: this.radius + targetRadius,
-                    targetType: this.target.constructor.name,
-                    frame: this.game.gameState.frame || 0,
-                    timestamp: Date.now()
-                });
+        // 標的が敵リストにいない場合も考慮し、標的にも個別判定
+        if (this.target && !this.hitEnemies.has(this.target) && !this.target.markedForDeletion) {
+            const ex = this.target.x + (this.target.width || 0) / 2;
+            const ey = this.target.y + (this.target.height || 0) / 2;
+            let targetRadius;
+            if (this.target.constructor.name === 'Player') {
+                targetRadius = Math.min(this.target.width, this.target.height) / 2 * 0.8;
+            } else {
+                targetRadius = Math.max(this.target.width || 0, this.target.height || 0) / 2;
             }
-            
-            if (typeof this.target.takeDamage === 'function') {
-                this.target.takeDamage(this.damage);
+            const dist = Math.hypot(this.x - ex, this.y - ey);
+            if (dist < this.radius + targetRadius) {
+                if (typeof this.target.takeDamage === 'function') {
+                    this.target.takeDamage(this.damage);
+                }
+                this.hitEnemies.add(this.target);
+                hitAny = true;
             }
+        }
+
+        // 何かに当たったら弾を消す（複数ヒット可ならhitAnyで消さない）
+        if (hitAny) {
             this.markedForDeletion = true;
         }
     }

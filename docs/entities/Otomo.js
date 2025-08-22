@@ -11,6 +11,9 @@ export class Otomo extends Character {
         this.wanderRadius = 200;
         this.canShoot = true;
 
+        // 攻撃SEカウント
+        this.attackSECount = 0;
+
         // 移動方向を追跡（1: 右向き, -1: 左向き）
         this.direction = 1;
         this.lastX = x;
