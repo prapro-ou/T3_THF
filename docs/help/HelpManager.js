@@ -104,6 +104,12 @@ export class HelpManager {
         
         this.isVisible = false;
         this.elements.modal.classList.add('hidden');
+        
+        // 初回ログイン完了を記録
+        if (!localStorage.getItem('kibidan_tutorial_completed')) {
+            localStorage.setItem('kibidan_tutorial_completed', 'true');
+            console.log('初回ログイン完了を記録しました');
+        }
     }
     
     /**

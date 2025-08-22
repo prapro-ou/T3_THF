@@ -206,11 +206,11 @@ export class Otomo extends Character {
 
     // momotaro専用：自身の近くの敵をProjectileで攻撃
     //canShootは外部から制御する
-    // rangeはデフォルトで1050、cooldownは1000ms
+    // rangeはデフォルトで1050、cooldownは2000ms
     // これにより、オトモが近くの敵を自動で攻撃する
     // ただし、canShootがfalseの場合は何もしない
     // cooldownが経過するまで再度攻撃しない
-    attackNearEnemy(range = 1050, cooldown = 1000) {
+    attackNearEnemy(range = 1050, cooldown = 2000) {
         if (!this.canShoot) return;
         const target = this.findEnemyNearSelf(range);
         if (target) {

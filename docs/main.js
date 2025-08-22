@@ -419,14 +419,38 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('スタートボタンがクリックされました');
         playSE("kettei"); // ← 決定音
 
-        // 障子風アニメーションでボス選択画面へ（開く方向）
-        switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
-            console.log('障子アニメーション完了');
-            // ボス選択画面が確実に表示されるようにする
-            stageSelectArea.style.display = 'flex';
-            stageSelectArea.style.opacity = '1';
-            stageSelectArea.style.transform = 'translateX(0)';
-        });
+        // 初回ログイン時のチュートリアル表示チェック
+        const isFirstTime = !localStorage.getItem('kibidan_tutorial_completed');
+        
+        if (isFirstTime) {
+            console.log('初回ログインです。操作説明を表示します。');
+            // 初回ログイン時は操作説明を表示
+            helpManager.show();
+            // 操作説明が閉じられた後にボス選択画面へ進む
+            // 操作説明の閉じるイベントを監視
+            const checkHelpClosed = setInterval(() => {
+                if (helpManager.elements.modal.classList.contains('hidden')) {
+                    clearInterval(checkHelpClosed);
+                    // 操作説明が閉じられたらボス選択画面へ
+                    switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
+                        console.log('障子アニメーション完了');
+                        // ボス選択画面が確実に表示されるようにする
+                        stageSelectArea.style.display = 'flex';
+                        stageSelectArea.style.opacity = '1';
+                        stageSelectArea.style.transform = 'translateX(0)';
+                    });
+                }
+            }, 100);
+        } else {
+            // 通常の流れ：直接ボス選択画面へ
+            switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
+                console.log('障子アニメーション完了');
+                // ボス選択画面が確実に表示されるようにする
+                stageSelectArea.style.display = 'flex';
+                stageSelectArea.style.opacity = '1';
+                stageSelectArea.style.transform = 'translateX(0)';
+            });
+        }
     });
 
     // リスタート時もゲーム画面を維持
@@ -473,6 +497,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 操作説明マネージャーの初期化
     const helpManager = new HelpManager();
+    
+    // デバッグ用：ローカルストレージのチュートリアル状態をリセット
+    // コンソールから resetTutorialStatus() を呼び出してリセット可能
+    window.resetTutorialStatus = () => {
+        localStorage.removeItem('kibidan_tutorial_completed');
+        console.log('チュートリアル状態をリセットしました。次回の開始ボタンクリック時に操作説明が表示されます。');
+    };
     
     // 操作説明表示
     helpButton.addEventListener('click', () => {
@@ -885,9 +916,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let statusHTML = `<div>討伐済み: ${defeatedCount}/5</div>`;
             statusHTML += `<div>アンロック済み: ${unlockedCount}/5</div>`;
             statusHTML += `<div>ラスボス解放条件:</div>`;
-            statusHTML += `<div>・砲鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
-            statusHTML += `<div>・バイク鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
-            statusHTML += `<div>・ワープ鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・鋼鉄鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・暴走鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・妖術鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・風神・雷神: ${bossData[4]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>ラスボス: ${bossData[5]?.unlocked ? '✓ アンロック済み' : '✗ 未解放'}</div>`;
             statusHTML += `<div>お供開放状況:</div>`;
