@@ -810,34 +810,7 @@ button:hover,
     font-size: 1.2em;
 }
 
-/* ===== ヘルプ・説明 ===== */
-#quickHelp {
-    position: absolute;
-    bottom: 350px;
-    right: -180px;
-    min-width: 150px;
-    min-height: 120px;
-    font-size: 0.85em;
-    padding: 20px 15px;
-    z-index: 10;
-    background: url('assets/UI/UI/scroll.png') center center no-repeat;
-    background-size: 100% 100%;
-    border: none;
-    border-radius: 0;
-    color: #2c1810;
-    box-shadow: none;
-    text-align: center;
-    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
-    pointer-events: none;
-    user-select: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
-    font-weight: 700;
-    line-height: 1.2;
-}
+
 
 #otomoLevelDisplay {
     position: absolute;
@@ -865,6 +838,281 @@ button:hover,
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
     font-weight: 700;
     line-height: 1.2;
+}
+
+/* ===== ゲーム中操作ボタン ===== */
+.game-control-buttons {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    min-width: 120px;
+    min-height: 120px;
+    padding: 0;
+    z-index: 10;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: auto;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.game-control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* レベルアップ用巻物コンテナ */
+.level-up-container {
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    padding: 15px 10px;
+    min-width: 130px;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-control-btn {
+    background: linear-gradient(135deg, #C1272D 0%, #8B0000 100%);
+    border: 2px solid #8B0000;
+    border-radius: 8px;
+    color: white;
+    padding: 6px 8px;
+    font-size: 0.7em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 65px;
+    min-height: 50px;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-control-btn:hover {
+    background: linear-gradient(135deg, #D1272D 0%, #9B0000 100%);
+    border-color: #9B0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.game-control-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-control-btn .btn-icon {
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.game-control-btn .btn-text {
+    font-size: 0.8em;
+    line-height: 1;
+}
+
+.game-control-btn .shortcut-key {
+    font-size: 0.6em;
+    font-weight: 600;
+    color: #FFD700;
+    background: rgba(139, 69, 19, 0.8);
+    border: 1px solid #8B4513;
+    border-radius: 4px;
+    padding: 2px 4px;
+    line-height: 1;
+    text-shadow: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ポーズボタン専用スタイル */
+.pause-btn {
+    background: linear-gradient(135deg, #666 0%, #444 100%) !important;
+    border-color: #555 !important;
+    min-width: 80px;
+    min-height: 50px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 15;
+}
+
+.pause-btn:hover {
+    background: linear-gradient(135deg, #777 0%, #555 100%) !important;
+    border-color: #666 !important;
+}
+
+.pause-btn .btn-icon {
+    font-size: 1.4em;
+}
+
+/* ===== ゲーム中基本操作説明 ===== */
+.game-basic-controls {
+    position: fixed;
+    top: calc(50% + 100px);
+    right: 20px;
+    min-width: 130px;
+    min-height: 80px;
+    padding: 15px 10px;
+    z-index: 10;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.basic-controls-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75em;
+    line-height: 1;
+}
+
+.control-icon {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+.control-text {
+    font-size: 0.9em;
+    line-height: 1;
+}
+
+/* ===== お供切り替えUI ===== */
+.otomo-switch-ui {
+    position: fixed;
+    top: calc(50% + 200px);
+    right: 20px;
+    min-width: 100px;
+    min-height: 80px;
+    padding: 12px 8px;
+    z-index: 10;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.otomo-switch-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-icons-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-keys-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-mode-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    background: rgba(139, 69, 19, 0.1);
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    transition: all 0.2s ease;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.otomo-key-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 25px;
+}
+
+.otomo-mode-item:hover {
+    background: rgba(139, 69, 19, 0.2);
+    border-color: rgba(139, 69, 19, 0.5);
+}
+
+.otomo-mode-item.active {
+    background: rgba(193, 39, 45, 0.2);
+    border-color: #C1272D;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(193, 39, 45, 0.4);
+}
+
+.otomo-mode-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+}
+
+.otomo-shortcut {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #FFD700;
+    background: rgba(139, 69, 19, 0.8);
+    border: 1px solid #8B4513;
+    border-radius: 4px;
+    padding: 3px 6px;
+    line-height: 1;
+    text-shadow: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* 操作説明関連のスタイルは docs/help/help.css に移動しました */
