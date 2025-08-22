@@ -37,6 +37,12 @@
             messageElement.textContent = message;
         }
         this.gameOverMessage.classList.remove('hidden');
+        
+        // ゲーム中操作ボタンを非表示
+        const gameControlButtons = document.getElementById('gameControlButtons');
+        if (gameControlButtons) {
+            gameControlButtons.classList.add('hidden');
+        }
     }
 
     hideGameOver() {
@@ -48,12 +54,48 @@
         if (pauseMessage) {
             pauseMessage.classList.remove('hidden');
         }
+        
+        // ゲーム中操作ボタンを非表示
+        const gameControlButtons = document.getElementById('gameControlButtons');
+        if (gameControlButtons) {
+            gameControlButtons.classList.add('hidden');
+        }
+        
+        // ゲーム中基本操作説明を非表示
+        const gameBasicControls = document.getElementById('gameBasicControls');
+        if (gameBasicControls) {
+            gameBasicControls.classList.add('hidden');
+        }
+        
+        // お供切り替えUIを非表示
+        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
+        if (otomoSwitchUI) {
+            otomoSwitchUI.classList.add('hidden');
+        }
     }
 
     hidePauseMessage() {
         const pauseMessage = document.getElementById('pauseMessage');
         if (pauseMessage) {
             pauseMessage.classList.add('hidden');
+        }
+        
+        // ゲーム中操作ボタンを再表示
+        const gameControlButtons = document.getElementById('gameControlButtons');
+        if (gameControlButtons) {
+            gameControlButtons.classList.remove('hidden');
+        }
+        
+        // ゲーム中基本操作説明を再表示
+        const gameBasicControls = document.getElementById('gameBasicControls');
+        if (gameBasicControls) {
+            gameBasicControls.classList.remove('hidden');
+        }
+        
+        // お供切り替えUIを再表示
+        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
+        if (otomoSwitchUI) {
+            otomoSwitchUI.classList.remove('hidden');
         }
     }
 

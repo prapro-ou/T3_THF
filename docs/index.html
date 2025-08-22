@@ -108,21 +108,77 @@
             <canvas id="minimapCanvas" width="120" height="90"></canvas>
     <div id="oniHpLogContainer" style="color: red; font-weight: bold; margin-top: 4px;"></div>
         </div>
-        <!-- ゲーム中の簡易操作説明-->
-        <div id="quickHelp" class="hidden wafu-panel wafu-shadow">
-            <b>操作</b>
-            <br> WASD : 移動
-            <br> 左クリック : 攻撃
-            <br> L : ステータス割り振り
-            <br> P : ポーズ
-        </div>
+
         <!-- 桃太郎レベル表示（操作説明UIの直後に配置） -->
         <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow" style="margin-top:10px;"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
+        
         <!-- 回復アイテムカウンター -->
         <div id="recoveryItemDisplay" class="hidden wafu-panel wafu-shadow recovery-item-counter">
             <span class="wafu-label">回復アイテム</span> <span id="recoveryItemValue">0</span>
             <div class="recovery-hint">Spaceで使用</div>
         </div>
+        </div>
+    </div>
+    
+    <!-- ゲーム中操作ボタン（画面右端に配置） -->
+    <div id="gameControlButtons" class="hidden game-control-buttons">
+        <div class="game-control-row">
+            <div class="level-up-container">
+                <button id="levelUpButton" class="game-control-btn level-up-btn" title="レベルアップ (L)">
+                    <span class="btn-icon">⚔️</span>
+                    <span class="btn-text">レベルアップ</span>
+                    <span class="shortcut-key">L</span>
+                </button>
+            </div>
+            <div class="pause-container">
+                <button id="pauseButton" class="game-control-btn pause-btn" title="ポーズ (P)">
+                    <span class="btn-icon">⏸️</span>
+                    <span class="btn-text">ポーズ</span>
+                    <span class="shortcut-key">P</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ゲーム中基本操作説明（画面右端、操作ボタンの下に配置） -->
+    <div id="gameBasicControls" class="hidden game-basic-controls">
+        <div class="basic-controls-content">
+            <div class="control-item">
+                <span class="control-icon">🎮</span>
+                <span class="control-text">WASD 移動</span>
+            </div>
+            <div class="control-item">
+                <span class="control-icon">⚡</span>
+                <span class="control-text">左クリック 攻撃</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- お供切り替えUI（画面右端、基本操作説明の下に配置） -->
+    <div id="otomoSwitchUI" class="hidden otomo-switch-ui">
+        <div class="otomo-switch-content">
+            <div class="otomo-icons-row">
+                <div class="otomo-mode-item" data-mode="1">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/monkey.png" alt="フォロー" title="フォロー">
+                </div>
+                <div class="otomo-mode-item" data-mode="2">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/bird.png" alt="ワンダー" title="ワンダー">
+                </div>
+                <div class="otomo-mode-item" data-mode="3">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/dog.png" alt="チャージ" title="チャージ">
+                </div>
+            </div>
+            <div class="otomo-keys-row">
+                <div class="otomo-key-item" data-mode="1">
+                    <span class="otomo-shortcut">1</span>
+                </div>
+                <div class="otomo-key-item" data-mode="2">
+                    <span class="otomo-shortcut">2</span>
+                </div>
+                <div class="otomo-key-item" data-mode="3">
+                    <span class="otomo-shortcut">3</span>
+                </div>
+            </div>
         </div>
     </div>
 
