@@ -733,12 +733,9 @@ export class Game {
             this.attackManager.reset();
         }
 
-        // UIの状態もリセット
+        // UIの状態もリセット（全UIを非表示に）
         if (this.uiManager) {
-            this.uiManager.hideGameOver();
-            this.uiManager.hidePauseMessage();
-            this.uiManager.hideBossCutIn();
-            this.uiManager.hideMinimap();
+            this.uiManager.hideAllUI();
         }
 
         // ボス進捗の更新を通知（カスタムイベント）

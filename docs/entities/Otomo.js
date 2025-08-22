@@ -119,8 +119,7 @@ export class Otomo extends Character {
             if (dist === 0) return;
             const speed = 5 * 1.2;
             const damage = isBoss ? 5 : 10;
-
-            const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
+            const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage, 'normal', this, 'otomo');
             this.game.projectileManager.addProjectile(projectile);
         } else if (type === 'charge') {
             // 直接ダメージ
