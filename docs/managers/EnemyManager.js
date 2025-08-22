@@ -219,12 +219,34 @@ export class EnemyManager {
                 return;
             }
             case 4: {
-                // BossOni4 単体
-                console.log('BossOni4を生成中...');
-                boss = new BossOni4(this.game, centerX, centerY);
-                if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
-                if (boss._hp) boss._hp = boss._maxHP;
-                this.enemies.push(boss);
+                // 風神・雷神同時出現
+                console.log('BossOni4/BossOni5(風神・雷神)を同時生成中...');
+                // 風神（左側）
+                const fuzinX = centerX - 300;
+                const fuzinY = centerY;
+                const fuzin = new BossOni4(this.game, fuzinX, fuzinY);
+                if (fuzin._maxHP) fuzin._maxHP = Math.round(fuzin._maxHP * 1.5);
+                if (fuzin._hp) fuzin._hp = fuzin._maxHP;
+                // 雷神（右側）
+                const raizinX = centerX + 300;
+                const raizinY = centerY;
+                const raizin = new BossOni5(this.game, raizinX, raizinY);
+                if (raizin._maxHP) raizin._maxHP = Math.round(raizin._maxHP * 1.5);
+                if (raizin._hp) raizin._hp = raizin._maxHP;
+                // 衝突判定で位置を調整
+                if (this.checkCollision(fuzin, raizin)) {
+                    console.log('風神・雷神が重なっているため位置を調整します');
+                    const safePos = this.findSafePosition(raizinX, raizinY, [fuzin], 200);
+                    raizin.x = safePos.x;
+                    raizin.y = safePos.y;
+                }
+                // 登場ギミック
+                this.game.particleManager.createExplosion(fuzin.x, fuzin.y, '#7ed6df');
+                this.game.particleManager.createExplosion(raizin.x, raizin.y, '#f9ca24');
+                this.enemies.push(fuzin, raizin);
+                console.log('風神・雷神を追加後敵数:', this.enemies.length);
+                console.log('風神位置:', { x: fuzin.x, y: fuzin.y });
+                console.log('雷神位置:', { x: raizin.x, y: raizin.y });
                 return;
             }
             case 5: {

@@ -885,18 +885,6 @@ button:hover,
     justify-content: center;
 }
 
-/* ポーズ用巻物コンテナ */
-.pause-container {
-    background: url('assets/UI/UI/scroll.png') center center no-repeat;
-    background-size: 100% 100%;
-    padding: 15px 10px;
-    min-width: 130px;
-    min-height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .game-control-btn {
     background: linear-gradient(135deg, #C1272D 0%, #8B0000 100%);
     border: 2px solid #8B0000;
@@ -951,6 +939,27 @@ button:hover,
     line-height: 1;
     text-shadow: none;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ポーズボタン専用スタイル */
+.pause-btn {
+    background: linear-gradient(135deg, #666 0%, #444 100%) !important;
+    border-color: #555 !important;
+    min-width: 80px;
+    min-height: 50px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 15;
+}
+
+.pause-btn:hover {
+    background: linear-gradient(135deg, #777 0%, #555 100%) !important;
+    border-color: #666 !important;
+}
+
+.pause-btn .btn-icon {
+    font-size: 1.4em;
 }
 
 /* ===== ゲーム中基本操作説明 ===== */

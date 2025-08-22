@@ -521,6 +521,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameControlButtons.classList.remove('hidden');
         gameBasicControls.classList.remove('hidden');
         otomoSwitchUI.classList.remove('hidden');
+        pauseButton.classList.remove('hidden');
         
         // お供切り替えUIの初期状態を設定
         updateOtomoSwitchUI(1);
@@ -615,6 +616,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameControlButtons.classList.add('hidden');
         gameBasicControls.classList.add('hidden');
         otomoSwitchUI.classList.add('hidden');
+        pauseButton.classList.add('hidden');
         
         // 桃太郎レベル表示を非表示
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
@@ -688,6 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gameControlButtons.classList.add('hidden');
         gameBasicControls.classList.add('hidden');
         otomoSwitchUI.classList.add('hidden');
+        pauseButton.classList.add('hidden');
         
         // 桃太郎レベル表示を非表示
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
@@ -1257,6 +1260,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameControlButtons.classList.remove('hidden');
                 gameBasicControls.classList.remove('hidden');
                 otomoSwitchUI.classList.remove('hidden');
+                pauseButton.classList.remove('hidden');
                 
                 // お供切り替えUIの初期状態を設定
                 updateOtomoSwitchUI(1);

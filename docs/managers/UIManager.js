@@ -72,6 +72,12 @@
         if (otomoSwitchUI) {
             otomoSwitchUI.classList.add('hidden');
         }
+        
+        // ポーズボタンを非表示
+        const pauseButton = document.getElementById('pauseButton');
+        if (pauseButton) {
+            pauseButton.classList.add('hidden');
+        }
     }
 
     hidePauseMessage() {
@@ -96,6 +102,12 @@
         const otomoSwitchUI = document.getElementById('otomoSwitchUI');
         if (otomoSwitchUI) {
             otomoSwitchUI.classList.remove('hidden');
+        }
+        
+        // ポーズボタンを再表示
+        const pauseButton = document.getElementById('pauseButton');
+        if (pauseButton) {
+            pauseButton.classList.remove('hidden');
         }
     }
 
