@@ -292,6 +292,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // ゲーム内UIを一括で非表示にするヘルパー
+    function hideInGameUI() {
+        // キャンバス/左下系
+        gameCanvas.classList.add('hidden');
+        scoreDisplay.classList.add('hidden');
+        livesDisplay.classList.add('hidden');
+        timerDisplay.classList.add('hidden');
+        minimapContainer.classList.add('hidden');
+        gameOverMessage.classList.add('hidden');
+
+        // 右側UI
+        const gameControlButtons = document.getElementById('gameControlButtons');
+        if (gameControlButtons) gameControlButtons.classList.add('hidden');
+        const gameBasicControls = document.getElementById('gameBasicControls');
+        if (gameBasicControls) gameBasicControls.classList.add('hidden');
+        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
+        if (otomoSwitchUI) otomoSwitchUI.classList.add('hidden');
+        const pauseButtonEl = document.getElementById('pauseButton');
+        if (pauseButtonEl) pauseButtonEl.classList.add('hidden');
+
+        // 桃太郎Lv/回復カウンター
+        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+        if (otomoLevelDisplay) otomoLevelDisplay.classList.add('hidden');
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) recoveryItemDisplay.classList.add('hidden');
+
+        // 照準
+        hideCrosshair();
+    }
+
     // ゲーム状態を監視して照準の表示/非表示を制御
     function monitorGameState() {
         if (!game || !game.gameState) return;
@@ -606,31 +636,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // スタート画面へ戻る
     backToStartButton.addEventListener('click', () => {
-        // ゲーム中UIを非表示
-        gameCanvas.classList.add('hidden');
-        scoreDisplay.classList.add('hidden');
-        livesDisplay.classList.add('hidden');
-        timerDisplay.classList.add('hidden');
-        minimapContainer.classList.add('hidden');
-        gameOverMessage.classList.add('hidden');
-        gameControlButtons.classList.add('hidden');
-        gameBasicControls.classList.add('hidden');
-        otomoSwitchUI.classList.add('hidden');
-        pauseButton.classList.add('hidden');
-        
-        // 桃太郎レベル表示を非表示
-        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
-        if (otomoLevelDisplay) {
-            otomoLevelDisplay.classList.add('hidden');
-        }
-        
-        // 回復アイテムUIを非表示
-        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
-        if (recoveryItemDisplay) {
-            recoveryItemDisplay.classList.add('hidden');
-        }
-        
-        hideCrosshair(); // 照準を非表示
+        // ゲーム中UIを非表示（ゲームオーバーからの戻りも含む）
+        hideInGameUI();
 
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
@@ -680,35 +687,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     pauseBackToStartButton.addEventListener('click', () => {
-        // ゲーム中UIを非表示
-        gameCanvas.classList.add('hidden');
-        scoreDisplay.classList.add('hidden');
-        livesDisplay.classList.add('hidden');
-        timerDisplay.classList.add('hidden');
-        minimapContainer.classList.add('hidden');
-        pauseMessage.classList.add('hidden');
-        gameControlButtons.classList.add('hidden');
-        gameBasicControls.classList.add('hidden');
-        otomoSwitchUI.classList.add('hidden');
-        pauseButton.classList.add('hidden');
+        // ゲーム中UIを非表示（帰還ボタンからの戻りも含む）
+        hideInGameUI();
         
-        // 桃太郎レベル表示を非表示
-        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
-        if (otomoLevelDisplay) {
-            otomoLevelDisplay.classList.add('hidden');
+        // ゲームのポーズ状態を確実に解除（右側UIが再表示されないように）
+        if (game && game.pauseManager) {
+            game.pauseManager.isPaused = false;
         }
         
-        // 回復アイテムUIを非表示
-        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
-        if (recoveryItemDisplay) {
-            recoveryItemDisplay.classList.add('hidden');
+        // ポーズ画面を非表示（右側UIは再表示しない）
+        const pauseMessage = document.getElementById('pauseMessage');
+        if (pauseMessage) {
+            pauseMessage.classList.add('hidden');
         }
-        
-        hideCrosshair(); // 照準を非表示
 
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
             if (game) {
+                // ゲームのポーズ状態を解除（右側UIが再表示されないように）
+                if (game.pauseManager && game.pauseManager.isPaused) {
+                    game.pauseManager.isPaused = false;
+                }
                 game.destroy(); // ゲームを完全に破棄
                 game = null; // ゲームインスタンスをリセット
             }

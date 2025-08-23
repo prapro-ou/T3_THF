@@ -38,10 +38,22 @@
         }
         this.gameOverMessage.classList.remove('hidden');
         
-        // ゲーム中操作ボタンを非表示
+        // 右側UIを非表示（ゲームオーバー時も）
         const gameControlButtons = document.getElementById('gameControlButtons');
         if (gameControlButtons) {
             gameControlButtons.classList.add('hidden');
+        }
+        const gameBasicControls = document.getElementById('gameBasicControls');
+        if (gameBasicControls) {
+            gameBasicControls.classList.add('hidden');
+        }
+        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
+        if (otomoSwitchUI) {
+            otomoSwitchUI.classList.add('hidden');
+        }
+        const pauseButton = document.getElementById('pauseButton');
+        if (pauseButton) {
+            pauseButton.classList.add('hidden');
         }
     }
 
