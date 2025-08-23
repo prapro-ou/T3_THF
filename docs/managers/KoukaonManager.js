@@ -36,7 +36,16 @@ export function playSE(id) {
     if (audio) {
         // 連続再生対応のため、毎回新しいAudioインスタンスを生成
         const se = audio.cloneNode();
+        se.volume = audio.volume;
         se.currentTime = 0;
         se.play();
     }
 }
+
+window.setSEVolume = setVolume;
+export function setVolume(volume) {
+    Object.values(seFiles).forEach(se => {
+        se.volume = volume;
+    });
+}
+

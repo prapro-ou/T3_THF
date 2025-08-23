@@ -28,6 +28,7 @@
     <div id="startScreen" class="dark-bg">
                 <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
                 <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
+                <img id="volume" src="" alt="音量" class="image-btn">
                 <div id="audioNotice" class="audio-notice">
                         <p>🔊 最初のクリックでBGMが開始されます</p>
                 </div>
@@ -104,6 +105,28 @@
                 <button id="nextHelpPage" class="help-nav-btn help-next-btn">
                     <span class="nav-arrow">→</span>
                 </button>
+            </div>
+        </div>
+    </div>
+    <div id="volumeModal" class="hidden">
+        <div class="volume-content">
+            <span class="volume-title">音量設定</span>
+            <span class="volume-text">バーをクリックして音量を指定</span>
+            <div class="volume-desc">
+                <div style="display:flex;align-items:center;gap:9px;margin:4px 0;">
+                    <span id="seVolumeLabel" class="volume-label">効果音</span>
+                    <span id="seVolumeValue" class="volume-value">5</span>
+                    <div id="seVolumeBar" style="display:flex;align-items:center;"></div>
+                </div>
+                <br>
+                <div style="display:flex;align-items:center;gap:9px;margin:4px 0;">
+                    <span id="bgmVolumeLabel" class="volume-label">BGM</span>
+                    <span id="bgmVolumeValue" class="volume-value">5</span>
+                    <div id="bgmVolumeBar" style="display:flex;align-items:center;"></div>
+                </div>
+            </div>
+            <div class="volume-buttons">
+                <img id="closeVolume" src="assets/UI/UI/button/modoru_button_UI.png" alt="音量調整を閉じる" class="image-btn">
             </div>
         </div>
     </div>
@@ -187,6 +210,8 @@
             <div class="pause-buttons">
                 <img id="resumeButton" src="assets/UI/UI/button/restart_button_UI.png" alt="ゲーム再開" class="image-btn">
                 <img id="pauseHelpButton" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明"
+                    class="image-btn">
+                <img id="pauseVolumeButton" src="" alt="音量調整"
                     class="image-btn">
                 <img id="pauseBackToStartButton" src="assets/UI/UI/button/kikan_button_UI.png" alt="スタート画面へ戻る"
                     class="image-btn">

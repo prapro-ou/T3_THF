@@ -5,6 +5,7 @@ import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
 import { BossProgressManager } from './managers/BossProgressManager.js';
 import { HelpManager } from './help/index.js';
+import { VolumeManager } from './managers/VolumeManager.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 鬼HP上昇ログ用
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const stageSelectArea = document.getElementById('stageSelectArea');
     const minimapContainer = document.getElementById('minimapContainer');
     const crosshair = document.getElementById('crosshair');
-
+   
     // デバッグパネルの要素
     const debugPanel = document.getElementById('debugPanel');
     const closeDebug = document.getElementById('closeDebug');
@@ -126,10 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const pauseMessage = document.getElementById('pauseMessage');
     const resumeButton = document.getElementById('resumeButton');
     const pauseHelpButton = document.getElementById('pauseHelpButton');
+    const pauseVolumeButton = document.getElementById('pauseVolumeButton');
     const pauseBackToStartButton = document.getElementById('pauseBackToStartButton');
 
     // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
     const bgmManager = new BgmManager();
+    window.bgmManager = bgmManager;
     bgmManager.play('mainBgm'); // ユーザー操作後まで保留される
 
     // ボス進捗マネージャーの初期化
@@ -479,6 +482,17 @@ document.addEventListener('DOMContentLoaded', () => {
         playSE("kettei"); // ← 決定音
         helpManager.show();
     });
+    
+    // 音量調節マネージャーの初期化
+    const volumeManager = new VolumeManager();
+
+    // 音量調整画面表示
+    pauseVolumeButton.addEventListener('click', () => {
+        const volumeModal = document.getElementById('volumeModal');
+        if (volumeModal) {
+            volumeModal.classList.remove('hidden');
+        }
+    });
 
     // ボス選択画面からスタート画面へ戻る
     backToStartFromStageButton.addEventListener('click', () => {
@@ -561,6 +575,14 @@ document.addEventListener('DOMContentLoaded', () => {
     pauseHelpButton.addEventListener('click', () => {
         playSE("kettei"); // 決定音を追加
         helpManager.show();
+    });
+
+    pauseVolumeButton.addEventListener('click', () => {
+        const volumeModal = document.getElementById('volumeModal');
+        playSE("kettei"); // 決定音を追加
+        if (volumeModal) {
+            volumeModal.classList.remove('hidden');
+        }
     });
 
     pauseBackToStartButton.addEventListener('click', () => {
