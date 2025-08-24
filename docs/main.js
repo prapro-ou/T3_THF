@@ -1239,7 +1239,8 @@ document.addEventListener('DOMContentLoaded', () => {
             bossCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             // ボス種別取得
-            const selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
+            selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
+            console.log('ボス選択: ボスID', selectedBossType, 'が選択されました');
 
             // 既存のゲームインスタンスがあれば破棄
             if (game) {
@@ -1280,8 +1281,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 新しいゲームインスタンスを作成
                 console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
+                console.log('グローバルselectedBossType:', window.selectedBossType || 'undefined');
                 
-                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
+                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType, bgmManager);
+                console.log('ゲームインスタンス作成完了。選択されたボス:', selectedBossType);
                 
                 // ゲーム状態監視を開始
                 const gameStateInterval = setInterval(() => {
