@@ -1,14 +1,14 @@
 {
     "title": "クレジット",
+    "team": {
+        "name": "TH_fullhouse",
+        "logo": "assets/UI/TH_fullhouse.png",
+        "description": "ゲーム開発チーム"
+    },
     "sections": [
         {
-            "title": "開発",
+            "title": "開発メンバー",
             "items": [
-
-                {
-                    "role": "開発チーム",
-                    "name": "TH_フルハウス"
-                },
 
                 {
 
