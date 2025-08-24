@@ -145,7 +145,7 @@ export class Game {
             if (window.oniHpLogContainer) {
                 const log = document.createElement('div');
                 log.textContent = `赤鬼・青鬼・黒鬼の移動速度が上昇！（現在倍率: x${this.enemySpeedMultiplier.toFixed(1)}）`;
-                log.style.color = 'blue';
+                log.style.color = 'cyan';
                 log.style.fontWeight = 'bold';
                 window.oniHpLogContainer.appendChild(log);
                 setTimeout(() => {
