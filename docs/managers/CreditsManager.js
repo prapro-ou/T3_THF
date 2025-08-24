@@ -42,6 +42,17 @@ export class CreditsManager {
 
         let html = '';
 
+        // チームアイコンをヘッダーに追加
+        if (this.creditsData.team) {
+            html += `<div class="credits-header-team">`;
+            html += `<img src="${this.creditsData.team.logo}" alt="${this.creditsData.team.name}" class="team-logo">`;
+            html += `<h2 class="team-name">${this.creditsData.team.name}</h2>`;
+            if (this.creditsData.team.description) {
+                html += `<p class="team-description">${this.creditsData.team.description}</p>`;
+            }
+            html += `</div>`;
+        }
+
         // 各セクションをレンダリング
         this.creditsData.sections.forEach(section => {
             html += `<div class="credits-section">`;
@@ -108,6 +119,10 @@ export class CreditsManager {
         if (!this.creditsBody) return;
 
         const defaultHtml = `
+            <div class="credits-header-team">
+                <img src="assets/UI/TH_fullhouse.png" alt="TH_fullhouse" class="team-logo">
+                <h2 class="team-name">TH_fullhouse</h2>
+            </div>
             <div class="credits-section">
                 <h3>開発</h3>
                 <div class="credit-item">

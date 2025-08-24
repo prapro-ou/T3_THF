@@ -2329,6 +2329,47 @@ hr,
     position: relative;
 }
 
+/* チームアイコンのスタイル */
+.credits-header-team {
+    text-align: center;
+    margin-bottom: 2em;
+    padding: 1em;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.team-logo {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 1em;
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    transition: transform 0.3s ease;
+}
+
+.team-logo:hover {
+    transform: scale(1.05);
+}
+
+.team-name {
+    color: white;
+    font-size: 1.8em;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    font-weight: bold;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.1em;
+}
+
+.team-description {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1em;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    margin: 0.5em 0 0 0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
 .credits-header h2 {
     margin: 0;
     font-size: 1.8em;
