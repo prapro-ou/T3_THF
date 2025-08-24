@@ -122,34 +122,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const crosshair = document.getElementById('crosshair');
 
     
-    // ゲーム中操作ボタンの要素
-    const gameControlButtons = document.getElementById('gameControlButtons');
+    // レベルアップボタンの要素（右側UIパネル内）
     const levelUpButton = document.getElementById('levelUpButton');
     const pauseButton = document.getElementById('pauseButton');
     
-    // ゲーム中基本操作説明の要素
-    const gameBasicControls = document.getElementById('gameBasicControls');
-    
-    // お供切り替えUIの要素
-    const otomoSwitchUI = document.getElementById('otomoSwitchUI');
+    // 右側UIパネルの要素
+    const rightUIPanel = document.getElementById('rightUIPanel');
     
     // お供切り替えUIの状態管理
     let currentOtomoMode = 1; // デフォルトはフォロー（モード1）
     
     // お供切り替えUIの状態を更新する関数
     function updateOtomoSwitchUI(mode) {
+        if (!rightUIPanel) return;
+        
         currentOtomoMode = mode;
         
         // すべてのモードアイテムからactiveクラスを削除
-        const modeItems = otomoSwitchUI.querySelectorAll('.otomo-mode-item');
+        const modeItems = rightUIPanel.querySelectorAll('.otomo-mode-item');
         modeItems.forEach(item => item.classList.remove('active'));
         
         // 現在のモードに対応するアイテムにactiveクラスを追加
-        const currentItem = otomoSwitchUI.querySelector(`[data-mode="${mode}"]`);
+        const currentItem = rightUIPanel.querySelector(`[data-mode="${mode}"]`);
         if (currentItem) {
             currentItem.classList.add('active');
         }
     }
+    
+    // グローバル関数として公開（Game.jsから呼び出し可能）
+    window.updateOtomoSwitchUI = updateOtomoSwitchUI;
+    
+    // 初期状態を設定
+    updateOtomoSwitchUI(currentOtomoMode);
     
     // キーボードでお供切り替え
     window.addEventListener('keydown', (e) => {
@@ -160,6 +164,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (mode >= 1 && mode <= 3) {
                     // お供切り替え処理（実際のゲームロジックと連携）
                     console.log(`お供モード切り替え: ${mode}`);
+                    
+                    // ゲームのお供モードを実際に変更
+                    let modeName;
+                    switch (mode) {
+                        case 1:
+                            modeName = 'follow';
+                            break;
+                        case 2:
+                            modeName = 'wander';
+                            break;
+                        case 3:
+                            modeName = 'charge';
+                            break;
+                        default:
+                            modeName = 'follow';
+                    }
+                    
+                    if (game.setOtomoMode) {
+                        game.setOtomoMode(modeName);
+                    }
+                    
+                    // UIの更新
                     updateOtomoSwitchUI(mode);
                     
                     // 効果音再生
@@ -168,6 +194,48 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+    
+    // お供切り替えUIのクリックイベント
+    if (rightUIPanel) {
+        const otomoModeItems = rightUIPanel.querySelectorAll('.otomo-mode-item');
+        otomoModeItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if (game && !game.pauseManager.isPaused) {
+                    const mode = parseInt(item.dataset.mode);
+                    if (mode >= 1 && mode <= 3) {
+                        // お供切り替え処理（実際のゲームロジックと連携）
+                        console.log(`お供モード切り替え（クリック）: ${mode}`);
+                        
+                        // ゲームのお供モードを実際に変更
+                        let modeName;
+                        switch (mode) {
+                            case 1:
+                                modeName = 'follow';
+                                break;
+                            case 2:
+                                modeName = 'wander';
+                                break;
+                            case 3:
+                                modeName = 'charge';
+                                break;
+                            default:
+                                modeName = 'follow';
+                        }
+                        
+                        if (game.setOtomoMode) {
+                            game.setOtomoMode(modeName);
+                        }
+                        
+                        // UIの更新
+                        updateOtomoSwitchUI(mode);
+                        
+                        // 効果音再生
+                        playSE("kettei");
+                    }
+                }
+            });
+        });
+    }
 
 
     // デバッグパネルの要素
@@ -319,14 +387,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gameOverMessage.classList.add('hidden');
 
         // 右側UI
-        const gameControlButtons = document.getElementById('gameControlButtons');
-        if (gameControlButtons) gameControlButtons.classList.add('hidden');
-        const gameBasicControls = document.getElementById('gameBasicControls');
-        if (gameBasicControls) gameBasicControls.classList.add('hidden');
-        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
-        if (otomoSwitchUI) otomoSwitchUI.classList.add('hidden');
-        const pauseButtonEl = document.getElementById('pauseButton');
-        if (pauseButtonEl) pauseButtonEl.classList.add('hidden');
+        if (rightUIPanel) rightUIPanel.classList.add('hidden');
+        if (pauseButton) pauseButton.classList.add('hidden');
 
         // 桃太郎Lv/回復カウンター
         const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
@@ -566,7 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
         minimapContainer.classList.remove('hidden');
         gameControlButtons.classList.remove('hidden');
         gameBasicControls.classList.remove('hidden');
-        otomoSwitchUI.classList.remove('hidden');
+                        rightUIPanel.classList.remove('hidden');
         pauseButton.classList.remove('hidden');
         
         // お供切り替えUIの初期状態を設定
@@ -1342,9 +1404,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 livesDisplay.classList.remove('hidden');
                 timerDisplay.classList.remove('hidden');
                 minimapContainer.classList.remove('hidden');
-                gameControlButtons.classList.remove('hidden');
-                gameBasicControls.classList.remove('hidden');
-                otomoSwitchUI.classList.remove('hidden');
+                rightUIPanel.classList.remove('hidden');
                 pauseButton.classList.remove('hidden');
                 
                 // お供切り替えUIの初期状態を設定

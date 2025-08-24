@@ -191,13 +191,13 @@ export class Game {
             if (!this.otomo) return;
             switch (e.key) {
                 case '1':
-                    this.otomo.setMode('follow');
+                    this.setOtomoMode('follow');
                     break;
                 case '2':
-                    this.otomo.setMode('wander');
+                    this.setOtomoMode('wander');
                     break;
                 case '3':
-                    this.otomo.setMode('charge');
+                    this.setOtomoMode('charge');
                     break;
             }
         };
@@ -818,6 +818,39 @@ export class Game {
     getOtomoAttackCooldown() {
         // デフォルト攻撃速度を速く（例: レベル1で700ms、レベルごとに10%短縮、下限250ms）
         return Math.max(250, 700 * Math.pow(0.9, this.otomoLevel - 1));
+    }
+    
+    // お供のモードを設定するメソッド（外部から呼び出し可能）
+    setOtomoMode(mode) {
+        if (!this.otomo) return;
+        
+        // モードを設定
+        this.otomo.setMode(mode);
+        
+        // 現在のモードを保存
+        this.currentOtomoMode = mode;
+        
+        // UIの更新を通知（グローバル関数として呼び出し）
+        if (typeof window.updateOtomoSwitchUI === 'function') {
+            // モード名を数値に変換
+            let modeNumber;
+            switch (mode) {
+                case 'follow':
+                    modeNumber = 1;
+                    break;
+                case 'wander':
+                    modeNumber = 2;
+                    break;
+                case 'charge':
+                    modeNumber = 3;
+                    break;
+                default:
+                    modeNumber = 1;
+            }
+            window.updateOtomoSwitchUI(modeNumber);
+        }
+        
+        console.log(`お供モード切り替え: ${mode}`);
     }
 
     // ゲッター

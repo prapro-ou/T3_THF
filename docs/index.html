@@ -186,29 +186,33 @@
         </div>
     </div>
     
-    <!-- ゲーム中操作ボタン（画面右端に配置） -->
-    <div id="gameControlButtons" class="hidden game-control-buttons">
-        <div class="game-control-row">
-            <div class="level-up-container">
-                <button id="levelUpButton" class="game-control-btn level-up-btn" title="レベルアップ (L)">
+    <!-- ポーズボタン（画面右上に配置） -->
+    <button id="pauseButton" class="game-control-btn pause-btn hidden" title="ポーズ (P)">
+        <div class="btn-content">
+            <span class="btn-icon">⏸️</span>
+            <span class="btn-text">ポーズ</span>
+            <span class="shortcut-key">P</span>
+        </div>
+    </button>
+    
+    <!-- 右側UIパネル（ゲームキャンバスの右側余白部分中央に一列配置） -->
+    <div id="rightUIPanel" class="hidden right-ui-panel">
+        <!-- レベルアップボタン -->
+        <div class="ui-section">
+            <button id="levelUpButton" class="game-control-btn level-up-btn" title="レベルアップ (L)">
+                <div class="btn-content">
                     <span class="btn-icon">⚔️</span>
                     <span class="btn-text">レベルアップ</span>
                     <span class="shortcut-key">L</span>
-                </button>
-            </div>
+                </div>
+            </button>
         </div>
-    </div>
-    
-    <!-- ポーズボタン（画面右上に配置） -->
-    <button id="pauseButton" class="game-control-btn pause-btn hidden" title="ポーズ (P)">
-        <span class="btn-icon">⏸️</span>
-        <span class="btn-text">ポーズ</span>
-        <span class="shortcut-key">P</span>
-    </button>
-    
-    <!-- ゲーム中基本操作説明（画面右端、操作ボタンの下に配置） -->
-    <div id="gameBasicControls" class="hidden game-basic-controls">
-        <div class="basic-controls-content">
+        
+        <!-- 基本操作説明 -->
+        <div class="ui-section">
+            <div class="section-header">
+                <span class="section-title">操作説明</span>
+            </div>
             <div class="control-item">
                 <span class="control-icon">🎮</span>
                 <span class="control-text">WASD 移動</span>
@@ -218,30 +222,32 @@
                 <span class="control-text">左クリック 攻撃</span>
             </div>
         </div>
-    </div>
-    
-    <!-- お供切り替えUI（画面右端、基本操作説明の下に配置） -->
-    <div id="otomoSwitchUI" class="hidden otomo-switch-ui">
-        <div class="otomo-switch-content">
-            <div class="otomo-icons-row">
-                <div class="otomo-mode-item" data-mode="1">
-                    <img class="otomo-mode-icon" src="assets/characters/otomo/monkey.png" alt="フォロー" title="フォロー">
-                </div>
-                <div class="otomo-mode-item" data-mode="2">
-                    <img class="otomo-mode-icon" src="assets/characters/otomo/bird.png" alt="ワンダー" title="ワンダー">
-                </div>
-                <div class="otomo-mode-item" data-mode="3">
-                    <img class="otomo-mode-icon" src="assets/characters/otomo/dog.png" alt="チャージ" title="チャージ">
-                </div>
+        
+        <!-- お供選択 -->
+        <div class="ui-section">
+            <div class="section-header">
+                <span class="section-title">お供選択</span>
             </div>
-            <div class="otomo-keys-row">
-                <div class="otomo-key-item" data-mode="1">
+            <div class="otomo-modes">
+                <div class="otomo-mode-item" data-mode="1" title="フォロー (1)">
+                    <div class="otomo-icon-container">
+                        <img class="otomo-mode-icon" src="assets/characters/otomo/monkey.png" alt="フォロー">
+                    </div>
+                    <span class="otomo-mode-name">フォロー</span>
                     <span class="otomo-shortcut">1</span>
                 </div>
-                <div class="otomo-key-item" data-mode="2">
+                <div class="otomo-mode-item" data-mode="2" title="ワンダー (2)">
+                    <div class="otomo-icon-container">
+                        <img class="otomo-mode-icon" src="assets/characters/otomo/bird.png" alt="ワンダー">
+                    </div>
+                    <span class="otomo-mode-name">ワンダー</span>
                     <span class="otomo-shortcut">2</span>
                 </div>
-                <div class="otomo-key-item" data-mode="3">
+                <div class="otomo-mode-item" data-mode="3" title="チャージ (3)">
+                    <div class="otomo-icon-container">
+                        <img class="otomo-mode-icon" src="assets/characters/otomo/dog.png" alt="チャージ">
+                    </div>
+                    <span class="otomo-mode-name">チャージ</span>
                     <span class="otomo-shortcut">3</span>
                 </div>
             </div>
