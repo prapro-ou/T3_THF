@@ -57,12 +57,27 @@
     }
 
     destroy() {
+        // 既に破棄済みの場合は何もしない
+        if (!this.eventHandlers) {
+            return;
+        }
+        
         // イベントリスナーを削除
-        window.removeEventListener('keydown', this.eventHandlers.keydown);
-        window.removeEventListener('keyup', this.eventHandlers.keyup);
-        window.removeEventListener('mousemove', this.eventHandlers.mousemove);
-        window.removeEventListener('mousedown', this.eventHandlers.mousedown);
-        window.removeEventListener('mouseup', this.eventHandlers.mouseup);
+        if (this.eventHandlers.keydown) {
+            window.removeEventListener('keydown', this.eventHandlers.keydown);
+        }
+        if (this.eventHandlers.keyup) {
+            window.removeEventListener('keyup', this.eventHandlers.keyup);
+        }
+        if (this.eventHandlers.mousemove) {
+            window.removeEventListener('mousemove', this.eventHandlers.mousemove);
+        }
+        if (this.eventHandlers.mousedown) {
+            window.removeEventListener('mousedown', this.eventHandlers.mousedown);
+        }
+        if (this.eventHandlers.mouseup) {
+            window.removeEventListener('mouseup', this.eventHandlers.mouseup);
+        }
         
         // データをクリア
         this.keys = null;
