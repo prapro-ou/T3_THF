@@ -358,6 +358,7 @@ export class Game {
                     );
                     
                     this.gameState.setGameOver();
+                    this.bgmManager.stop();
                     playSE("gameclear"); // ← ボス撃破時に効果音を鳴らす
                     const clearMsg = (this.selectedBossType === 4)
                         ? 'クリア！風神・雷神を倒した！'

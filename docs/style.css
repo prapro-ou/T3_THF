@@ -376,7 +376,8 @@ canvas {
 
 /* 開始画面のボタンを右下に配置 */
 #startScreen #startButton,
-#startScreen #help {
+#startScreen #help,
+#startScreen #volume {
     position: absolute;
     max-width: 250px;
     height: auto;
@@ -384,12 +385,17 @@ canvas {
 }
 
 #startScreen #startButton {
-    bottom: 10em;
+    bottom: 12.5em;
 }
 
 #startScreen #help {
 
-    bottom: 5em;
+    bottom: 7.5em;
+}
+
+#startScreen #volume {
+
+    bottom: 2.5em;
 }
 
 /* 音声案内スタイル */
@@ -457,6 +463,7 @@ button,
 .wafu-btn,
 #startButton,
 #help,
+#volume,
 .ui-btn,
 #restartButton,
 #closeHelp {
@@ -478,6 +485,7 @@ button:hover,
 .wafu-btn:hover,
 #startButton:hover,
 #help:hover,
+#volume:hover,
 .ui-btn:hover {
     background: #C1272D;
     color: #fff;
@@ -488,7 +496,8 @@ button:hover,
 
 /* 特殊ボタンスタイル */
 #startButton,
-#help {
+#help,
+#volume {
     display: inline-block;
     margin: 0 auto;
     min-width: 180px;
@@ -500,7 +509,8 @@ button:hover,
 }
 
 #startButton:hover,
-#help:hover {
+#help:hover,
+#volume:hover {
     background: linear-gradient(90deg, #e6b422 60%, #fffbe7 100%);
 }
 
@@ -532,7 +542,8 @@ button:hover,
 
 /* 小さい画像ボタン用スタイル */
 #backToStartButton.image-btn,
-#closeHelp.image-btn {
+#closeHelp.image-btn,
+#closeVolume.image-btn {
     max-width: 150px;
 }
 
@@ -1143,12 +1154,13 @@ button:hover,
     text-shadow: 0 2px 8px #000a;
 }
 
-/* ===== ゲームオーバー・ポーズ・勝利画面 ===== */
+/* ===== ゲームオーバー・ポーズ・勝利画面・音量調整画面 ===== */
 #gameOverMessage,
 #pauseMessage,
 #pausePanel,
 #gameOverPanel,
-#winPanel {
+#winPanel,
+#volumeModal {
     position: fixed;
     top: 0;
     left: 0;
@@ -1324,6 +1336,71 @@ button:hover,
     .pause-buttons button {
         min-width: 160px;
     }
+}
+
+/* 音量調整画面のコンテンツ */
+#volumeModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(120deg, rgba(24, 24, 24, 0.9) 0%, rgba(35, 35, 35, 0.9) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: blur(3px);
+}
+
+.volume-content {
+    background: rgba(42, 42, 42, 0.95);
+    color: #fff;
+    border: 3px solid #C1272D;
+    border-radius: 20px;
+    padding: 3em 4em;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
+    backdrop-filter: blur(5px);
+}
+
+.volume-title {
+    font-size: 2.5em;
+    color: #C1272D;
+    font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
+    font-weight: 700;
+    margin-bottom: 1.5em;
+    display: block;
+    letter-spacing: 0.1em;
+    text-shadow: none;
+}
+
+.volume-text {
+    font-size: 1.2em;
+    color: #fff;
+    margin-bottom: 1em;
+}
+
+.volume-label {
+    font-weight: bold;
+    font-size: 1.2em;
+    min-width: 70px;
+}
+
+.volume-value {
+  font-size: 2em;
+  display: inline-block;
+  min-width: 2em;
+  text-align: center;
 }
 
 /* ===== ボス選択画面 ===== */

@@ -19,10 +19,16 @@ export class BgmManager {
         this.introTimeout = null;
         this.isUserInteracted = false; // ユーザーの最初の相互作用フラグ
         this.pendingPlay = null; // 保留中の再生要求
-        this.bgms.mainBgm.volume = 1;
-        this.bgms.battleBgm.volume = 0.7;
-        this.bgms.bossBgm.volume = 0.7;
-        this.bgms.lastbossBgm.volume = 0.5;
+        this.baseVolumes = {
+            mainBgm: 1,
+            battleBgm: 0.7,
+            bossBgm: 0.7,
+            lastbossBgm: 0.5
+        };
+        this.bgms.mainBgm.volume = this.baseVolumes.mainBgm;
+        this.bgms.battleBgm.volume = this.baseVolumes.battleBgm;
+        this.bgms.bossBgm.volume = this.baseVolumes.bossBgm;
+        this.bgms.lastbossBgm.volume = this.baseVolumes.lastbossBgm;
         Object.values(this.bgms).forEach(bgm => {
             bgm.loop = true;
         });
@@ -158,8 +164,8 @@ export class BgmManager {
 
     setVolume(volume) {
         this.volume = volume;
-        Object.values(this.bgms).forEach(bgm => {
-            bgm.volume = volume;
+        Object.keys(this.bgms).forEach(key => {
+            this.bgms[key].volume = this.baseVolumes[key] * volume;
         });
     }
 
