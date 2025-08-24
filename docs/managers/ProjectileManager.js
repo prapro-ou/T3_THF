@@ -1,4 +1,4 @@
-import { Projectile, OtomoProjectile, CannonBallProjectile } from '../entities/Projectile.js';
+import { Projectile } from '../entities/Projectile.js';
 import { SpriteSheet } from '../utils/SpriteSheet.js';
 
 export class ProjectileManager {
@@ -62,13 +62,30 @@ export class ProjectileManager {
     }
 
     update(deltaTime) {
-        this.projectiles.forEach(p => p.update(deltaTime));
+        console.log('ProjectileManager: Updating', this.projectiles.length, 'projectiles');
+        this.projectiles.forEach((p, index) => {
+            console.log(`ProjectileManager: Updating projectile ${index}, type: ${p.type || 'unknown'}, markedForDeletion: ${p.markedForDeletion}`);
+            p.update(deltaTime);
+            
+            // お札の当たり判定をチェック
+            if (p.type === 'ofuda' && this.game.player && !p.markedForDeletion) {
+                console.log('ProjectileManager: Checking ofuda collision with player');
+                if (p.checkPlayerCollision && p.checkPlayerCollision(this.game.player)) {
+                    console.log('ProjectileManager: Ofuda hit player, collision detected');
+                    // markedForDeletionはcheckPlayerCollision内で設定されるので、ここでは設定しない
+                }
+            }
+        });
         this.projectiles = this.projectiles.filter(p => !p.markedForDeletion);
+        console.log('ProjectileManager: After cleanup,', this.projectiles.length, 'projectiles remaining');
     }
 
     draw(ctx, scrollX, scrollY) {
-        console.log("Drawing", this.projectiles.length, "projectiles");
-        this.projectiles.forEach(p => p.draw(ctx, scrollX, scrollY));
+        console.log("ProjectileManager: Drawing", this.projectiles.length, "projectiles");
+        this.projectiles.forEach((p, index) => {
+            console.log(`ProjectileManager: Drawing projectile ${index}, type: ${p.type || 'unknown'}, position: (${p.x}, ${p.y})`);
+            p.draw(ctx, scrollX, scrollY);
+        });
     }
 
     reset() {
@@ -85,17 +102,35 @@ export class ProjectileManager {
         this.projectiles.push(proj);
     }
 
-    spawnCannonBallProjectile(x, y, target, speed = 6, damage = 15, radius = 40, color = '#ff0') {
+    spawnCannonBallProjectile(x, y, target, speed = 6, damage = 15) {
         // cannon_ballタイプの弾（ターゲットはプレイヤー）
         console.log("Creating cannon ball projectile at:", x, y);
-        const proj = new CannonBallProjectile(this.game, x, y, target, speed, damage, radius, color);
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'cannon_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
         console.log("Cannon ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }
 
-    spawnOtomoProjectile(x, y, target, speed = 6, damage = 10) {
-        // お供の弾
-        const proj = new OtomoProjectile(this.game, x, y, target, speed, damage);
+    spawnBlackBallProjectile(x, y, target, speed = 8, damage = 10) {
+        // 黒い玉（小さめで速い球）
+        console.log("Creating black ball projectile at:", x, y);
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'black_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
+        console.log("Black ball projectile created with type:", proj.type);
+        this.projectiles.push(proj);
+    }
+
+    spawnRedBallProjectile(x, y, target, speed = 5, damage = 12) {
+        // 赤い玉（曲がる弾）
+        console.log("Creating red ball projectile at:", x, y);
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'red_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
+        console.log("Red ball projectile created with type:", proj.type);
+        this.projectiles.push(proj);
+    }
+
+    spawnYellowBallProjectile(x, y, target, speed = 5, damage = 12) {
+        // 黄色い玉（反対方向に曲がる弾）
+        console.log("Creating yellow ball projectile at:", x, y);
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'yellow_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
+        console.log("Yellow ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }
 } 

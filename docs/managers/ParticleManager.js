@@ -6,13 +6,15 @@ export class ParticleManager {
         this.particles = [];
     }
 
-    createParticle(x, y, color) {
-        this.particles.push(new Particle(this.game, x, y, color));
+    createParticle(x, y, vx, vy, color, lifeTime, alpha) {
+        this.particles.push(new Particle(this.game, x, y, vx, vy, color, lifeTime, alpha));
     }
 
     createExplosion(x, y, color, count = 15) {
         for (let i = 0; i < count; i++) {
-            this.createParticle(x, y, color);
+            const vx = (Math.random() - 0.5) * 4;
+            const vy = (Math.random() - 0.5) * 4;
+            this.createParticle(x, y, vx, vy, color, 60, 1.0);
         }
     }
 

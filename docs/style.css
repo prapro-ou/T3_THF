@@ -1,7 +1,157 @@
+/* ===== ステータス割り振りモーダル ===== */
+#statusModal {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.status-modal-card {
+    background: #fff8f0;
+    border-radius: 24px;
+    min-width: 340px;
+    max-width: 95vw;
+    box-shadow: 0 0 32px #0008, 0 0 0 8px #c1272d22;
+    padding: 2.2em 2.5em 1.5em 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    border: 4px solid #C1272D;
+    position: relative;
+}
+.status-modal-title {
+    color: #C1272D;
+    font-size: 2em;
+    margin-bottom: 0.7em;
+    letter-spacing: 0.08em;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff, 2px 2px 6px #c1272d33;
+}
+.status-points-row {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    font-size: 1.2em;
+    margin-bottom: 1.2em;
+}
+.status-points-label {
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.status-points-value {
+    background: #fff3;
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.3em;
+    border: 2px solid #C1272D;
+    border-radius: 8px;
+    padding: 0.1em 1.2em;
+}
+.status-alloc-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1em;
+    margin-bottom: 1.5em;
+}
+.status-alloc-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2em;
+    font-size: 1.15em;
+}
+.status-alloc-label {
+    min-width: 5.5em;
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1.1em;
+    letter-spacing: 0.04em;
+}
+.status-alloc-btn {
+    font-size: 1.3em;
+    width: 2.2em;
+    height: 2.2em;
+    border-radius: 50%;
+    border: 2px solid #C1272D;
+    background: #fff;
+    color: #C1272D;
+    font-weight: bold;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+.status-alloc-btn:hover {
+    background: #C1272D;
+    color: #fff;
+    transform: scale(1.1);
+}
+.status-alloc-value {
+    font-size: 1.2em;
+    min-width: 2.5em;
+    text-align: center;
+    color: #222;
+    font-weight: bold;
+    background: #fff3;
+    border-radius: 6px;
+    border: 1.5px solid #C1272D;
+    padding: 0.1em 0.7em;
+}
+.status-modal-btn-row {
+    display: flex;
+    gap: 2em;
+    margin-bottom: 0.7em;
+}
+.status-modal-btn {
+    font-size: 1.15em;
+    padding: 0.5em 2.5em;
+    border-radius: 12px;
+    border: 2px solid #C1272D;
+    background: #fff;
+    color: #C1272D;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s, transform 0.1s;
+}
+.status-modal-btn:hover {
+    background: #C1272D;
+    color: #fff;
+    transform: scale(1.05);
+}
+.status-modal-apply {
+    background: #C1272D;
+    color: #fff;
+}
+.status-modal-apply:hover {
+    background: #a01d23;
+    color: #fff;
+}
+.status-modal-cancel {
+    background: #fff;
+    color: #C1272D;
+}
+.status-modal-cancel:hover {
+    background: #c1272d22;
+    color: #C1272D;
+}
+.status-modal-hint {
+    margin-top: 0.7em;
+    color: #888;
+    font-size: 0.95em;
+    text-align: center;
+}
 /* ===== 桃太郎ゲーム スタイルシート ===== */
 
 /* ===== 基本レイアウト ===== */
-body, html {
+body,
+html {
     margin: 0;
     padding: 0;
     height: 100%;
@@ -9,14 +159,14 @@ body, html {
     overflow: hidden;
     overflow-x: hidden;
     min-height: 100vh;
-    
+
     /* レイアウト */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     position: relative;
-    
+
     /* デザイン */
     background: linear-gradient(120deg, #181818 0%, #232323 100%);
     color: #f7f7f7;
@@ -34,14 +184,30 @@ canvas {
 /* ===== ゲームコンテナ ===== */
 .game-container {
     position: relative;
-    width: 800px;
-    height: 600px;
+    width: 1000px;
+    height: 800px;
     margin: 0 auto;
 }
 
 /* ===== 共通ユーティリティ ===== */
 .hidden {
     display: none !important;
+}
+
+/* ===== 照準カーソル ===== */
+#crosshair {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 999;
+    transform: translate(-50%, -50%);
+}
+
+#crosshair img {
+    width: 192px;
+    height: 192px;
+    opacity: 0.8;
 }
 
 /* ===== 障子風画面切り替えアニメーション ===== */
@@ -60,7 +226,8 @@ canvas {
     pointer-events: none;
 }
 
-.shoji-left, .shoji-right {
+.shoji-left,
+.shoji-right {
     position: absolute;
     top: 0;
     width: 50vw;
@@ -100,13 +267,14 @@ canvas {
 }
 
 /* ふすまの木枠装飾 */
-.shoji-left::before, .shoji-right::before {
+.shoji-left::before,
+.shoji-right::before {
     content: '';
     position: absolute;
     top: 0;
     width: 100%;
     height: 100%;
-    background: 
+    background:
         linear-gradient(90deg, rgba(139, 69, 19, 0.4) 0%, transparent 3%, transparent 97%, rgba(139, 69, 19, 0.4) 100%),
         linear-gradient(0deg, rgba(139, 69, 19, 0.4) 0%, transparent 3%, transparent 97%, rgba(139, 69, 19, 0.4) 100%),
         linear-gradient(90deg, rgba(139, 69, 19, 0.2) 0%, transparent 1%, transparent 99%, rgba(139, 69, 19, 0.2) 100%),
@@ -115,13 +283,14 @@ canvas {
 }
 
 /* ふすまの格子模様 */
-.shoji-left::after, .shoji-right::after {
+.shoji-left::after,
+.shoji-right::after {
     content: '';
     position: absolute;
     top: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         linear-gradient(rgba(139, 69, 19, 0.15) 1px, transparent 1px),
         linear-gradient(90deg, rgba(139, 69, 19, 0.15) 1px, transparent 1px);
     background-size: 60px 60px;
@@ -140,7 +309,7 @@ canvas {
     border: 3px solid #654321;
     border-radius: 50%;
     transform: translateY(-50%);
-    box-shadow: 
+    box-shadow:
         inset 2px 2px 4px rgba(255, 255, 255, 0.3),
         inset -2px -2px 4px rgba(0, 0, 0, 0.3),
         0 4px 8px rgba(0, 0, 0, 0.3);
@@ -158,7 +327,7 @@ canvas {
     border: 3px solid #654321;
     border-radius: 50%;
     transform: translateY(-50%);
-    box-shadow: 
+    box-shadow:
         inset 2px 2px 4px rgba(255, 255, 255, 0.3),
         inset -2px -2px 4px rgba(0, 0, 0, 0.3),
         0 4px 8px rgba(0, 0, 0, 0.3);
@@ -201,6 +370,52 @@ canvas {
     opacity: 1;
     transform: scale(1) translateY(0);
     transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    min-height: 100vh;
+}
+
+/* 開始画面のボタンを右下に配置 */
+#startScreen #startButton,
+#startScreen #help,
+#startScreen #volume {
+    position: absolute;
+    max-width: 250px;
+    height: auto;
+    right: 12em;
+}
+
+#startScreen #startButton {
+    bottom: 12.5em;
+}
+
+#startScreen #help {
+
+    bottom: 7.5em;
+}
+
+#startScreen #volume {
+
+    bottom: 2.5em;
+}
+
+/* 音声案内スタイル */
+.audio-notice {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid #ffd700;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: #ffd700;
+    animation: fadeInOut 3s ease-in-out infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
 #stageSelectArea {
@@ -214,7 +429,13 @@ h1 {
     margin-bottom: 20px;
 }
 
-.wafu-title, h1, h2, h3, h4, h5, h6 {
+.wafu-title,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: #C1272D;
     font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
     font-weight: 700;
@@ -228,8 +449,24 @@ h1 {
     margin: 2vw 0 1vw 0;
 }
 
+/* ステージ選択タイトル画像 */
+.stage-select-title {
+    display: block;
+    margin: 2vw auto 1vw auto;
+    max-width: 400px;
+    width: auto;
+    height: auto;
+}
+
 /* ===== ボタン ===== */
-button, .wafu-btn, #startButton, #help, .ui-btn, #restartButton, #closeHelp {
+button,
+.wafu-btn,
+#startButton,
+#help,
+#volume,
+.ui-btn,
+#restartButton,
+#closeHelp {
     background: #2a2a2a;
     color: #fff;
     border: 2px solid #C1272D;
@@ -244,7 +481,12 @@ button, .wafu-btn, #startButton, #help, .ui-btn, #restartButton, #closeHelp {
     outline: none;
 }
 
-button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
+button:hover,
+.wafu-btn:hover,
+#startButton:hover,
+#help:hover,
+#volume:hover,
+.ui-btn:hover {
     background: #C1272D;
     color: #fff;
     border: 2px solid #C1272D;
@@ -253,7 +495,9 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* 特殊ボタンスタイル */
-#startButton, #help {
+#startButton,
+#help,
+#volume {
     display: inline-block;
     margin: 0 auto;
     min-width: 180px;
@@ -264,11 +508,78 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     padding: 0.7em 2.5em;
 }
 
-#startButton:hover, #help:hover {
+#startButton:hover,
+#help:hover,
+#volume:hover {
     background: linear-gradient(90deg, #e6b422 60%, #fffbe7 100%);
-    color: #fffbe7;
-    box-shadow: 0 0 16px #e6b42288;
+}
+
+/* 画像ボタン用スタイル */
+.image-btn {
+    border: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    background-image: none !important;
+    padding: 0 !important;
+    margin: 0 auto;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    max-width: 300px;
+    height: auto;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    display: inline-block;
+}
+
+.image-btn:hover {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    transform: translateY(-2px) scale(1.04);
+    filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    box-shadow: none !important;
+}
+
+/* 小さい画像ボタン用スタイル */
+#backToStartButton.image-btn,
+#closeHelp.image-btn,
+#closeVolume.image-btn {
+    max-width: 150px;
+}
+
+/* 戻るボタンの位置調整 */
+#backToStartButton.image-btn {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 20;
+    max-width: 120px;
+}
+
+/* ボタンコンテナのスタイル調整 */
+.pause-buttons .image-btn,
+.game-over-buttons .image-btn {
+    max-width: 200px;
+    margin: 5px;
+}
+
+/* ボス選択画像ボタン用スタイル */
+.boss-select-btn {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border: none !important;
+    background: none !important;
+    background-color: transparent !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    object-fit: contain;
+    border-radius: 0 !important;
+}
+
+.boss-select-btn:hover {
     transform: scale(1.05);
+    filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 #restartButton {
@@ -301,7 +612,13 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ===== UIパネル ===== */
-.ui-panel, #score, #ammo, #timer, #helpPanel, .hud, .hud-panel, .wafu-panel {
+.ui-panel,
+#score,
+#timer,
+#helpPanel,
+.hud,
+.hud-panel,
+.wafu-panel {
     background: #2a2a2a;
     color: #fff;
     border: 2px solid #C1272D;
@@ -337,7 +654,9 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ===== ゲームHUD ===== */
-#scoreDisplay, #livesDisplay, #timerDisplay {
+#scoreDisplay,
+#livesDisplay,
+#timerDisplay {
     position: absolute;
     min-width: 60px;
     max-width: 120px;
@@ -350,122 +669,469 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     border-radius: 10px;
     font-weight: 600;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
 }
 
 #scoreDisplay {
     top: 8px;
     left: 12px;
+    color: #fff;
+    background: url('assets/UI/UI/score_UI.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 1em;
+    padding: 0.5em 1em;
+    box-shadow: none;
+    min-width: 200px;
+    min-height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    position: absolute;
+    z-index: 10;
 }
 
 #livesDisplay {
     bottom: 12px;
     left: 12px;
     font-size: 0.92em;
+    color: #fff;
+    background: url('assets/UI/UI/bullet_gauge_UI.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    font-weight: 700;
+    padding: 0.5em 1em;
+    box-shadow: none;
+    min-width: 150px;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: center;
+    position: absolute;
+    z-index: 10;
+    padding-right: 20px;
 }
 
 #timerDisplay {
-    top: 8px;
-    right: 12px;
+    top: 0px;
+    right: 2px;
+    color: #fff;
+    background: url('assets/UI/UI/timer_UI.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    font-weight: 700;
+    font-size: 0.85em;
+    padding: 0.5em 1em;
+    box-shadow: none;
+    min-width: 200px;
+    min-height: 80px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+    text-align: left;
+    position: absolute;
+    z-index: 10;
+    padding-left: 28px;
+    padding-top: 40px;
 }
 
-#timer, #score {
+/* 回復アイテムカウンター */
+.recovery-item-counter {
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    min-width: 150px;
+    min-height: 60px;
+    font-size: 0.9em;
+    padding: 10px 15px;
+    z-index: 10;
+    background: url('assets/UI/UI/recover_bags_gauge.png') center center no-repeat;
+    background-size: contain;
+    border: none;
+    border-radius: 0;
+    color: white;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.recovery-item-counter .wafu-label {
+    color: white;
+}
+
+.recovery-hint {
+    font-size: 0.75em;
+    color: white;
+    margin-top: 2px;
+}
+
+/* ===== ミニマップ ===== */
+.minimap-container {
+    position: absolute;
+    top: 95px;
+    left: 12px;
+    background: rgba(42, 42, 42, 0.9);
+    border: 2px solid #C1272D;
+    border-radius: 8px;
+    padding: 8px;
+    z-index: 15;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    pointer-events: none;
+}
+
+.minimap-container .wafu-label {
+    color: #fff;
+    font-size: 0.8em;
+    font-weight: 600;
+    margin-bottom: 4px;
+    text-align: center;
+    display: block;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+#minimapCanvas {
+    border: 1px solid #555;
+    border-radius: 4px;
+    display: block;
+    background: #1a1a1a;
+}
+
+#timer,
+#score {
     color: #C1272D;
     font-weight: 700;
     font-size: 1.2em;
 }
 
-#ammo {
-    color: #fff;
-    background: #2a2a2a;
-    border: 2px solid #C1272D;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1.1em;
-    padding: 0.2em 0.7em;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
 
-/* ===== ヘルプ・説明 ===== */
-#quickHelp {
+
+#otomoLevelDisplay {
     position: absolute;
     bottom: 12px;
-    right: 12px;
-    min-width: 60px;
-    max-width: 120px;
-    font-size: 0.92em;
-    padding: 0.18em 0.5em;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 200px;
+    min-height: 80px;
+    font-size: 1em;
+    padding: 15px 20px;
     z-index: 10;
-    background: rgba(42, 42, 42, 0.95);
-    border: 3px solid #C1272D;
-    border-radius: 16px;
-    color: #fff;
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 0 2px 12px rgba(0, 0, 0, 0.2);
-    text-align: left;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
     font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
     pointer-events: none;
     user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+    line-height: 1.2;
 }
 
-#helpPanel, #quickHelp {
-    background: #2a2a2a;
-    color: #fff;
-    border: 2px solid #C1272D;
-    border-radius: 12px;
-    font-size: 1em;
-    font-family: 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    padding: 1em 1.5em;
-}
-
-/* ヘルプモーダル */
-#helpModal {
+/* ===== ゲーム中操作ボタン ===== */
+.game-control-buttons {
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 150;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    min-width: 120px;
+    min-height: 120px;
+    padding: 0;
+    z-index: 10;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: auto;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.game-control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* レベルアップ用巻物コンテナ */
+.level-up-container {
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    padding: 15px 10px;
+    min-width: 130px;
+    min-height: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-#helpModal.hidden {
-    display: none;
+.game-control-btn {
+    background: linear-gradient(135deg, #C1272D 0%, #8B0000 100%);
+    border: 2px solid #8B0000;
+    border-radius: 8px;
+    color: white;
+    padding: 6px 8px;
+    font-size: 0.7em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 65px;
+    min-height: 50px;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.help-content {
-    background: #1a1a1a;
-    color: #fff;
-    padding: 36px 48px;
-    border-radius: 14px;
-    text-align: left;
-    min-width: 320px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    border: 2px solid #C1272D;
-    position: relative;
+.game-control-btn:hover {
+    background: linear-gradient(135deg, #D1272D 0%, #9B0000 100%);
+    border-color: #9B0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
-.help-content h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-    margin-bottom: 18px;
+.game-control-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-control-btn .btn-icon {
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.game-control-btn .btn-text {
+    font-size: 0.8em;
+    line-height: 1;
+}
+
+.game-control-btn .shortcut-key {
+    font-size: 0.6em;
+    font-weight: 600;
+    color: #FFD700;
+    background: rgba(139, 69, 19, 0.8);
+    border: 1px solid #8B4513;
+    border-radius: 4px;
+    padding: 2px 4px;
+    line-height: 1;
+    text-shadow: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ポーズボタン専用スタイル */
+.pause-btn {
+    background: linear-gradient(135deg, #666 0%, #444 100%) !important;
+    border-color: #555 !important;
+    min-width: 80px;
+    min-height: 50px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 15;
+}
+
+.pause-btn:hover {
+    background: linear-gradient(135deg, #777 0%, #555 100%) !important;
+    border-color: #666 !important;
+}
+
+.pause-btn .btn-icon {
+    font-size: 1.4em;
+}
+
+/* ===== ゲーム中基本操作説明 ===== */
+.game-basic-controls {
+    position: fixed;
+    top: calc(50% + 100px);
+    right: 20px;
+    min-width: 130px;
+    min-height: 80px;
+    padding: 15px 10px;
+    z-index: 10;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
     text-align: center;
-    letter-spacing: 1px;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
 }
 
-.help-content ul {
-    margin: 0 0 18px 0;
-    padding-left: 22px;
+.basic-controls-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75em;
+    line-height: 1;
+}
+
+.control-icon {
     font-size: 1.1em;
+    line-height: 1;
 }
 
-.help-content ul li {
-    margin-bottom: 8px;
-    line-height: 1.6;
+.control-text {
+    font-size: 0.9em;
+    line-height: 1;
 }
+
+/* ===== お供切り替えUI ===== */
+.otomo-switch-ui {
+    position: fixed;
+    top: calc(50% + 200px);
+    right: 20px;
+    min-width: 100px;
+    min-height: 80px;
+    padding: 12px 8px;
+    z-index: 10;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.otomo-switch-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-icons-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-keys-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-mode-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    background: rgba(139, 69, 19, 0.1);
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    transition: all 0.2s ease;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.otomo-key-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 25px;
+}
+
+.otomo-mode-item:hover {
+    background: rgba(139, 69, 19, 0.2);
+    border-color: rgba(139, 69, 19, 0.5);
+}
+
+.otomo-mode-item.active {
+    background: rgba(193, 39, 45, 0.2);
+    border-color: #C1272D;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(193, 39, 45, 0.4);
+}
+
+.otomo-mode-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+}
+
+.otomo-shortcut {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #FFD700;
+    background: rgba(139, 69, 19, 0.8);
+    border: 1px solid #8B4513;
+    border-radius: 4px;
+    padding: 3px 6px;
+    line-height: 1;
+    text-shadow: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* 操作説明関連のスタイルは docs/help/help.css に移動しました */
 
 /* ===== スタート画面 ===== */
-#startScreen, .dark-bg {
-    background: url('assets/UI/title1.png') center center no-repeat;
+#startScreen,
+.dark-bg {
+    background: url('assets/UI/kibidango_title.png') center center no-repeat;
     background-size: contain;
     min-height: 100vh;
     width: 100vw;
@@ -488,8 +1154,13 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     text-shadow: 0 2px 8px #000a;
 }
 
-/* ===== ゲームオーバー・ポーズ・勝利画面 ===== */
-#gameOverMessage, #pauseMessage, #pausePanel, #gameOverPanel, #winPanel {
+/* ===== ゲームオーバー・ポーズ・勝利画面・音量調整画面 ===== */
+#gameOverMessage,
+#pauseMessage,
+#pausePanel,
+#gameOverPanel,
+#winPanel,
+#volumeModal {
     position: fixed;
     top: 0;
     left: 0;
@@ -541,13 +1212,13 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 
 .game-over-text.wafu-title {
     font-size: 2.5em;
-  color: #C1272D;
-  font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
-  font-weight: 700;
+    color: #C1272D;
+    font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
+    font-weight: 700;
     margin-bottom: 1.5em;
     display: block;
     letter-spacing: 0.1em;
-  text-shadow: none;
+    text-shadow: none;
 }
 
 #gameOverMessage button {
@@ -556,19 +1227,19 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     padding: 15px 30px;
     font-size: 1.2em;
     font-weight: 600;
-  border: 2px solid #C1272D;
-  border-radius: 12px;
+    border: 2px solid #C1272D;
+    border-radius: 12px;
     background: #2a2a2a;
     color: #fff;
     cursor: pointer;
     transition: all 0.3s ease;
-  font-family: 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
+    font-family: 'Noto Sans JP', 'Yu Gothic', 'Meiryo', sans-serif;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 #gameOverMessage button:hover {
-  background: #C1272D;
-  color: #fff;
+    background: #C1272D;
+    color: #fff;
     transform: translateY(-2px) scale(1.05);
     box-shadow: 0 4px 12px rgba(193, 39, 45, 0.4);
 }
@@ -590,7 +1261,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
         flex-direction: row;
         gap: 20px;
     }
-    
+
     .game-over-buttons button {
         min-width: 180px;
     }
@@ -613,7 +1284,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     margin: 0;
     border: none;
     border-radius: 0;
-  box-shadow: none;
+    box-shadow: none;
     backdrop-filter: blur(2px);
 }
 
@@ -661,10 +1332,75 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
         flex-wrap: wrap;
         justify-content: center;
     }
-    
+
     .pause-buttons button {
         min-width: 160px;
     }
+}
+
+/* 音量調整画面のコンテンツ */
+#volumeModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(120deg, rgba(24, 24, 24, 0.9) 0%, rgba(35, 35, 35, 0.9) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: blur(3px);
+}
+
+.volume-content {
+    background: rgba(42, 42, 42, 0.95);
+    color: #fff;
+    border: 3px solid #C1272D;
+    border-radius: 20px;
+    padding: 3em 4em;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
+    backdrop-filter: blur(5px);
+}
+
+.volume-title {
+    font-size: 2.5em;
+    color: #C1272D;
+    font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
+    font-weight: 700;
+    margin-bottom: 1.5em;
+    display: block;
+    letter-spacing: 0.1em;
+    text-shadow: none;
+}
+
+.volume-text {
+    font-size: 1.2em;
+    color: #fff;
+    margin-bottom: 1em;
+}
+
+.volume-label {
+    font-weight: bold;
+    font-size: 1.2em;
+    min-width: 70px;
+}
+
+.volume-value {
+  font-size: 2em;
+  display: inline-block;
+  min-width: 2em;
+  text-align: center;
 }
 
 /* ===== ボス選択画面 ===== */
@@ -676,7 +1412,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     max-height: 100vh;
     margin: 0 auto;
     padding: 0;
-    background: linear-gradient(120deg, #181818 60%, #232323 100%);
+    background: url('assets/UI/kibidango_home.png') no-repeat center center;
+    background-size: cover;
     border-radius: 0;
     box-shadow: none;
     display: flex;
@@ -747,8 +1484,8 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
         "boss1 empty1 boss2"
         "empty2 boss5 empty3"
         "boss3 empty4 boss4";
-    grid-template-columns: minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);
-    grid-template-rows: minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
     gap: clamp(1vw, 3vw, 32px);
     justify-items: center;
     align-items: center;
@@ -760,12 +1497,12 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 .boss-card {
-    min-width: 250px;
-    max-width: min(22vw, 22vh, 320px);
-    width: 18vw;
-    min-height: 250px;
-    max-height: min(22vw, 22vh, 320px);
-    height: 18vw;
+    min-width: 350px;
+    max-width: min(40vw, 20vh, 650px);
+    width: 36vw;
+    min-height: 350px;
+    max-height: min(40vw, 40vh, 650px);
+    height: 36vw;
     font-size: 1.1em;
     z-index: 1;
     position: relative;
@@ -774,14 +1511,15 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     justify-content: center;
     align-items: center;
     box-sizing: border-box;
-    background: #fff;
-    border: 3px solid #C1272D;
-    border-radius: 18px;
-    transition: border 0.2s, box-shadow 0.2s, transform 0.15s;
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    transition: transform 0.15s;
     color: #2d1a1a;
     font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
     font-weight: 600;
-    box-shadow: none;
+    box-shadow: none !important;
 }
 
 .boss-card[data-boss="5"] {
@@ -793,13 +1531,13 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     height: 22vw;
     font-size: 1.3em;
     z-index: 2;
-    border-width: 4px;
+    border: none !important;
 }
 
 .boss-card img {
     max-width: 80%;
     max-height: 60%;
-    margin-bottom: 0.5em;
+    margin-bottom: 0.1em;
     border-radius: 12px;
     border: 2px solid #C1272D22;
     background: #fff;
@@ -823,12 +1561,22 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     min-height: 80px;
 }
 
-.boss-card.selected, .boss-card:hover {
-    border: 4px solid #C1272D;
+/* ラスボスカードの画像スタイル */
+.boss-card[data-boss="5"] .boss-select-btn {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.boss-card.selected,
+.boss-card:hover {
+    border: none !important;
     color: #C1272D;
-    background: #f7f7f7;
+    background: none !important;
+    background-color: transparent !important;
     transform: scale(1.07) rotate(-1deg);
-    box-shadow: 0 0 0 2px #C1272D33;
+    box-shadow: none !important;
 }
 
 .boss-name {
@@ -837,6 +1585,61 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
     font-weight: 700;
     margin-bottom: 0.2em;
+}
+
+.boss-status {
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3em;
+    margin-top: 0.5em;
+}
+
+.boss-progress {
+    font-size: 0.9em;
+    font-weight: 600;
+    padding: 0.2em 0.6em;
+    border-radius: 12px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.boss-progress.defeated {
+    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+    color: white;
+    border: 2px solid #2E7D32;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.boss-progress.defeated::after {
+    content: "再挑戦可能";
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(78, 205, 196, 0.9);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 0.7em;
+    white-space: nowrap;
+    z-index: 10;
+}
+
+.boss-progress.locked {
+    background: linear-gradient(135deg, #9E9E9E 0%, #757575 100%);
+    color: white;
+    border: 2px solid #424242;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.boss-progress.unlocked {
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    color: white;
+    border: 2px solid #E65100;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .boss-desc {
@@ -848,11 +1651,25 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 /* ボスカードグリッド配置 */
-.boss-card[data-boss="1"] { grid-area: boss1; }
-.boss-card[data-boss="2"] { grid-area: boss2; }
-.boss-card[data-boss="3"] { grid-area: boss3; }
-.boss-card[data-boss="4"] { grid-area: boss4; }
-.boss-card[data-boss="5"] { grid-area: boss5; }
+.boss-card[data-boss="1"] {
+    grid-area: boss1;
+}
+
+.boss-card[data-boss="2"] {
+    grid-area: boss2;
+}
+
+.boss-card[data-boss="3"] {
+    grid-area: boss3;
+}
+
+.boss-card[data-boss="4"] {
+    grid-area: boss4;
+}
+
+.boss-card[data-boss="5"] {
+    grid-area: boss5;
+}
 
 /* ===== ローディング画面 ===== */
 #loading-screen {
@@ -861,7 +1678,7 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(255,255,255,0.95);
+    background: rgba(255, 255, 255, 0.95);
     z-index: 9999;
     display: flex;
     flex-direction: column;
@@ -896,88 +1713,94 @@ button:hover, .wafu-btn:hover, #startButton:hover, #help:hover, .ui-btn:hover {
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* ===== レスポンシブデザイン ===== */
 @media (max-width: 900px) {
-  #stageSelectArea {
-    min-height: 100vh;
-    max-height: 100vh;
-    padding: 0;
-  }
-    
-  .boss-cards {
-    gap: clamp(0.5vw, 1.5vw, 16px);
-  }
-    
-  .boss-card {
-    min-width: 80px;
-    max-width: min(28vw, 28vh, 180px);
-    width: 24vw;
-    min-height: 80px;
-    max-height: min(28vw, 28vh, 180px);
-    height: 24vw;
-    font-size: 0.95em;
-  }
-    
-  .boss-card[data-boss="5"] {
-    min-width: 100px;
-    max-width: min(36vw, 36vh, 220px);
-    width: 30vw;
-    min-height: 100px;
-    max-height: min(36vw, 36vh, 220px);
-    height: 30vw;
-    font-size: 1.1em;
-  }
+    #stageSelectArea {
+        min-height: 100vh;
+        max-height: 100vh;
+        padding: 0;
+    }
+
+    .boss-cards {
+        gap: clamp(0.5vw, 1.5vw, 16px);
+    }
+
+    .boss-card {
+        min-width: 80px;
+        max-width: min(28vw, 28vh, 180px);
+        width: 24vw;
+        min-height: 80px;
+        max-height: min(28vw, 28vh, 180px);
+        height: 24vw;
+        font-size: 0.95em;
+    }
+
+    .boss-card[data-boss="5"] {
+        min-width: 100px;
+        max-width: min(36vw, 36vh, 220px);
+        width: 30vw;
+        min-height: 100px;
+        max-height: min(36vw, 36vh, 220px);
+        height: 30vw;
+        font-size: 1.1em;
+    }
 }
 
 @media (max-width: 600px) {
-  #stageSelectArea {
-    min-height: 100vh;
-    max-height: 100vh;
-    padding: 0;
-  }
-    
-  .boss-cards {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: repeat(3, 1fr);
-    grid-template-areas:
-      "boss1 boss2"
-      "boss5 boss5"
-      "boss3 boss4";
-    gap: clamp(0.2vw, 0.7vw, 8px);
-  }
-    
-  .boss-card {
-    min-width: 60px;
-    max-width: min(44vw, 44vh, 100px);
-    width: 38vw;
-    min-height: 60px;
-    max-height: min(44vw, 44vh, 100px);
-    height: 38vw;
-    font-size: 0.85em;
-  }
-    
-  .boss-card[data-boss="5"] {
-    min-width: 80px;
-    max-width: min(60vw, 60vh, 140px);
-    width: 50vw;
-    min-height: 80px;
-    max-height: min(60vw, 60vh, 140px);
-    height: 50vw;
-    font-size: 1em;
-  }
+    #stageSelectArea {
+        min-height: 100vh;
+        max-height: 100vh;
+        padding: 0;
+    }
+
+    .boss-cards {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(3, 1fr);
+        grid-template-areas:
+            "boss1 boss2"
+            "boss5 boss5"
+            "boss3 boss4";
+        gap: clamp(0.2vw, 0.7vw, 8px);
+    }
+
+    .boss-card {
+        min-width: 60px;
+        max-width: min(44vw, 44vh, 100px);
+        width: 38vw;
+        min-height: 60px;
+        max-height: min(44vw, 44vh, 100px);
+        height: 38vw;
+        font-size: 0.85em;
+    }
+
+    .boss-card[data-boss="5"] {
+        min-width: 80px;
+        max-width: min(60vw, 60vh, 140px);
+        width: 50vw;
+        min-height: 80px;
+        max-height: min(60vw, 60vh, 140px);
+        height: 50vw;
+        font-size: 1em;
+    }
 }
 
 /* ===== その他 ===== */
-hr, .wafu-divider {
-  border: none;
-  border-top: 2px solid #C1272D;
-  margin: 2em 0;
-  width: 80%;
-  background: none;
+hr,
+.wafu-divider {
+    border: none;
+    border-top: 2px solid #C1272D;
+    margin: 2em 0;
+    width: 80%;
+    background: none;
 }
 
 /* ===== デバッグパネル ===== */
@@ -1110,6 +1933,19 @@ hr, .wafu-divider {
     box-shadow: 0 4px 12px rgba(193, 39, 45, 0.4);
 }
 
+.debug-info {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    margin-top: 5px;
+    font-size: 12px;
+    line-height: 1.4;
+    max-height: 120px;
+    overflow-y: auto;
+    color: #f7f7f7;
+}
+
 /* レスポンシブ対応 */
 @media (max-width: 600px) {
     .debug-panel {
@@ -1119,25 +1955,217 @@ hr, .wafu-divider {
         max-width: 320px;
         max-height: calc(100vh - 20px);
     }
-    
+
     .debug-control {
         flex-direction: column;
         align-items: flex-start;
         gap: 5px;
     }
-    
+
     .debug-control input {
         width: 100%;
         max-width: 200px;
     }
-    
+
     .debug-actions {
         flex-direction: column;
         align-items: center;
     }
-    
+
     .debug-btn {
         width: 100%;
         max-width: 200px;
     }
+}
+
+/* ボス討伐状況切り替えボタンのスタイル */
+.boss-toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 8px 0;
+    padding: 4px 0;
+}
+
+.boss-toggle-row span {
+    font-weight: 600;
+    color: #f7f7f7;
+    min-width: 80px;
+}
+
+.boss-toggle-btn {
+    min-width: 80px;
+    font-size: 0.8em;
+    padding: 6px 12px;
+}
+
+.boss-toggle-btn.defeated {
+    background: #4ecdc4;
+    border-color: #4ecdc4;
+}
+
+.boss-toggle-btn.defeated:hover {
+    background: #44a08d;
+    border-color: #44a08d;
+}
+
+.boss-toggle-btn.unlocked {
+    background: #FF9800;
+    border-color: #FF9800;
+}
+
+.boss-toggle-btn.unlocked:hover {
+    background: #F57C00;
+    border-color: #F57C00;
+}
+
+/* ===== クレジット画面 ===== */
+#creditsModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.credits-content {
+    background: #fff8f0;
+    border-radius: 24px;
+    min-width: 400px;
+    max-width: 90vw;
+    max-height: 90vh;
+    box-shadow: 0 0 32px #0008, 0 0 0 8px #c1272d22;
+    border: 4px solid #C1272D;
+    position: relative;
+    overflow: hidden;
+}
+
+.credits-header {
+    background: #C1272D;
+    color: white;
+    padding: 1.5em 2em;
+    text-align: center;
+    position: relative;
+}
+
+.credits-header h2 {
+    margin: 0;
+    font-size: 1.8em;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+}
+
+.credits-close-btn {
+    position: absolute;
+    top: 1em;
+    right: 1.5em;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.credits-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.credits-body {
+    padding: 2em;
+    max-height: 60vh;
+    overflow-y: auto;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+}
+
+.credits-section {
+    margin-bottom: 2em;
+}
+
+.credits-section h3 {
+    color: #C1272D;
+    font-size: 1.3em;
+    margin-bottom: 1em;
+    padding-bottom: 0.5em;
+    border-bottom: 2px solid #C1272D;
+    font-weight: bold;
+}
+
+.credit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1em;
+    padding: 0.8em;
+    background: #fff3;
+    border-radius: 8px;
+    border: 1px solid #C1272D33;
+}
+
+.credit-role {
+    color: #666;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+.credit-name {
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1em;
+    text-align: right;
+}
+
+.credits-footer {
+    text-align: center;
+    margin-top: 2em;
+    padding-top: 1.5em;
+    border-top: 2px solid #C1272D33;
+}
+
+.credits-footer p {
+    color: #666;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+/* クレジット画面のレスポンシブ対応 */
+@media (max-width: 600px) {
+    .credits-content {
+        min-width: 95vw;
+        margin: 1em;
+    }
+    
+    .credits-body {
+        padding: 1.5em;
+    }
+    
+    .credit-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
+    }
+    
+    .credit-name {
+        text-align: left;
+    }
+}
+
+/* クレジット読み込み中表示 */
+.loading-credits {
+    text-align: center;
+    padding: 2em;
+    color: #666;
+    font-style: italic;
 }

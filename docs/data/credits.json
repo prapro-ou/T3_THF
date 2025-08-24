@@ -1,0 +1,56 @@
+{
+    "title": "クレジット",
+    "sections": [
+        {
+            "title": "開発",
+            "items": [
+                {
+                    "role": "ゲームデザイン・プログラミング",
+                    "name": "[aaa]"
+                },
+                {
+                    "role": "アート・グラフィック",
+                    "name": "[アーティスト名を入力]"
+                },
+                {
+                    "role": "サウンド・音楽",
+                    "name": "[サウンドデザイナー名を入力]"
+                }
+            ]
+        },
+        {
+            "title": "使用素材",
+            "items": [
+                {
+                    "role": "フォント",
+                    "name": "Google Fonts (Kiwi Maru, Noto Serif JP)"
+                },
+                {
+                    "role": "効果音・BGM",
+                    "name": "[使用素材の詳細を入力]"
+                },
+                {
+                    "role": "グラフィック素材",
+                    "name": "[グラフィック素材の詳細を入力]"
+                }
+            ]
+        },
+        {
+            "title": "スペシャルサンクス",
+            "items": [
+                {
+                    "name": "[サンクスメッセージを入力]"
+                },
+                {
+                    "name": "[追加のサンクスメッセージ]"
+                }
+            ]
+        }
+    ],
+    "footer": "© 2024 [プロジェクト名] All Rights Reserved.",
+    "additionalInfo": {
+        "version": "1.0.0",
+        "buildDate": "2024-12-XX",
+        "website": "[プロジェクトウェブサイトURL]"
+    }
+}

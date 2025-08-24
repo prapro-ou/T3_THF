@@ -15,23 +15,31 @@ export class PlayerController {
     updatePlayerMovement(player, deltaTime) {
         this._isMoving = false;
         
+    // レベルアップや減速効果を考慮した移動速度を計算
+    const currentSpeed = (player.speed || player.constructor.SPEED) * (player.slowStrength || 1);
+        
+        // デバッグ用：減速効果が適用されている場合のみログ出力
+        if (player.slowStrength && player.slowStrength !== 1) {
+            console.log(`PlayerController: Current speed: ${currentSpeed} (base: ${player.constructor.SPEED}, slow: ${player.slowStrength}, timer: ${player.slowTimer?.toFixed(1) || 'N/A'})`);
+        }
+        
         if (this.inputManager.isKeyPressed('w')) {
-            player.y -= player.constructor.SPEED;
+            player.y -= currentSpeed;
             player.direction = 'up';
             this._isMoving = true;
         }
         if (this.inputManager.isKeyPressed('s')) {
-            player.y += player.constructor.SPEED;
+            player.y += currentSpeed;
             player.direction = 'down';
             this._isMoving = true;
         }
         if (this.inputManager.isKeyPressed('a')) {
-            player.x -= player.constructor.SPEED;
+            player.x -= currentSpeed;
             player.direction = 'left';
             this._isMoving = true;
         }
         if (this.inputManager.isKeyPressed('d')) {
-            player.x += player.constructor.SPEED;
+            player.x += currentSpeed;
             player.direction = 'right';
             this._isMoving = true;
         }
@@ -41,7 +49,8 @@ export class PlayerController {
 
     constrainPlayerToMap(player) {
         const { width: mapWidth, height: mapHeight } = this.cameraManager.getMapDimensions();
-        player.x = Math.max(player.width / 2, Math.min(player.x, mapWidth - player.width / 2));
-        player.y = Math.max(player.height / 2, Math.min(player.y, mapHeight - player.height / 2));
+        // プレイヤーの左上座標を基準に制約を適用（中心ではなく実際の描画座標）
+        player.x = Math.max(0, Math.min(player.x, mapWidth - player.width));
+        player.y = Math.max(0, Math.min(player.y, mapHeight - player.height));
     }
 }

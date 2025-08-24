@@ -38,9 +38,9 @@ export class CollisionManager {
 
     // 高速移動時のプレイヤー-敵衝突判定
     checkPlayerEnemyCollisionWithMovement(player, enemy, playerPrevX, playerPrevY) {
-        // 桃太郎と敵の中心座標を計算
-        const playerCenterX = player.x;
-        const playerCenterY = player.y;
+        // 桃太郎と敵の中心座標を計算（プレイヤーの座標は左上が基準なので中心を計算）
+        const playerCenterX = player.x + player.width / 2;
+        const playerCenterY = player.y + player.height / 2;
         const enemyCenterX = enemy.x + enemy.width / 2;
         const enemyCenterY = enemy.y + enemy.height / 2;
         
@@ -51,24 +51,6 @@ export class CollisionManager {
         // 敵の半径（より自然な当たり判定のため、大きめに設定）
         const enemyRadius = Math.max(enemy.width, enemy.height) / 2;
         
-        // デバッグ情報を出力
-        console.log('Player-Enemy collision debug:', {
-            playerX: player.x,
-            playerY: player.y,
-            playerWidth: player.width,
-            playerHeight: player.height,
-            playerRadius: playerRadius,
-            enemyX: enemy.x,
-            enemyY: enemy.y,
-            enemyWidth: enemy.width,
-            enemyHeight: enemy.height,
-            enemyRadius: enemyRadius,
-            enemyCenterX: enemyCenterX,
-            enemyCenterY: enemyCenterY,
-            distance: Math.sqrt((playerCenterX - enemyCenterX) ** 2 + (playerCenterY - enemyCenterY) ** 2),
-            collisionDistance: playerRadius + enemyRadius
-        });
-        
         // 線分交差判定（高速移動時）
         if (playerPrevX !== undefined && playerPrevY !== undefined) {
             const moveDistance = Math.sqrt(
@@ -77,9 +59,15 @@ export class CollisionManager {
             );
             
             if (moveDistance > 10) { // 高速移動時
+                // 前の位置も中心座標で計算
+                const playerPrevCenterX = playerPrevX + player.width / 2;
+                const playerPrevCenterY = playerPrevY + player.height / 2;
+                const playerCurrCenterX = player.x + player.width / 2;
+                const playerCurrCenterY = player.y + player.height / 2;
+                
                 return this.checkLineCircleIntersection(
-                    playerPrevX, playerPrevY, 
-                    player.x, player.y, 
+                    playerPrevCenterX, playerPrevCenterY, 
+                    playerCurrCenterX, playerCurrCenterY, 
                     enemyCenterX, enemyCenterY, 
                     playerRadius + enemyRadius
                 );
@@ -99,34 +87,20 @@ export class CollisionManager {
     }
 
     checkAttackCollision(attackX, attackY, attackRadius, enemy) {
-        const ex = enemy.x + enemy.width / 2;
-        const ey = enemy.y + enemy.height / 2;
-        const enemyRadius = Math.max(enemy.width, enemy.height) / 2 * 1.1;
+        const ex = (typeof enemy.centerX === 'number') ? enemy.centerX : (enemy.x + enemy.width / 2);
+        const ey = (typeof enemy.centerY === 'number') ? enemy.centerY : (enemy.y + enemy.height / 2);
+        const enemyRadius = (typeof enemy.collisionRadius === 'number') ? enemy.collisionRadius : Math.min(enemy.width, enemy.height) / 2;
         const dist = distance(attackX, ex, attackY, ey);
         const isHit = dist <= attackRadius + enemyRadius;
-        
-        // デバッグ情報をコンソールに出力
-        console.log('Collision Debug:', {
-            attackX: attackX,
-            attackY: attackY,
-            attackRadius: attackRadius,
-            enemyX: enemy.x,
-            enemyY: enemy.y,
-            enemyCenterX: ex,
-            enemyCenterY: ey,
-            enemyRadius: enemyRadius,
-            distance: dist,
-            isHit: isHit
-        });
         
         return isHit;
     }
 
     // 高速移動時の攻撃判定
     checkAttackCollisionWithMovement(attackStartX, attackStartY, attackEndX, attackEndY, attackRadius, enemy) {
-        const ex = enemy.x + enemy.width / 2;
-        const ey = enemy.y + enemy.height / 2;
-        const enemyRadius = Math.max(enemy.width, enemy.height) / 2 * 1.1;
+        const ex = (typeof enemy.centerX === 'number') ? enemy.centerX : (enemy.x + enemy.width / 2);
+        const ey = (typeof enemy.centerY === 'number') ? enemy.centerY : (enemy.y + enemy.height / 2);
+        const enemyRadius = (typeof enemy.collisionRadius === 'number') ? enemy.collisionRadius : Math.min(enemy.width, enemy.height) / 2;
         
         // 移動距離を計算
         const moveDistance = Math.sqrt(

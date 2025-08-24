@@ -1,4 +1,5 @@
 ﻿import { CollisionManager } from './CollisionManager.js';
+import { playSE } from '../managers/KoukaonManager.js'; // 追加
 
 export class AttackManager {
     constructor(game) {
@@ -11,31 +12,25 @@ export class AttackManager {
 
     // 剣攻撃（近接）
     handleSwordAttack(event) {
+        playSE("click"); // ← 攻撃時に効果音
         const { scrollX, scrollY } = this.game.calcScroll();
         const rect = this.game.canvas.getBoundingClientRect();
+
+        // キャンバス内の座標を計算
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
-        const { width: viewWidth, height: viewHeight } = this.game.renderer.getViewDimensions();
-        const { width: mapWidth, height: mapHeight } = this.game.renderer.getMapDimensions();
-        let drawX = viewWidth / 2 - this.game.player.width / 2;
-        let drawY = viewHeight / 2 - this.game.player.height / 2;
-        if (this.game.player.x < viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.x > mapWidth - viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.y < viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        if (this.game.player.y > mapHeight - viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        const playerDrawCenterX = drawX + this.game.player.width / 2;
-        const playerDrawCenterY = drawY + this.game.player.height / 2;
-        const relativeX = canvasX - playerDrawCenterX;
-        const relativeY = canvasY - playerDrawCenterY;
-        const mouseX = this.game.player.x + relativeX;
-        const mouseY = this.game.player.y + relativeY;
+
+        // キャンバス座標をワールド座標に変換
+        const mouseX = canvasX + scrollX;
+        const mouseY = canvasY + scrollY;
+
         // 剣の攻撃半径（狭める: 80px）
         const attackRadius = 80;
         this.attackCircle = {
             x: mouseX,
             y: mouseY,
             radius: attackRadius,
-            timer: 10
+            timer: 22
         };
         let hitCount = 0;
         const level = this.game.otomoLevel || 1;
@@ -56,32 +51,28 @@ export class AttackManager {
 
     // クリック攻撃（弾）
     handleProjectileAttack(event) {
+        playSE("click"); // ← 攻撃時に効果音
         const { scrollX, scrollY } = this.game.calcScroll();
         const rect = this.game.canvas.getBoundingClientRect();
+
+        // キャンバス内の座標を計算
         const canvasX = event.clientX - rect.left;
         const canvasY = event.clientY - rect.top;
-        const { width: viewWidth, height: viewHeight } = this.game.renderer.getViewDimensions();
-        const { width: mapWidth, height: mapHeight } = this.game.renderer.getMapDimensions();
-        let drawX = viewWidth / 2 - this.game.player.width / 2;
-        let drawY = viewHeight / 2 - this.game.player.height / 2;
-        if (this.game.player.x < viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.x > mapWidth - viewWidth / 2) drawX = this.game.player.x - scrollX - this.game.player.width / 2;
-        if (this.game.player.y < viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        if (this.game.player.y > mapHeight - viewHeight / 2) drawY = this.game.player.y - scrollY - this.game.player.height / 2;
-        const playerDrawCenterX = drawX + this.game.player.width / 2;
-        const playerDrawCenterY = drawY + this.game.player.height / 2;
-        const relativeX = canvasX - playerDrawCenterX;
-        const relativeY = canvasY - playerDrawCenterY;
-        const mouseX = this.game.player.x + relativeX;
-        const mouseY = this.game.player.y + relativeY;
+
+        // キャンバス座標をワールド座標に変換
+        const mouseX = canvasX + scrollX;
+        const mouseY = canvasY + scrollY;
+
         const attackRadius = this.game.player.getAttackRadius();
         this.attackCircle = {
             x: mouseX,
             y: mouseY,
             radius: attackRadius,
-            timer: 10
+            timer: 22
         };
-        return this.processAttack(mouseX, mouseY, attackRadius);
+    // プレイヤーのクリック攻撃は常に1固定
+    this.damage = this.game.player.getClickAttackPower ? this.game.player.getClickAttackPower() : 1;
+    return this.processAttack(mouseX, mouseY, attackRadius);
     }
 
     // 既存のhandleAttackは用途に応じて呼び分ける（デフォルトは剣攻撃）
@@ -96,18 +87,18 @@ export class AttackManager {
     processAttack(attackX, attackY, attackRadius) {
         let hitCount = 0;
         const player = this.game.player;
-        
+
         this.game.enemyManager.getEnemies().forEach(enemy => {
             let isHit = false;
-            
+
             // 高速移動時の攻撃判定
             if (player) {
                 const playerPos = player.getPreviousPosition();
                 const moveDistance = Math.sqrt(
-                    (player.x - playerPos.x) * (player.x - playerPos.x) + 
+                    (player.x - playerPos.x) * (player.x - playerPos.x) +
                     (player.y - playerPos.y) * (player.y - playerPos.y)
                 );
-                
+
                 if (moveDistance > 10) { // 高速移動時
                     // 線分交差判定を使用
                     isHit = this.collisionManager.checkAttackCollisionWithMovement(
@@ -117,27 +108,33 @@ export class AttackManager {
                     );
                 } else {
                     // 通常の判定
+                    const ex = (typeof enemy.centerX === 'number') ? enemy.centerX : (enemy.x + enemy.width / 2);
+                    const ey = (typeof enemy.centerY === 'number') ? enemy.centerY : (enemy.y + enemy.height / 2);
+                    const enemyRadius = (typeof enemy.collisionRadius === 'number') ? enemy.collisionRadius : Math.min(enemy.width, enemy.height) / 2;
                     const playerToEnemyDist = Math.sqrt(
-                        Math.pow(player.x - (enemy.x + enemy.width / 2), 2) +
-                        Math.pow(player.y - (enemy.y + enemy.height / 2), 2)
+                        Math.pow(player.x - ex, 2) +
+                        Math.pow(player.y - ey, 2)
                     );
-                    
+
                     const attackToEnemyDist = Math.sqrt(
-                        Math.pow(attackX - (enemy.x + enemy.width / 2), 2) +
-                        Math.pow(attackY - (enemy.y + enemy.height / 2), 2)
+                        Math.pow(attackX - ex, 2) +
+                        Math.pow(attackY - ey, 2)
                     );
-                    
-                    isHit = playerToEnemyDist <= attackRadius || attackToEnemyDist <= attackRadius;
+
+                    isHit = playerToEnemyDist <= attackRadius + enemyRadius || attackToEnemyDist <= attackRadius + enemyRadius;
                 }
             } else {
                 // プレイヤー情報がない場合の通常判定
+                const ex = (typeof enemy.centerX === 'number') ? enemy.centerX : (enemy.x + enemy.width / 2);
+                const ey = (typeof enemy.centerY === 'number') ? enemy.centerY : (enemy.y + enemy.height / 2);
+                const enemyRadius = (typeof enemy.collisionRadius === 'number') ? enemy.collisionRadius : Math.min(enemy.width, enemy.height) / 2;
                 const attackToEnemyDist = Math.sqrt(
-                    Math.pow(attackX - (enemy.x + enemy.width / 2), 2) +
-                    Math.pow(attackY - (enemy.y + enemy.height / 2), 2)
+                    Math.pow(attackX - ex, 2) +
+                    Math.pow(attackY - ey, 2)
                 );
-                isHit = attackToEnemyDist <= attackRadius;
+                isHit = attackToEnemyDist <= attackRadius + enemyRadius;
             }
-            
+
             console.log('Enemy Attack Check:', {
                 enemyX: enemy.x,
                 enemyY: enemy.y,
@@ -147,7 +144,7 @@ export class AttackManager {
                 isHit: isHit,
                 enemyHealth: enemy.health
             });
-            
+
             if (isHit) {
                 enemy.takeDamage(this.damage);
                 if (!enemy.isAlive) {
@@ -155,8 +152,8 @@ export class AttackManager {
                     this.game.gameState.addScore(this.scorePerKill);
                     hitCount++;
                     this.game.particleManager.createExplosion(
-                        enemy.x + enemy.width / 2, 
-                        enemy.y + enemy.height / 2, 
+                        enemy.x + enemy.width / 2,
+                        enemy.y + enemy.height / 2,
                         enemy.color
                     );
                 }

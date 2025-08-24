@@ -3,34 +3,41 @@
         this.keys = {};
         this.mousePosition = { x: 0, y: 0 };
         this.isMouseDown = false;
+        this.eventHandlers = {};
         this.setupEvents();
     }
 
     setupEvents() {
-        window.addEventListener('keydown', (e) => {
+        this.eventHandlers.keydown = (e) => {
             this.keys[e.key.toLowerCase()] = true;
-        });
+        };
         
-        window.addEventListener('keyup', (e) => {
+        this.eventHandlers.keyup = (e) => {
             this.keys[e.key.toLowerCase()] = false;
-        });
+        };
 
-        window.addEventListener('mousemove', (e) => {
+        this.eventHandlers.mousemove = (e) => {
             this.mousePosition.x = e.clientX;
             this.mousePosition.y = e.clientY;
-        });
+        };
 
-        window.addEventListener('mousedown', (e) => {
-            if (e.button === 0) { // 左クリチE��のみ
+        this.eventHandlers.mousedown = (e) => {
+            if (e.button === 0) { // 左クリックのみ
                 this.isMouseDown = true;
             }
-        });
+        };
 
-        window.addEventListener('mouseup', (e) => {
+        this.eventHandlers.mouseup = (e) => {
             if (e.button === 0) {
                 this.isMouseDown = false;
             }
-        });
+        };
+
+        window.addEventListener('keydown', this.eventHandlers.keydown);
+        window.addEventListener('keyup', this.eventHandlers.keyup);
+        window.addEventListener('mousemove', this.eventHandlers.mousemove);
+        window.addEventListener('mousedown', this.eventHandlers.mousedown);
+        window.addEventListener('mouseup', this.eventHandlers.mouseup);
     }
 
     isKeyPressed(key) {
@@ -47,5 +54,34 @@
 
     resetMouseState() {
         this.isMouseDown = false;
+    }
+
+    destroy() {
+        // 既に破棄済みの場合は何もしない
+        if (!this.eventHandlers) {
+            return;
+        }
+        
+        // イベントリスナーを削除
+        if (this.eventHandlers.keydown) {
+            window.removeEventListener('keydown', this.eventHandlers.keydown);
+        }
+        if (this.eventHandlers.keyup) {
+            window.removeEventListener('keyup', this.eventHandlers.keyup);
+        }
+        if (this.eventHandlers.mousemove) {
+            window.removeEventListener('mousemove', this.eventHandlers.mousemove);
+        }
+        if (this.eventHandlers.mousedown) {
+            window.removeEventListener('mousedown', this.eventHandlers.mousedown);
+        }
+        if (this.eventHandlers.mouseup) {
+            window.removeEventListener('mouseup', this.eventHandlers.mouseup);
+        }
+        
+        // データをクリア
+        this.keys = null;
+        this.mousePosition = null;
+        this.eventHandlers = null;
     }
 } 

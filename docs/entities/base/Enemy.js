@@ -3,17 +3,17 @@ import { MovableEntity } from './MovableEntity.js';
 
 /**
  * 敵の基底クラス
- * 単一責任: 敵の基本行動と状態管理
+ * 単一責任: 敵の基本行動と状態管理.
  * 継承: CharacterとMovableEntityの機能を組み合わせ
  */
 export class Enemy extends Character {
     static BASE_HP = 30;
-    static BASE_SPEED = 1;
+    static BASE_SPEED = 1.5;
 
     constructor(game, color = '#888', maxHP = Enemy.BASE_HP) {
         // マップ端からランダムスポーン位置を計算（thisを使用しない）
-        const spawnPosition = Enemy.generateSpawnPosition(game);
-        const speed = Enemy.BASE_SPEED + Math.random();
+    const spawnPosition = Enemy.generateSpawnPosition(game);
+    const speed = Enemy.BASE_SPEED + Math.random() * 1.2;
         
         console.log('Enemy constructor - maxHP:', maxHP, 'color:', color); // デバッグログ
         
@@ -27,6 +27,15 @@ export class Enemy extends Character {
         this._markedForDeletion = false;
         
         console.log('Enemy constructor finished - _maxHP:', this._maxHP, '_hp:', this._hp); // デバッグログ
+    }
+
+    // 統一的なHPアクセサがない場合は追加
+    get hp() {
+        return this._hp !== undefined ? this._hp : this.health;
+    }
+    
+    get maxHP() {
+        return this._maxHP !== undefined ? this._maxHP : this.maxHealth;
     }
 
     // カプセル化: 移動関連のプロパティへのアクセスを制御
@@ -126,4 +135,4 @@ export class Enemy extends Character {
                 };
         }
     }
-} 
+}

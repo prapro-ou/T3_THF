@@ -39,9 +39,7 @@
 
     getFormattedTime() {
         const remaining = this.update();
-        const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
-        const seconds = String(remaining % 60).padStart(2, '0');
-        return `${minutes}:${seconds}`;
+        return `${remaining}`;
     }
 
     isTimeUp() {
@@ -73,5 +71,10 @@
         }
         
         return totalElapsed;
+    }
+
+    stop() {
+        this.isPaused = true;
+        this.lastTimerResume = null;
     }
 } 

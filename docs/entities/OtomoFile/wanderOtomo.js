@@ -1,7 +1,10 @@
+import { playSE } from '../../managers/KoukaonManager.js'; // 追加
+
 export class WanderOtomoBehavior {
     constructor(otomo) {
         this.otomo = otomo;
         this.wanderTarget = null;
+        this.imageName = 'bird'; // キジの画像
     }
 
     update(player, deltaTime) {
@@ -31,13 +34,21 @@ export class WanderOtomoBehavior {
         const range = 150;
         const target = this.otomo.findEnemyNearSelf(range);
         if (target && this.otomo.canShoot) {
-            this.otomo.shootAt(target);
+            this.otomo.attackTarget(target, 'projectile');
+            this.otomo.attackSECount = (this.otomo.attackSECount || 0) + 1;
+            if (this.otomo.attackSECount % 5 === 0) {
+                playSE('pheasant1'); // 5回に1回だけ鳴らす
+            }
             this.otomo.canShoot = false;
             setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }
     }
 
     getColor() {
-        return '#32CD32'; // ライムグリーン
+        return '#8B4513'; // 茶色（キジの色）
+    }
+
+    getImageName() {
+        return this.imageName;
     }
 }

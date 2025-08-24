@@ -61,17 +61,16 @@ export class PlayerRenderer {
     }
 
     drawPlayer(player, ctx, scrollX, scrollY) {
-        // プレイヤーのロジック上の中心を常に画像の中心にする
-        const centerX = player.x - scrollX;
-        const centerY = player.y - scrollY;
-        const drawX = centerX - player.width / 2;
-        const drawY = centerY - player.height / 2;
-
-        // 中心点の可視化（ロジック上の中心）
-        ctx.beginPath();
-        ctx.arc(player.x - scrollX, player.y - scrollY, 3, 0, Math.PI * 2);
-        ctx.fillStyle = 'red';
-        ctx.fill();
+        ctx.save();
+        // 無敵時間中は点滅（globalAlphaを交互に切り替え）
+        if (player.invincibleTimer > 0) {
+            ctx.globalAlpha = (Math.floor(player.invincibleTimer * 10) % 2 === 0) ? 0.2 : 1.0;
+        }
+        
+        // プレイヤーの描画位置を計算（当たり判定と一致させる）
+        // player.x, player.yは左上座標なので、そのままスクロールを適用
+        const drawX = player.x - scrollX;
+        const drawY = player.y - scrollY;
 
         // momotaroスプライトシートがロード済みならアニメーション描画
         if (momotaroSpriteSheetLoaded && momotaroSpriteSheet) {
@@ -114,5 +113,6 @@ export class PlayerRenderer {
             const ratio = player.ammoRecoveryTimer / player.ammoRecoveryTime;
             this.renderer.drawAmmoGauge(drawX, gaugeY, gaugeWidth, gaugeHeight, ratio);
         }
+        ctx.restore();
     }
 }

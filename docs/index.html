@@ -1,102 +1,279 @@
 ﻿<!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>キビ弾GO</title>
+    <!-- ファビコン設定 -->
+    <link rel="icon" type="image/png" href="assets/UI/UI/peach_tab_icon.png">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="help/help.css">
     <!-- 和風Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Serif+JP:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@500&family=Noto+Serif+JP:wght@700&display=swap"
+        rel="stylesheet">
 </head>
+
 <body>
     <!-- 障子風アニメーション用コンテナ -->
     <div class="shoji-container hidden">
         <div class="shoji-left"></div>
         <div class="shoji-right"></div>
     </div>
-    
+
     <div id="loading-screen">
         <h2>ロード中...</h2>
         <div class="loader"></div>
     </div>
     <div id="startScreen" class="dark-bg">
-        <button id="startButton" class="wafu-btn">ゲームスタート</button>
-        <button id="help" class="wafu-btn">操作説明</button>
+                <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
+                <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
+                <img id="credits" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="クレジット" class="image-btn">
+                <img id="volume" src="" alt="音量" class="image-btn">
+                <div id="audioNotice" class="audio-notice">
+                        <p>🔊 最初のクリックでBGMが開始されます</p>
+                </div>
+
     </div>
     <div id="stageSelectArea" class="hidden">
-      <button id="backToStartButton" class="back-arrow-btn" title="スタート画面に戻る">←</button>
-      <h2 class="wafu-title">ステージ選択</h2>
-      <div class="boss-cards">
-        <div class="boss-card" data-boss="1">
-          <div class="boss-placeholder">四天王1</div>
-          <div class="boss-name">四天王1：でかいボス</div>
-          <div class="boss-desc">動かず高耐久。弾を撃つ。</div>
+        <img id="backToStartButton" src="assets/UI/UI/button/modoru_button_UI.png" alt="スタート画面に戻る" class="image-btn"
+            title="スタート画面に戻る">
+        <img src="assets/UI/UI/stage_select.png" alt="ステージ選択" class="stage-select-title">
+        <div class="boss-cards">
+            <div class="boss-card" data-boss="1">
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/cannon_oni_select_button_shadow_UI.png" alt="四天王1">
+                <div class="boss-status">
+                    <div class="boss-progress defeated hidden">討伐済み</div>
+                </div>
+            </div>
+            <div class="boss-card" data-boss="2">
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/bike_oni_select_button_shadow_UI.png" alt="四天王2">
+                <div class="boss-status">
+                    <div class="boss-progress defeated hidden">討伐済み</div>
+                </div>
+            </div>
+            <div class="boss-card" data-boss="3">
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/warp_oni_select_button_shadow_UI.png" alt="四天王3">
+                <div class="boss-status">
+                    <div class="boss-progress defeated hidden">討伐済み</div>
+                </div>
+            </div>
+            <div class="boss-card" data-boss="4">
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/fuzin_raizin_select_button_shadow_UI.png" alt="四天王4">
+                <div class="boss-status">
+                    <div class="boss-progress defeated hidden">討伐済み</div>
+                </div>
+            </div>
+            <div class="boss-card" data-boss="7">
+                <img class="boss-select-btn" src="assets/UI/UI/boss_select/last_stage_select_button_shadow_UI_2.png" alt="ラスボス">
+                <div class="boss-status">
+                    <div class="boss-progress defeated hidden">討伐済み</div>
+                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                </div>
+            </div>
         </div>
-        <div class="boss-card" data-boss="2">
-          <div class="boss-placeholder">四天王2</div>
-          <div class="boss-name">四天王2：はやいボス</div>
-          <div class="boss-desc">急加速と停止を繰り返す。</div>
-        </div>
-        <div class="boss-card" data-boss="3">
-          <div class="boss-placeholder">四天王3</div>
-          <div class="boss-name">四天王3：ワープボス</div>
-          <div class="boss-desc">ワープで逃げ、鬼を呼ぶ。</div>
-        </div>
-        <div class="boss-card" data-boss="4">
-          <div class="boss-placeholder">四天王4</div>
-          <div class="boss-name">四天王4：2体1組ボス</div>
-          <div class="boss-desc">2体で異なる能力。</div>
-        </div>
-        <div class="boss-card" data-boss="5">
-          <div class="boss-placeholder">ラスボス</div>
-          <div class="boss-name">ラスボス（いいとこどり）</div>
-          <div class="boss-desc">四天王の力を併せ持つ。</div>
-        </div>
-      </div>
     </div>
     <div id="helpModal" class="hidden">
         <div class="help-content">
-            <h2>操作説明</h2>
-            <ul>
-                <li><b>W/A/S/Dキー</b> プレイヤーを上下左右に移動</li>
-                <li><b>マウス左クリック</b> 攻撃（弾1つ消費）</li>
-                <li><b>弾</b> 最大10発。時間経過で自動回復</li>
-                <li><b>敵</b> 近づいてくる敵を攻撃して倒そう</li>
-                <li><b>スコア</b> 敵を倒すとスコアが増える</li>
-                <li><b>ゲームオーバー</b> HPが0になると終了</li>
-                <li><b>Pキー</b> ゲームの一時中断/再開</li>
-                <li><b>F12キー</b> 開発者ツール（ゲーム中のみ）</li>
-            </ul>
-            <button id="closeHelp">閉じる</button>
+            <div class="help-header">
+                <h2>操作説明</h2>
+                <button id="closeHelp" class="help-close-btn">×</button>
+            </div>
+            <div class="help-image-container">
+                <img id="helpImage" src="" alt="操作説明画像" class="help-image">
+            </div>
+            <div class="help-navigation">
+                <button id="prevHelpPage" class="help-nav-btn help-prev-btn" disabled>
+                    <span class="nav-arrow">←</span>
+                </button>
+                <div class="help-page-info">
+                    <span id="currentHelpPage">1</span> / <span id="totalHelpPages">1</span>
+                </div>
+                <button id="nextHelpPage" class="help-nav-btn help-next-btn">
+                    <span class="nav-arrow">→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <div id="volumeModal" class="hidden">
+        <div class="volume-content">
+            <span class="volume-title">音量設定</span>
+            <span class="volume-text">バーをクリックして音量を指定</span>
+            <div class="volume-desc">
+                <div style="display:flex;align-items:center;gap:9px;margin:4px 0;">
+                    <span id="seVolumeLabel" class="volume-label">効果音</span>
+                    <span id="seVolumeValue" class="volume-value">5</span>
+                    <div id="seVolumeBar" style="display:flex;align-items:center;"></div>
+                </div>
+                <br>
+                <div style="display:flex;align-items:center;gap:9px;margin:4px 0;">
+                    <span id="bgmVolumeLabel" class="volume-label">BGM</span>
+                    <span id="bgmVolumeValue" class="volume-value">5</span>
+                    <div id="bgmVolumeBar" style="display:flex;align-items:center;"></div>
+                </div>
+            </div>
+            <div class="volume-buttons">
+                <img id="closeVolume" src="assets/UI/UI/button/modoru_button_UI.png" alt="音量調整を閉じる" class="image-btn">
+            </div>
+        </div>
+    </div>
+
+    <!-- クレジット画面 -->
+    <div id="creditsModal" class="hidden">
+        <div class="credits-content">
+            <div class="credits-header">
+                <h2>クレジット</h2>
+                <button id="closeCredits" class="credits-close-btn">×</button>
+            </div>
+            <div class="credits-body">
+                <!-- クレジット内容はCreditsManagerによって動的に生成されます -->
+                <div class="loading-credits">
+                    <p>クレジット情報を読み込み中...</p>
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="game-container">
-    <canvas id="gameCanvas" width="800" height="600" class="hidden"></canvas>
-    <div id="scoreDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">スコア</span>: <span id="scoreValue">0</span></div>
-    <div id="livesDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残弾数</span>: <span id="livesValue">10</span></div>
-    <div id="timerDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残り時間</span>: <span id="timerValue">05:00</span></div>
-    <!-- ゲーム中の簡易操作説明-->
-    <div id="quickHelp" class="hidden wafu-panel wafu-shadow">
-        <b>操作</b>
-        <br> WASD : 移動
-        <br> 左クリック : 攻撃
-        <br> P : ポーズ
+        <canvas id="gameCanvas" width="1000" height="800" class="hidden"></canvas>
+        <div id="scoreDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">スコア</span>: <span
+                id="scoreValue">0</span></div>
+        <div id="livesDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残弾数</span>: <span
+                id="livesValue">10</span></div>
+        <div id="timerDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">残り時間</span>: <span
+                id="timerValue">05:00</span></div>
+        <!-- ミニマップ -->
+        <div id="minimapContainer" class="hidden wafu-panel wafu-shadow minimap-container">
+            <div class="wafu-label">ミニマップ</div>
+            <canvas id="minimapCanvas" width="120" height="90"></canvas>
+    <div id="oniHpLogContainer" style="color: red; font-weight: bold; margin-top: 4px;"></div>
+        </div>
+
+        <!-- 桃太郎レベル表示（操作説明UIの直後に配置） -->
+        <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow" style="margin-top:10px;"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
+        
+        <!-- 回復アイテムカウンター -->
+        <div id="recoveryItemDisplay" class="hidden wafu-panel wafu-shadow recovery-item-counter">
+            <span class="wafu-label">回復アイテム</span> <span id="recoveryItemValue">0</span>
+            <div class="recovery-hint">Spaceで使用</div>
+        </div>
+        </div>
     </div>
-</div>
+    
+    <!-- ゲーム中操作ボタン（画面右端に配置） -->
+    <div id="gameControlButtons" class="hidden game-control-buttons">
+        <div class="game-control-row">
+            <div class="level-up-container">
+                <button id="levelUpButton" class="game-control-btn level-up-btn" title="レベルアップ (L)">
+                    <span class="btn-icon">⚔️</span>
+                    <span class="btn-text">レベルアップ</span>
+                    <span class="shortcut-key">L</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ポーズボタン（画面右上に配置） -->
+    <button id="pauseButton" class="game-control-btn pause-btn hidden" title="ポーズ (P)">
+        <span class="btn-icon">⏸️</span>
+        <span class="btn-text">ポーズ</span>
+        <span class="shortcut-key">P</span>
+    </button>
+    
+    <!-- ゲーム中基本操作説明（画面右端、操作ボタンの下に配置） -->
+    <div id="gameBasicControls" class="hidden game-basic-controls">
+        <div class="basic-controls-content">
+            <div class="control-item">
+                <span class="control-icon">🎮</span>
+                <span class="control-text">WASD 移動</span>
+            </div>
+            <div class="control-item">
+                <span class="control-icon">⚡</span>
+                <span class="control-text">左クリック 攻撃</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- お供切り替えUI（画面右端、基本操作説明の下に配置） -->
+    <div id="otomoSwitchUI" class="hidden otomo-switch-ui">
+        <div class="otomo-switch-content">
+            <div class="otomo-icons-row">
+                <div class="otomo-mode-item" data-mode="1">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/monkey.png" alt="フォロー" title="フォロー">
+                </div>
+                <div class="otomo-mode-item" data-mode="2">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/bird.png" alt="ワンダー" title="ワンダー">
+                </div>
+                <div class="otomo-mode-item" data-mode="3">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/dog.png" alt="チャージ" title="チャージ">
+                </div>
+            </div>
+            <div class="otomo-keys-row">
+                <div class="otomo-key-item" data-mode="1">
+                    <span class="otomo-shortcut">1</span>
+                </div>
+                <div class="otomo-key-item" data-mode="2">
+                    <span class="otomo-shortcut">2</span>
+                </div>
+                <div class="otomo-key-item" data-mode="3">
+                    <span class="otomo-shortcut">3</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- ボス出現演出用カットイン -->
-    <div id="bossCutIn" class="hidden" style="position:fixed;top:30%;left:0;width:100%;text-align:center;font-size:2.5em;color:#fff;text-shadow:2px 2px 8px #000;z-index:1000;background:rgba(0,0,0,0.5);padding:1em 0;pointer-events:none;">
+    <div id="bossCutIn" class="hidden"
+        style="position:fixed;top:30%;left:0;width:100%;text-align:center;font-size:2.5em;color:#fff;text-shadow:2px 2px 8px #000;z-index:1000;background:rgba(0,0,0,0.5);padding:1em 0;pointer-events:none;">
         ボス鬼出現！！
     </div>
 
     <div id="pauseMessage" class="hidden">
+    <!-- ステータス割り振りモーダル -->
+        <div id="statusModal" class="hidden">
+            <div class="status-modal-card">
+                <h2 class="status-modal-title">ステータス割り振り</h2>
+                <div class="status-points-row">
+                    <span class="status-points-label">残りポイント</span>
+                    <span id="statusPointsValue" class="status-points-value">0</span>
+                </div>
+                <div class="status-alloc-list">
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">攻撃力</span>
+                        <button id="subAttackBtn" class="status-alloc-btn">－</button>
+                        <span id="statusAttackValue" class="status-alloc-value">0</span>
+                        <button id="addAttackBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">移動速度</span>
+                        <button id="subSpeedBtn" class="status-alloc-btn">－</button>
+                        <span id="statusSpeedValue" class="status-alloc-value">0</span>
+                        <button id="addSpeedBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                    <div class="status-alloc-item">
+                        <span class="status-alloc-label">リロード速度</span>
+                        <button id="subReloadBtn" class="status-alloc-btn">－</button>
+                        <span id="statusReloadValue" class="status-alloc-value">0</span>
+                        <button id="addReloadBtn" class="status-alloc-btn">＋</button>
+                    </div>
+                </div>
+                <div class="status-modal-btn-row">
+                    <button id="statusApplyBtn" class="status-modal-btn status-modal-apply">決定</button>
+                    <button id="statusCancelBtn" class="status-modal-btn status-modal-cancel">キャンセル</button>
+                </div>
+                <div class="status-modal-hint">※「L」キーでこの画面を開閉できます</div>
+            </div>
+        </div>
         <div class="pause-content">
             <span class="pause-text wafu-title">ポーズ</span>
             <div class="pause-buttons">
-                <button id="resumeButton" class="wafu-btn">ゲーム再開</button>
-                <button id="pauseHelpButton" class="wafu-btn">操作説明</button>
-                <button id="pauseBackToStartButton" class="wafu-btn">スタート画面へ戻る</button>
+                <img id="resumeButton" src="assets/UI/UI/button/restart_button_UI.png" alt="ゲーム再開" class="image-btn">
+                <img id="pauseHelpButton" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明"
+                    class="image-btn">
+                <img id="pauseVolumeButton" src="" alt="音量調整"
+                    class="image-btn">
+                <img id="pauseBackToStartButton" src="assets/UI/UI/button/kikan_button_UI.png" alt="スタート画面へ戻る"
+                    class="image-btn">
             </div>
         </div>
     </div>
@@ -105,13 +282,17 @@
         <div class="game-over-content">
             <span class="game-over-text wafu-title">ゲームオーバー</span>
             <div class="game-over-buttons">
-                <button id="restartButton" class="wafu-btn">もう一度プレイ</button>
-                <button class="backToStart wafu-btn">スタート画面へ戻る</button>
+                <img id="restartButton" src="assets/UI/UI/retry_button_UI.png" alt="もう一度プレイ" class="image-btn">
+                <img class="backToStart image-btn" src="assets/UI/UI/button/kikan_button_UI.png" alt="スタート画面へ戻る">
             </div>
         </div>
     </div>
-    <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
-    
+
+    <!-- 照準カーソル -->
+    <div id="crosshair" class="hidden">
+        <img src="assets/UI/UI/cross_hair.png" alt="照準">
+    </div>
+
     <!-- デバッグパネル -->
     <div id="debugPanel" class="hidden debug-panel">
         <div class="debug-header">
@@ -182,6 +363,12 @@
                     <label><input type="checkbox" id="showEnemyHitbox"> 敵当たり判定を表示</label>
                 </div>
                 <div class="debug-control">
+                    <label><input type="checkbox" id="showBossCollision"> ボス衝突判定を表示</label>
+                </div>
+                <div class="debug-control">
+                    <label><input type="checkbox" id="showBossRageMode"> ボス怒りモード状態を表示</label>
+                </div>
+                <div class="debug-control">
                     <label><input type="checkbox" id="showProjectileHitbox"> 弾当たり判定を表示</label>
                 </div>
                 <div class="debug-control">
@@ -213,6 +400,20 @@
                     <label>ボス鬼1弾ダメージ:</label>
                     <input type="number" id="bossOni1ProjectileDamage" min="1" max="50" value="15">
                 </div>
+                <div class="debug-control">
+                    <button id="spawnBossNow" class="debug-btn">ボス鬼をすぐ出現</button>
+                </div>
+            </div>
+            <div class="debug-section">
+                <h4>回復アイテム設定</h4>
+                <div class="debug-control">
+                    <label>回復アイテムドロップ率(%):</label>
+                    <input type="number" id="recoveryItemDropRate" min="0" max="100" step="1" value="3">
+                </div>
+                <div class="debug-control">
+                    <label>回復アイテム回復率(%):</label>
+                    <input type="number" id="recoveryItemHealRate" min="1" max="100" step="1" value="30">
+                </div>
             </div>
             <div class="debug-section">
                 <h4>当たり判定詳細</h4>
@@ -224,13 +425,65 @@
                     <input type="number" id="playerHitboxSize" min="0.1" max="2.0" step="0.1" value="0.8">
                 </div>
             </div>
+            <div class="debug-section">
+                <h4>ボス進捗管理</h4>
+                <div class="debug-control">
+                    <button id="resetBossProgress" class="debug-btn">全ボス進捗リセット</button>
+                </div>
+                <div class="debug-control">
+                    <button id="unlockAllBosses" class="debug-btn">全ボスアンロック</button>
+                </div>
+                <div class="debug-control">
+                    <label>個別ボス進捗リセット:</label>
+                    <div class="debug-control">
+                        <button id="resetBoss1" class="debug-btn">砲鬼リセット</button>
+                        <button id="resetBoss2" class="debug-btn">バイク鬼リセット</button>
+                        <button id="resetBoss3" class="debug-btn">ワープ鬼リセット</button>
+                        <button id="resetBoss4" class="debug-btn">風神・雷神リセット</button>
+                    </div>
+                </div>
+                <div class="debug-control">
+                    <label>個別ボス討伐状況変更:</label>
+                    <div class="debug-control">
+                        <div class="boss-toggle-row">
+                            <span>鋼鉄鬼:</span>
+                            <button id="toggleBoss1" class="debug-btn boss-toggle-btn">未討伐</button>
+                        </div>
+                        <div class="boss-toggle-row">
+                            <span>暴走鬼:</span>
+                            <button id="toggleBoss2" class="debug-btn boss-toggle-btn">未討伐</button>
+                        </div>
+                        <div class="boss-toggle-row">
+                            <span>妖術鬼:</span>
+                            <button id="toggleBoss3" class="debug-btn boss-toggle-btn">未討伐</button>
+                        </div>
+                        <div class="boss-toggle-row">
+                            <span>風神・雷神:</span>
+                            <button id="toggleBoss4" class="debug-btn boss-toggle-btn">未討伐</button>
+                        </div>
+                        <div class="boss-toggle-row">
+                            <span>ラスボス:</span>
+                            <button id="toggleBoss5" class="debug-btn boss-toggle-btn">未討伐</button>
+                        </div>
+                        <div class="boss-toggle-row">
+                            <span>ラストステージ:</span>
+                            <button id="toggleBoss7" class="debug-btn boss-toggle-btn">未討伐</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="debug-control">
+                    <label>ボス進捗状況:</label>
+                    <div id="bossProgressStatus" class="debug-info"></div>
+                </div>
+            </div>
             <div class="debug-actions">
                 <button id="applyDebugSettings" class="debug-btn">設定を適用</button>
                 <button id="resetDebugSettings" class="debug-btn">設定をリセット</button>
             </div>
         </div>
     </div>
-    
-    <script type="module" src="main.js"></script>  
+
+    <script type="module" src="main.js"></script>
 </body>
+
 </html>
