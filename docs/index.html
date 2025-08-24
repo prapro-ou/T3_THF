@@ -26,9 +26,13 @@
         <div class="loader"></div>
     </div>
     <div id="startScreen" class="dark-bg">
+                <!-- 設定ボタン（右上） -->
+                <button id="settingsButton" class="settings-btn" title="設定">
+                    <span class="settings-icon">⚙️</span>
+                </button>
+                
                 <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
                 <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
-                <img id="credits" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="クレジット" class="image-btn">
                 <img id="volume" src="" alt="音量" class="image-btn">
                 <div id="audioNotice" class="audio-notice">
                         <p>🔊 最初のクリックでBGMが開始されます</p>
@@ -114,6 +118,28 @@
             </div>
             <div class="volume-buttons">
                 <img id="closeVolume" src="assets/UI/UI/button/modoru_button_UI.png" alt="音量調整を閉じる" class="image-btn">
+            </div>
+        </div>
+    </div>
+
+    <!-- 設定メニュー -->
+    <div id="settingsModal" class="hidden">
+        <div class="settings-content">
+            <div class="settings-header">
+                <h2>設定</h2>
+                <button id="closeSettings" class="settings-close-btn">×</button>
+            </div>
+            <div class="settings-body">
+                <div class="settings-menu">
+                    <button id="volumeSettingsBtn" class="settings-menu-btn">
+                        <span class="menu-icon">🔊</span>
+                        <span class="menu-text">音量設定</span>
+                    </button>
+                    <button id="creditsSettingsBtn" class="settings-menu-btn">
+                        <span class="menu-icon">📜</span>
+                        <span class="menu-text">クレジット</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
