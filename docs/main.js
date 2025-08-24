@@ -5,7 +5,7 @@ import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
 import { BossProgressManager } from './managers/BossProgressManager.js';
 import { HelpManager } from './help/index.js';
-import { VolumeManager } from './managers/VolumeManager.js';
+
 
 document.addEventListener('DOMContentLoaded', () => {
     // 鬼HP上昇ログ用
@@ -175,12 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const pauseMessage = document.getElementById('pauseMessage');
     const resumeButton = document.getElementById('resumeButton');
     const pauseHelpButton = document.getElementById('pauseHelpButton');
-    const pauseVolumeButton = document.getElementById('pauseVolumeButton');
+
     const pauseBackToStartButton = document.getElementById('pauseBackToStartButton');
 
     // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
     const bgmManager = new BgmManager();
-    window.bgmManager = bgmManager;
     bgmManager.play('mainBgm'); // ユーザー操作後まで保留される
 
     // ボス進捗マネージャーの初期化
@@ -606,15 +605,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
 
-    // 音量調節マネージャーの初期化
-    const volumeManager = new VolumeManager();
-
-    // 音量調整画面表示
-    pauseVolumeButton.addEventListener('click', () => {
-        const volumeModal = document.getElementById('volumeModal');
-        if (volumeModal) {
-            volumeModal.classList.remove('hidden');
-
     // ゲーム中操作ボタンのイベントハンドリング
     levelUpButton.addEventListener('click', () => {
         if (game && !game.pauseManager.isPaused) {
@@ -702,13 +692,7 @@ document.addEventListener('DOMContentLoaded', () => {
         helpManager.show();
     });
 
-    pauseVolumeButton.addEventListener('click', () => {
-        const volumeModal = document.getElementById('volumeModal');
-        playSE("kettei"); // 決定音を追加
-        if (volumeModal) {
-            volumeModal.classList.remove('hidden');
-        }
-    });
+
 
     pauseBackToStartButton.addEventListener('click', () => {
         // ゲーム中UIを非表示（帰還ボタンからの戻りも含む）
