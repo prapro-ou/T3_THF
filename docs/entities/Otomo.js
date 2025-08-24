@@ -24,7 +24,7 @@ export class Otomo extends Character {
             monkey: new Image(),
             bird: new Image()
         };
-        
+
         this.images.dog.src = 'assets/characters/otomo/dog.png';
         this.images.monkey.src = 'assets/characters/otomo/monkey.png';
         this.images.bird.src = 'assets/characters/otomo/bird.png';
@@ -48,7 +48,7 @@ export class Otomo extends Character {
             this.direction = this.x > this.lastX ? 1 : -1;
             this.lastX = this.x;
         }
-        
+
         // オトモの速度はプレイヤーに追従
         this.speed = (player && player.speed) ? player.speed * 40 : 140;
         this.behavior.update(player, deltaTime);
@@ -58,7 +58,7 @@ export class Otomo extends Character {
         // 動作モードに応じて画像を選択
         let image;
         const imageName = this.behavior.getImageName ? this.behavior.getImageName() : 'monkey';
-        
+
         switch (imageName) {
             case 'dog':
                 image = this.images.dog;
