@@ -105,7 +105,7 @@ export class ProjectileManager {
     spawnCannonBallProjectile(x, y, target, speed = 6, damage = 15) {
         // cannon_ballタイプの弾（ターゲットはプレイヤー）
         console.log("Creating cannon ball projectile at:", x, y);
-        const proj = new Projectile(this.game, x, y, target, speed, damage, 'cannon_ball');
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'cannon_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
         console.log("Cannon ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }
@@ -113,7 +113,7 @@ export class ProjectileManager {
     spawnBlackBallProjectile(x, y, target, speed = 8, damage = 10) {
         // 黒い玉（小さめで速い球）
         console.log("Creating black ball projectile at:", x, y);
-        const proj = new Projectile(this.game, x, y, target, speed, damage, 'black_ball');
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'black_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
         console.log("Black ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }
@@ -121,7 +121,7 @@ export class ProjectileManager {
     spawnRedBallProjectile(x, y, target, speed = 5, damage = 12) {
         // 赤い玉（曲がる弾）
         console.log("Creating red ball projectile at:", x, y);
-        const proj = new Projectile(this.game, x, y, target, speed, damage, 'red_ball');
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'red_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
         console.log("Red ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }
@@ -129,7 +129,7 @@ export class ProjectileManager {
     spawnYellowBallProjectile(x, y, target, speed = 5, damage = 12) {
         // 黄色い玉（反対方向に曲がる弾）
         console.log("Creating yellow ball projectile at:", x, y);
-        const proj = new Projectile(this.game, x, y, target, speed, damage, 'yellow_ball');
+    const proj = new Projectile(this.game, x, y, target, speed, damage, 'yellow_ball', this.game.enemyManager && this.game.enemyManager.bossOni1Instance ? this.game.enemyManager.bossOni1Instance : null, 'enemy');
         console.log("Yellow ball projectile created with type:", proj.type);
         this.projectiles.push(proj);
     }

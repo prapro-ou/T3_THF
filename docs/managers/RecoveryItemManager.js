@@ -8,7 +8,7 @@ export class RecoveryItemManager {
     constructor(game) {
         this.game = game;
         this.items = [];
-        this.dropRate = 0.03; // 3%の確率でドロップ
+    this.dropRate = 0.06; // 6%の確率でドロップ
     }
 
     // ドロップ率を設定（デバッグ用）

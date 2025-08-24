@@ -11,6 +11,7 @@ export class FollowOtomoBehavior {
         const dy = player.y - this.otomo.y;
         const dist = Math.hypot(dx, dy);
 
+
         if (dist > 30) {
             this.otomo.x += (dx / dist) * this.otomo.speed * deltaTime;
             this.otomo.y += (dy / dist) * this.otomo.speed * deltaTime;
@@ -20,8 +21,10 @@ export class FollowOtomoBehavior {
         const target = this.otomo.findEnemyNearPlayer(200);
         if (target && this.otomo.canShoot) {
             this.otomo.attackTarget(target, 'projectile');
-            playSE('monkey1'); // 攻撃時に効果音monkey1を鳴らす
-
+            this.otomo.attackSECount = (this.otomo.attackSECount || 0) + 1;
+            if (this.otomo.attackSECount % 5 === 0) {
+                playSE('monkey1'); // 5回に1回だけ鳴らす
+            }
             this.otomo.canShoot = false;
             setTimeout(() => this.otomo.canShoot = true, this.otomo.game.getOtomoAttackCooldown());
         }

@@ -374,9 +374,42 @@ canvas {
     min-height: 100vh;
 }
 
+/* 設定ボタン（右上） */
+.settings-btn {
+    position: absolute;
+    top: 2em;
+    right: 2em;
+    width: 3.5em;
+    height: 3.5em;
+    border-radius: 50%;
+    border: 3px solid #C1272D;
+    background: rgba(255, 255, 255, 0.9);
+    color: #C1272D;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.settings-btn:hover {
+    background: #C1272D;
+    color: white;
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(193, 39, 45, 0.4);
+}
+
+.settings-icon {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
 /* 開始画面のボタンを右下に配置 */
 #startScreen #startButton,
-#startScreen #help {
+#startScreen #help,
+#startScreen #volume {
     position: absolute;
     max-width: 250px;
     height: auto;
@@ -384,12 +417,17 @@ canvas {
 }
 
 #startScreen #startButton {
-    bottom: 10em;
+    bottom: 12.5em;
 }
 
 #startScreen #help {
 
-    bottom: 5em;
+    bottom: 7.5em;
+}
+
+#startScreen #volume {
+    display: none; /* 設定メニューからのみアクセス */
+    bottom: 2.5em;
 }
 
 /* 音声案内スタイル */
@@ -457,6 +495,7 @@ button,
 .wafu-btn,
 #startButton,
 #help,
+#volume,
 .ui-btn,
 #restartButton,
 #closeHelp {
@@ -478,6 +517,7 @@ button:hover,
 .wafu-btn:hover,
 #startButton:hover,
 #help:hover,
+#volume:hover,
 .ui-btn:hover {
     background: #C1272D;
     color: #fff;
@@ -488,7 +528,8 @@ button:hover,
 
 /* 特殊ボタンスタイル */
 #startButton,
-#help {
+#help,
+#volume {
     display: inline-block;
     margin: 0 auto;
     min-width: 180px;
@@ -500,7 +541,8 @@ button:hover,
 }
 
 #startButton:hover,
-#help:hover {
+#help:hover,
+#volume:hover {
     background: linear-gradient(90deg, #e6b422 60%, #fffbe7 100%);
 }
 
@@ -532,7 +574,8 @@ button:hover,
 
 /* 小さい画像ボタン用スタイル */
 #backToStartButton.image-btn,
-#closeHelp.image-btn {
+#closeHelp.image-btn,
+#closeVolume.image-btn {
     max-width: 150px;
 }
 
@@ -810,34 +853,7 @@ button:hover,
     font-size: 1.2em;
 }
 
-/* ===== ヘルプ・説明 ===== */
-#quickHelp {
-    position: absolute;
-    bottom: 350px;
-    right: -180px;
-    min-width: 150px;
-    min-height: 120px;
-    font-size: 0.85em;
-    padding: 20px 15px;
-    z-index: 10;
-    background: url('assets/UI/UI/scroll.png') center center no-repeat;
-    background-size: 100% 100%;
-    border: none;
-    border-radius: 0;
-    color: #2c1810;
-    box-shadow: none;
-    text-align: center;
-    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
-    pointer-events: none;
-    user-select: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
-    font-weight: 700;
-    line-height: 1.2;
-}
+
 
 #otomoLevelDisplay {
     position: absolute;
@@ -865,6 +881,281 @@ button:hover,
     text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
     font-weight: 700;
     line-height: 1.2;
+}
+
+/* ===== ゲーム中操作ボタン ===== */
+.game-control-buttons {
+    position: fixed;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    min-width: 120px;
+    min-height: 120px;
+    padding: 0;
+    z-index: 10;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: auto;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.game-control-row {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* レベルアップ用巻物コンテナ */
+.level-up-container {
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    padding: 15px 10px;
+    min-width: 130px;
+    min-height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.game-control-btn {
+    background: linear-gradient(135deg, #C1272D 0%, #8B0000 100%);
+    border: 2px solid #8B0000;
+    border-radius: 8px;
+    color: white;
+    padding: 6px 8px;
+    font-size: 0.7em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 65px;
+    min-height: 50px;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-control-btn:hover {
+    background: linear-gradient(135deg, #D1272D 0%, #9B0000 100%);
+    border-color: #9B0000;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.game-control-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-control-btn .btn-icon {
+    font-size: 1.2em;
+    line-height: 1;
+}
+
+.game-control-btn .btn-text {
+    font-size: 0.8em;
+    line-height: 1;
+}
+
+.game-control-btn .shortcut-key {
+    font-size: 0.6em;
+    font-weight: 600;
+    color: #FFD700;
+    background: rgba(139, 69, 19, 0.8);
+    border: 1px solid #8B4513;
+    border-radius: 4px;
+    padding: 2px 4px;
+    line-height: 1;
+    text-shadow: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* ポーズボタン専用スタイル */
+.pause-btn {
+    background: linear-gradient(135deg, #666 0%, #444 100%) !important;
+    border-color: #555 !important;
+    min-width: 80px;
+    min-height: 50px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 15;
+}
+
+.pause-btn:hover {
+    background: linear-gradient(135deg, #777 0%, #555 100%) !important;
+    border-color: #666 !important;
+}
+
+.pause-btn .btn-icon {
+    font-size: 1.4em;
+}
+
+/* ===== ゲーム中基本操作説明 ===== */
+.game-basic-controls {
+    position: fixed;
+    top: calc(50% + 100px);
+    right: 20px;
+    min-width: 130px;
+    min-height: 80px;
+    padding: 15px 10px;
+    z-index: 10;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.basic-controls-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+    justify-content: center;
+}
+
+.control-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.75em;
+    line-height: 1;
+}
+
+.control-icon {
+    font-size: 1.1em;
+    line-height: 1;
+}
+
+.control-text {
+    font-size: 0.9em;
+    line-height: 1;
+}
+
+/* ===== お供切り替えUI ===== */
+.otomo-switch-ui {
+    position: fixed;
+    top: calc(50% + 200px);
+    right: 20px;
+    min-width: 100px;
+    min-height: 80px;
+    padding: 12px 8px;
+    z-index: 10;
+    background: url('assets/UI/UI/scroll.png') center center no-repeat;
+    background-size: 100% 100%;
+    border: none;
+    border-radius: 0;
+    color: #2c1810;
+    box-shadow: none;
+    text-align: center;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    pointer-events: none;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 700;
+}
+
+.otomo-switch-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-icons-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-keys-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.otomo-mode-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    background: rgba(139, 69, 19, 0.1);
+    border: 1px solid rgba(139, 69, 19, 0.3);
+    transition: all 0.2s ease;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.otomo-key-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    min-height: 25px;
+}
+
+.otomo-mode-item:hover {
+    background: rgba(139, 69, 19, 0.2);
+    border-color: rgba(139, 69, 19, 0.5);
+}
+
+.otomo-mode-item.active {
+    background: rgba(193, 39, 45, 0.2);
+    border-color: #C1272D;
+    transform: scale(1.1);
+    box-shadow: 0 2px 8px rgba(193, 39, 45, 0.4);
+}
+
+.otomo-mode-icon {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+    display: block;
+}
+
+.otomo-shortcut {
+    font-size: 0.8em;
+    font-weight: 600;
+    color: #FFD700;
+    background: rgba(139, 69, 19, 0.8);
+    border: 1px solid #8B4513;
+    border-radius: 4px;
+    padding: 3px 6px;
+    line-height: 1;
+    text-shadow: none;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* 操作説明関連のスタイルは docs/help/help.css に移動しました */
@@ -895,12 +1186,122 @@ button:hover,
     text-shadow: 0 2px 8px #000a;
 }
 
-/* ===== ゲームオーバー・ポーズ・勝利画面 ===== */
+/* ===== 設定メニュー ===== */
+#settingsModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
+}
+
+.settings-content {
+    background: #fff8f0;
+    border-radius: 24px;
+    min-width: 400px;
+    max-width: 95vw;
+    box-shadow: 0 0 32px #0008, 0 0 0 8px #c1272d22;
+    padding: 2.2em 2.5em 1.5em 2.5em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 4px solid #C1272D;
+    position: relative;
+}
+
+.settings-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2em;
+}
+
+.settings-header h2 {
+    color: #C1272D;
+    font-size: 2em;
+    margin: 0;
+    letter-spacing: 0.08em;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #fff, 2px 2px 6px #c1272d33;
+}
+
+.settings-close-btn {
+    background: none;
+    border: none;
+    font-size: 2em;
+    color: #C1272D;
+    cursor: pointer;
+    padding: 0;
+    width: 1.5em;
+    height: 1.5em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.settings-close-btn:hover {
+    background: #C1272D;
+    color: white;
+    transform: scale(1.1);
+}
+
+.settings-menu {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em;
+}
+
+.settings-menu-btn {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 1.2em 1.5em;
+    background: white;
+    border: 3px solid #C1272D;
+    border-radius: 16px;
+    color: #C1272D;
+    font-size: 1.3em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    width: 100%;
+    text-align: left;
+}
+
+.settings-menu-btn:hover {
+    background: #C1272D;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(193, 39, 45, 0.3);
+}
+
+.menu-icon {
+    font-size: 1.5em;
+    min-width: 1.5em;
+}
+
+.menu-text {
+    font-size: 1.1em;
+}
+
+/* ===== ゲームオーバー・ポーズ・勝利画面・音量調整画面 ===== */
 #gameOverMessage,
 #pauseMessage,
 #pausePanel,
 #gameOverPanel,
-#winPanel {
+#winPanel,
+#volumeModal {
     position: fixed;
     top: 0;
     left: 0;
@@ -1076,6 +1477,71 @@ button:hover,
     .pause-buttons button {
         min-width: 160px;
     }
+}
+
+/* 音量調整画面のコンテンツ */
+#volumeModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(120deg, rgba(24, 24, 24, 0.9) 0%, rgba(35, 35, 35, 0.9) 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 150;
+    padding: 0;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    backdrop-filter: blur(3px);
+}
+
+.volume-content {
+    background: rgba(42, 42, 42, 0.95);
+    color: #fff;
+    border: 3px solid #C1272D;
+    border-radius: 20px;
+    padding: 3em 4em;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    max-width: 500px;
+    width: 90%;
+    margin: 0 auto;
+    backdrop-filter: blur(5px);
+}
+
+.volume-title {
+    font-size: 2.5em;
+    color: #C1272D;
+    font-family: 'Noto Serif JP', 'Yu Mincho', 'serif';
+    font-weight: 700;
+    margin-bottom: 1.5em;
+    display: block;
+    letter-spacing: 0.1em;
+    text-shadow: none;
+}
+
+.volume-text {
+    font-size: 1.2em;
+    color: #fff;
+    margin-bottom: 1em;
+}
+
+.volume-label {
+    font-weight: bold;
+    font-size: 1.2em;
+    min-width: 70px;
+}
+
+.volume-value {
+  font-size: 2em;
+  display: inline-block;
+  min-width: 2em;
+  text-align: center;
 }
 
 /* ===== ボス選択画面 ===== */
@@ -1692,4 +2158,155 @@ hr,
 .boss-toggle-btn.unlocked:hover {
     background: #F57C00;
     border-color: #F57C00;
+}
+
+/* ===== クレジット画面 ===== */
+#creditsModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.credits-content {
+    background: #fff8f0;
+    border-radius: 24px;
+    min-width: 400px;
+    max-width: 90vw;
+    max-height: 90vh;
+    box-shadow: 0 0 32px #0008, 0 0 0 8px #c1272d22;
+    border: 4px solid #C1272D;
+    position: relative;
+    overflow: hidden;
+}
+
+.credits-header {
+    background: #C1272D;
+    color: white;
+    padding: 1.5em 2em;
+    text-align: center;
+    position: relative;
+}
+
+.credits-header h2 {
+    margin: 0;
+    font-size: 1.8em;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+}
+
+.credits-close-btn {
+    position: absolute;
+    top: 1em;
+    right: 1.5em;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5em;
+    cursor: pointer;
+    width: 2em;
+    height: 2em;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.credits-close-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.credits-body {
+    padding: 2em;
+    max-height: 60vh;
+    overflow-y: auto;
+    font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
+}
+
+.credits-section {
+    margin-bottom: 2em;
+}
+
+.credits-section h3 {
+    color: #C1272D;
+    font-size: 1.3em;
+    margin-bottom: 1em;
+    padding-bottom: 0.5em;
+    border-bottom: 2px solid #C1272D;
+    font-weight: bold;
+}
+
+.credit-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1em;
+    padding: 0.8em;
+    background: #fff3;
+    border-radius: 8px;
+    border: 1px solid #C1272D33;
+}
+
+.credit-role {
+    color: #666;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+.credit-name {
+    color: #C1272D;
+    font-weight: bold;
+    font-size: 1em;
+    text-align: right;
+}
+
+.credits-footer {
+    text-align: center;
+    margin-top: 2em;
+    padding-top: 1.5em;
+    border-top: 2px solid #C1272D33;
+}
+
+.credits-footer p {
+    color: #666;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+/* クレジット画面のレスポンシブ対応 */
+@media (max-width: 600px) {
+    .credits-content {
+        min-width: 95vw;
+        margin: 1em;
+    }
+    
+    .credits-body {
+        padding: 1.5em;
+    }
+    
+    .credit-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5em;
+    }
+    
+    .credit-name {
+        text-align: left;
+    }
+}
+
+/* クレジット読み込み中表示 */
+.loading-credits {
+    text-align: center;
+    padding: 2em;
+    color: #666;
+    font-style: italic;
 }

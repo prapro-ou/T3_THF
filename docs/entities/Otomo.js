@@ -11,6 +11,9 @@ export class Otomo extends Character {
         this.wanderRadius = 200;
         this.canShoot = true;
 
+        // 攻撃SEカウント
+        this.attackSECount = 0;
+
         // 移動方向を追跡（1: 右向き, -1: 左向き）
         this.direction = 1;
         this.lastX = x;
@@ -21,7 +24,7 @@ export class Otomo extends Character {
             monkey: new Image(),
             bird: new Image()
         };
-        
+
         this.images.dog.src = 'assets/characters/otomo/dog.png';
         this.images.monkey.src = 'assets/characters/otomo/monkey.png';
         this.images.bird.src = 'assets/characters/otomo/bird.png';
@@ -45,7 +48,7 @@ export class Otomo extends Character {
             this.direction = this.x > this.lastX ? 1 : -1;
             this.lastX = this.x;
         }
-        
+
         // オトモの速度はプレイヤーに追従
         this.speed = (player && player.speed) ? player.speed * 40 : 140;
         this.behavior.update(player, deltaTime);
@@ -55,7 +58,7 @@ export class Otomo extends Character {
         // 動作モードに応じて画像を選択
         let image;
         const imageName = this.behavior.getImageName ? this.behavior.getImageName() : 'monkey';
-        
+
         switch (imageName) {
             case 'dog':
                 image = this.images.dog;
@@ -116,8 +119,7 @@ export class Otomo extends Character {
             if (dist === 0) return;
             const speed = 5 * 1.2;
             const damage = isBoss ? 5 : 10;
-
-            const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage);
+            const projectile = new Projectile(this.game, this.x, this.y, target, speed, damage, 'normal', this, 'otomo');
             this.game.projectileManager.addProjectile(projectile);
         } else if (type === 'charge') {
             // 直接ダメージ
@@ -206,11 +208,11 @@ export class Otomo extends Character {
 
     // momotaro専用：自身の近くの敵をProjectileで攻撃
     //canShootは外部から制御する
-    // rangeはデフォルトで1050、cooldownは1000ms
+    // rangeはデフォルトで1050、cooldownは2000ms
     // これにより、オトモが近くの敵を自動で攻撃する
     // ただし、canShootがfalseの場合は何もしない
     // cooldownが経過するまで再度攻撃しない
-    attackNearEnemy(range = 1050, cooldown = 1000) {
+    attackNearEnemy(range = 1050, cooldown = 2000) {
         if (!this.canShoot) return;
         const target = this.findEnemyNearSelf(range);
         if (target) {

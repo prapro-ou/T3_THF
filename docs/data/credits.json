@@ -1,0 +1,70 @@
+{
+    "title": "クレジット",
+    "sections": [
+        {
+            "title": "開発",
+            "items": [
+
+                {
+                    "role": "開発チーム",
+                    "name": "[TH_フルハウス]"
+                },
+
+                {
+
+                    "role": "リーダー 企画",
+                    "name": "[李皓太]"
+                },
+
+                {
+                    "role": "プログラミング",
+                    "name": "[阿保日翔,塚原甲明]"
+                },
+
+                {
+                    "role": "アート・グラフィック",
+                    "name": "[李皓太]"
+                },
+                {
+                    "role": "SE",
+                    "name": "[河田修佑]"
+                },
+                {
+                    "role": "音楽",
+                    "name": "[孝田陽音]"
+                }
+
+            ]
+        },
+        {
+            "title": "使用素材(敬称略)",
+            "items": [
+                {
+                    "role": "効果音・BGM",
+                    "name": "Sound Effect Lab（効果音ラボ）, Otologic, Mixkit, Pixabay, Uppbeat, Springin, Voicy, On-Jin, PANICPUMPKIN, ユーフルカ"
+                },
+                {
+                    "role": "グラフィック素材",
+                    "name": "[グラフィック素材の詳細を入力]"
+                }
+            ]
+        },
+        {
+            "title": "スペシャルサンクス",
+            "items": [
+                {
+                    "name": "[サンクスメッセージを入力]"
+                },
+                {
+                    "name": "[追加のサンクスメッセージ]"
+                }
+            ]
+        }
+    ],
+    "footer": "© 2025 [キビ弾GO] All Rights Reserved.",
+    "additionalInfo": {
+        "version": "1.0.0",
+        "buildDate": "2025-08-25",
+        "website": "[プロジェクトウェブサイトURL]"
+    }
+}

@@ -358,6 +358,7 @@ export class Game {
                     );
                     
                     this.gameState.setGameOver();
+                    this.bgmManager.stop();
                     playSE("gameclear"); // ← ボス撃破時に効果音を鳴らす
                     const clearMsg = (this.selectedBossType === 4)
                         ? 'クリア！風神・雷神を倒した！'
@@ -733,12 +734,9 @@ export class Game {
             this.attackManager.reset();
         }
 
-        // UIの状態もリセット
+        // UIの状態もリセット（ゲームオーバー表示を隠す）
         if (this.uiManager) {
             this.uiManager.hideGameOver();
-            this.uiManager.hidePauseMessage();
-            this.uiManager.hideBossCutIn();
-            this.uiManager.hideMinimap();
         }
 
         // ボス進捗の更新を通知（カスタムイベント）
