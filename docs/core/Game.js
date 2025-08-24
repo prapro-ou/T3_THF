@@ -357,6 +357,21 @@ export class Game {
                         clearTime
                     );
                     
+                    // ボス進捗更新イベントを発火
+                    if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new CustomEvent('bossProgressUpdated'));
+                        
+                        // 即座にUI更新を試行（ボス選択画面が表示されている場合のみ）
+                        if (window.isBossSelectScreenVisible && window.updateBossCardProgress) {
+                            try {
+                                window.updateBossCardProgress();
+                                console.log('ボス討伐時に即座にUI更新を実行しました（ボス選択画面表示中）');
+                            } catch (error) {
+                                console.warn('即座のUI更新に失敗しました:', error);
+                            }
+                        }
+                    }
+                    
                     this.gameState.setGameOver();
                     this.bgmManager.stop();
                     playSE("gameclear"); // ← ボス撃破時に効果音を鳴らす

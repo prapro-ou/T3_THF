@@ -19,8 +19,8 @@ export class BossOni2 extends BossOni {
             console.log('BossOni2: Super constructor completed');
 
             this.color = '#3498db'; // 青系
-            this._maxHP = 800; // HP増加（2倍）
-            this._hp = 800;
+            this._maxHP = 6000; // HP増加（2倍）
+            this._hp = 6000;
             this.name = 'BossOni2';
             // 視覚的サイズを設定
             this.setSize(120, 120);
@@ -115,8 +115,8 @@ export class BossOni2 extends BossOni {
         switch (this.difficulty) {
             case 'easy':
                 this.dashSpeed = 14;
-                this._maxHP = 600;
-                this._hp = 600;
+                this._maxHP = 1200;
+                this._hp = 1200;
                 this.specialAttackMaxCooldown = 240;
                 this.knockbackStrength = 15; // 弱いノックバック
                 this.noteAttackMaxCooldown = 180; // 音符攻撃のクールダウン長め

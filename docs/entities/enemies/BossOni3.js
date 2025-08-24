@@ -13,8 +13,8 @@ export class BossOni3 extends BossOni {
             console.log('BossOni3: Super constructor completed');
 
             this.color = '#9b59b6'; // 紫系（ワープのイメージ）
-            this._maxHP = 800;
-            this._hp = 800;
+            this._maxHP = 5000;
+            this._hp = 5000;
             this.name = 'BossOni3';
 
             // warp_oni画像のサイズに合わせて調整

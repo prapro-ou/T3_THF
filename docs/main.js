@@ -423,6 +423,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bossCardElements = document.querySelectorAll('.boss-card');
     console.log('ボスカード要素数:', bossCardElements.length);
     
+    // ボス選択画面の表示状態を管理
+    let isBossSelectScreenVisible = false;
+    
     // ボスカードの進捗状況を更新する関数
     function updateBossCardProgress() {
         bossCardElements.forEach((card) => {
@@ -470,6 +473,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 初期表示時に進捗状況を更新
     updateBossCardProgress();
+    
+    // グローバルに公開（BossProgressManagerから呼び出し可能にする）
+    window.updateBossCardProgress = updateBossCardProgress;
+    window.isBossSelectScreenVisible = isBossSelectScreenVisible;
     
     // 初期表示時にボス画像を更新
     bossCardElements.forEach((card) => {
@@ -592,6 +599,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         stageSelectArea.style.display = 'flex';
                         stageSelectArea.style.opacity = '1';
                         stageSelectArea.style.transform = 'translateX(0)';
+                        // ボス選択画面表示時に進捗状況を更新
+                        updateBossCardProgress();
+                        // ボス選択画面表示フラグを設定
+                        isBossSelectScreenVisible = true;
                     });
                 }
             }, 100);
@@ -603,6 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 stageSelectArea.style.display = 'flex';
                 stageSelectArea.style.opacity = '1';
                 stageSelectArea.style.transform = 'translateX(0)';
+                // ボス選択画面表示時に進捗状況を更新
+                updateBossCardProgress();
+                // ボス選択画面表示フラグを設定
+                isBossSelectScreenVisible = true;
             });
         }
     });
@@ -626,9 +641,7 @@ document.addEventListener('DOMContentLoaded', () => {
         livesDisplay.classList.remove('hidden');
         timerDisplay.classList.remove('hidden');
         minimapContainer.classList.remove('hidden');
-        gameControlButtons.classList.remove('hidden');
-        gameBasicControls.classList.remove('hidden');
-                        rightUIPanel.classList.remove('hidden');
+        rightUIPanel.classList.remove('hidden');
         pauseButton.classList.remove('hidden');
         
         // お供切り替えUIの初期状態を設定
@@ -787,6 +800,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 game = null; // ゲームインスタンスをリセット
             }
             bgmManager.play('mainBgm');
+            
+            // ボス選択画面表示フラグをリセット
+            isBossSelectScreenVisible = false;
+            
+            // ボス選択画面に戻る際に進捗状況を更新
+            updateBossCardProgress();
         });
     });
 
@@ -859,6 +878,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 game = null; // ゲームインスタンスをリセット
             }
             bgmManager.play('mainBgm');
+            
+            // ボス選択画面表示フラグをリセット
+            isBossSelectScreenVisible = false;
+            
+            // ボス選択画面に戻る際に進捗状況を更新
+            updateBossCardProgress();
         });
     });
 
