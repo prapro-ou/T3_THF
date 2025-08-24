@@ -42,45 +42,31 @@
             <div class="boss-card" data-boss="1">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/cannon_oni_select_button_shadow_UI.png" alt="四天王1">
                 <div class="boss-status">
-                    <div class="boss-name">砲鬼</div>
-                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
-                    <div class="boss-progress locked hidden">未開放</div>
-                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み</div>
                 </div>
             </div>
             <div class="boss-card" data-boss="2">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/bike_oni_select_button_shadow_UI.png" alt="四天王2">
                 <div class="boss-status">
-                    <div class="boss-name">バイク鬼</div>
-                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
-                    <div class="boss-progress locked hidden">未開放</div>
-                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み</div>
                 </div>
             </div>
             <div class="boss-card" data-boss="3">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/warp_oni_select_button_shadow_UI.png" alt="四天王3">
                 <div class="boss-status">
-                    <div class="boss-name">ワープ鬼</div>
-                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
-                    <div class="boss-progress locked hidden">未開放</div>
-                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み</div>
                 </div>
             </div>
             <div class="boss-card" data-boss="4">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/fuzin_raizin_select_button_shadow_UI.png" alt="四天王4">
                 <div class="boss-status">
-                    <div class="boss-name">風神・雷神</div>
-                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
-                    <div class="boss-progress locked hidden">未開放</div>
-                    <div class="boss-progress unlocked hidden">アンロック済み</div>
+                    <div class="boss-progress defeated hidden">討伐済み</div>
                 </div>
             </div>
             <div class="boss-card" data-boss="7">
                 <img class="boss-select-btn" src="assets/UI/UI/boss_select/last_stage_select_button_shadow_UI_2.png" alt="ラスボス">
                 <div class="boss-status">
-                    <div class="boss-name">ラスボス</div>
-                    <div class="boss-progress defeated hidden">討伐済み（再挑戦可能）</div>
-                    <div class="boss-progress locked hidden">4体のボスを倒すと解放</div>
+                    <div class="boss-progress defeated hidden">討伐済み</div>
                     <div class="boss-progress unlocked hidden">アンロック済み</div>
                 </div>
             </div>
@@ -145,21 +131,77 @@
             <canvas id="minimapCanvas" width="120" height="90"></canvas>
     <div id="oniHpLogContainer" style="color: red; font-weight: bold; margin-top: 4px;"></div>
         </div>
-        <!-- ゲーム中の簡易操作説明-->
-        <div id="quickHelp" class="hidden wafu-panel wafu-shadow">
-            <b>操作</b>
-            <br> WASD : 移動
-            <br> 左クリック : 攻撃
-            <br> P : ポーズ
-            <br> Ctrl+B : ボス鬼出現
-        </div>
+
         <!-- 桃太郎レベル表示（操作説明UIの直後に配置） -->
         <div id="otomoLevelDisplay" class="hidden wafu-panel wafu-shadow" style="margin-top:10px;"><span class="wafu-label">桃太郎Lv</span>: <span id="otomoLevelValue">1</span> <span class="wafu-label">Exp</span>: <span id="otomoExpValue">0</span>/<span id="otomoExpToLevelUpValue">10</span></div>
+        
         <!-- 回復アイテムカウンター -->
         <div id="recoveryItemDisplay" class="hidden wafu-panel wafu-shadow recovery-item-counter">
             <span class="wafu-label">回復アイテム</span> <span id="recoveryItemValue">0</span>
             <div class="recovery-hint">Spaceで使用</div>
         </div>
+        </div>
+    </div>
+    
+    <!-- ゲーム中操作ボタン（画面右端に配置） -->
+    <div id="gameControlButtons" class="hidden game-control-buttons">
+        <div class="game-control-row">
+            <div class="level-up-container">
+                <button id="levelUpButton" class="game-control-btn level-up-btn" title="レベルアップ (L)">
+                    <span class="btn-icon">⚔️</span>
+                    <span class="btn-text">レベルアップ</span>
+                    <span class="shortcut-key">L</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- ポーズボタン（画面右上に配置） -->
+    <button id="pauseButton" class="game-control-btn pause-btn hidden" title="ポーズ (P)">
+        <span class="btn-icon">⏸️</span>
+        <span class="btn-text">ポーズ</span>
+        <span class="shortcut-key">P</span>
+    </button>
+    
+    <!-- ゲーム中基本操作説明（画面右端、操作ボタンの下に配置） -->
+    <div id="gameBasicControls" class="hidden game-basic-controls">
+        <div class="basic-controls-content">
+            <div class="control-item">
+                <span class="control-icon">🎮</span>
+                <span class="control-text">WASD 移動</span>
+            </div>
+            <div class="control-item">
+                <span class="control-icon">⚡</span>
+                <span class="control-text">左クリック 攻撃</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- お供切り替えUI（画面右端、基本操作説明の下に配置） -->
+    <div id="otomoSwitchUI" class="hidden otomo-switch-ui">
+        <div class="otomo-switch-content">
+            <div class="otomo-icons-row">
+                <div class="otomo-mode-item" data-mode="1">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/monkey.png" alt="フォロー" title="フォロー">
+                </div>
+                <div class="otomo-mode-item" data-mode="2">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/bird.png" alt="ワンダー" title="ワンダー">
+                </div>
+                <div class="otomo-mode-item" data-mode="3">
+                    <img class="otomo-mode-icon" src="assets/characters/otomo/dog.png" alt="チャージ" title="チャージ">
+                </div>
+            </div>
+            <div class="otomo-keys-row">
+                <div class="otomo-key-item" data-mode="1">
+                    <span class="otomo-shortcut">1</span>
+                </div>
+                <div class="otomo-key-item" data-mode="2">
+                    <span class="otomo-shortcut">2</span>
+                </div>
+                <div class="otomo-key-item" data-mode="3">
+                    <span class="otomo-shortcut">3</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -387,15 +429,15 @@
                     <label>個別ボス討伐状況変更:</label>
                     <div class="debug-control">
                         <div class="boss-toggle-row">
-                            <span>砲鬼:</span>
+                            <span>鋼鉄鬼:</span>
                             <button id="toggleBoss1" class="debug-btn boss-toggle-btn">未討伐</button>
                         </div>
                         <div class="boss-toggle-row">
-                            <span>バイク鬼:</span>
+                            <span>暴走鬼:</span>
                             <button id="toggleBoss2" class="debug-btn boss-toggle-btn">未討伐</button>
                         </div>
                         <div class="boss-toggle-row">
-                            <span>ワープ鬼:</span>
+                            <span>妖術鬼:</span>
                             <button id="toggleBoss3" class="debug-btn boss-toggle-btn">未討伐</button>
                         </div>
                         <div class="boss-toggle-row">

@@ -1,5 +1,5 @@
 export class Projectile {
-    constructor(game, x, y, target, speed = 5, damage = 10, type = 'normal') {
+    constructor(game, x, y, target, speed = 5, damage = 10, type = 'normal', owner = null, sourceType = 'unknown') {
         this.game = game;
         this.x = x;
         this.y = y;
@@ -8,6 +8,10 @@ export class Projectile {
         this.damage = damage;
         this.markedForDeletion = false;
         this.type = type; // 弾の種類
+        this.owner = owner; // 発射者
+        this.sourceType = sourceType; // 'enemy', 'otomo', 'player' など
+        // すでに当たった敵リスト
+        this.hitEnemies = new Set();
         
         // 弾の種類に応じてサイズと当たり判定を設定
         if (type === 'cannon_ball') {
@@ -295,47 +299,81 @@ export class Projectile {
 
     // 通常の当たり判定
     checkCollision() {
+        // 標的が無効なら削除
         if (!this.target || this.target.markedForDeletion) {
-            console.log("Projectile deleted: invalid target");
             this.markedForDeletion = true;
             return;
         }
 
-        const ex = this.target.x + (this.target.width || 0) / 2;
-        const ey = this.target.y + (this.target.height || 0) / 2;
-        const dist = Math.hypot(this.x - ex, this.y - ey);
-
-        // プレイヤーの場合、実際の円形当たり判定サイズを使用
-        let targetRadius;
-        if (this.target.constructor.name === 'Player') {
-            targetRadius = Math.min(this.target.width, this.target.height) / 2 * 0.8;
+        let hitAny = false;
+        if (this.sourceType === 'otomo') {
+            // Otomoの弾は敵・ボスのみに当たる（owner除外）
+            const enemies = (this.game.enemyManager && typeof this.game.enemyManager.getEnemies === 'function')
+                ? this.game.enemyManager.getEnemies()
+                : [];
+            for (const enemy of enemies) {
+                if (!enemy || enemy.markedForDeletion) continue;
+                if (this.hitEnemies.has(enemy)) continue;
+                if (this.owner && enemy === this.owner) continue;
+                // プレイヤー・Otomoは除外
+                if (enemy.constructor && (enemy.constructor.name === 'Player' || enemy.constructor.name === 'Otomo')) continue;
+                // 当たり判定
+                const ex = enemy.x + (enemy.width || 0) / 2;
+                const ey = enemy.y + (enemy.height || 0) / 2;
+                const targetRadius = Math.max(enemy.width || 0, enemy.height || 0) / 2;
+                const dist = Math.hypot(this.x - ex, this.y - ey);
+                if (dist < this.radius + targetRadius) {
+                    if (typeof enemy.takeDamage === 'function') {
+                        enemy.takeDamage(this.damage);
+                    }
+                    this.hitEnemies.add(enemy);
+                    hitAny = true;
+                }
+            }
+        } else if (this.sourceType === 'enemy') {
+            // Oniの弾はプレイヤーとOtomoのみに当たる（owner除外）
+            const targets = [];
+            if (this.game.player) targets.push(this.game.player);
+            if (this.game.otomo) targets.push(this.game.otomo);
+            for (const t of targets) {
+                if (!t || t.markedForDeletion) continue;
+                if (this.owner && t === this.owner) continue;
+                if (this.hitEnemies.has(t)) continue;
+                const ex = t.x + (t.width || 0) / 2;
+                const ey = t.y + (t.height || 0) / 2;
+                const targetRadius = Math.max(t.width || 0, t.height || 0) / 2;
+                const dist = Math.hypot(this.x - ex, this.y - ey);
+                if (dist < this.radius + targetRadius) {
+                    if (typeof t.takeDamage === 'function') {
+                        t.takeDamage(this.damage);
+                    }
+                    this.hitEnemies.add(t);
+                    hitAny = true;
+                }
+            }
         } else {
-            targetRadius = Math.max(this.target.width || 0, this.target.height || 0) / 2;
+            // 旧仕様: 全敵に当たる
+            const enemies = (this.game.enemyManager && typeof this.game.enemyManager.getEnemies === 'function')
+                ? this.game.enemyManager.getEnemies()
+                : [];
+            for (const enemy of enemies) {
+                if (!enemy || enemy.markedForDeletion) continue;
+                if (this.hitEnemies.has(enemy)) continue;
+                if (this.owner && enemy === this.owner) continue;
+                const ex = enemy.x + (enemy.width || 0) / 2;
+                const ey = enemy.y + (enemy.height || 0) / 2;
+                const targetRadius = Math.max(enemy.width || 0, enemy.height || 0) / 2;
+                const dist = Math.hypot(this.x - ex, this.y - ey);
+                if (dist < this.radius + targetRadius) {
+                    if (typeof enemy.takeDamage === 'function') {
+                        enemy.takeDamage(this.damage);
+                    }
+                    this.hitEnemies.add(enemy);
+                    hitAny = true;
+                }
+            }
         }
-
-        if (dist < this.radius + targetRadius) {
-            // デバッグ情報を出力（cannon_ballの場合のみ）
-            if (this.type === 'cannon_ball') {
-                console.log('Cannon ball collision detected:', {
-                    projectileX: this.x,
-                    projectileY: this.y,
-                    projectileRadius: this.radius,
-                    targetX: this.target.x,
-                    targetY: this.target.y,
-                    targetCenterX: ex,
-                    targetCenterY: ey,
-                    targetRadius: targetRadius,
-                    distance: dist,
-                    collisionDistance: this.radius + targetRadius,
-                    targetType: this.target.constructor.name,
-                    frame: this.game.gameState.frame || 0,
-                    timestamp: Date.now()
-                });
-            }
-            
-            if (typeof this.target.takeDamage === 'function') {
-                this.target.takeDamage(this.damage);
-            }
+        if (hitAny) {
             this.markedForDeletion = true;
         }
     }

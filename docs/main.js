@@ -106,13 +106,61 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeHelp = document.getElementById('closeHelp');
     const backToStartButton = document.querySelector('.backToStart');
     const backToStartFromStageButton = document.getElementById('backToStartButton');
-    const quickHelp = document.getElementById('quickHelp');
     const loadingScreen = document.getElementById('loading-screen');
     const stageSelect = document.getElementById('stageSelect');
     const stageSelectArea = document.getElementById('stageSelectArea');
     const minimapContainer = document.getElementById('minimapContainer');
     const crosshair = document.getElementById('crosshair');
-   
+
+    
+    // ゲーム中操作ボタンの要素
+    const gameControlButtons = document.getElementById('gameControlButtons');
+    const levelUpButton = document.getElementById('levelUpButton');
+    const pauseButton = document.getElementById('pauseButton');
+    
+    // ゲーム中基本操作説明の要素
+    const gameBasicControls = document.getElementById('gameBasicControls');
+    
+    // お供切り替えUIの要素
+    const otomoSwitchUI = document.getElementById('otomoSwitchUI');
+    
+    // お供切り替えUIの状態管理
+    let currentOtomoMode = 1; // デフォルトはフォロー（モード1）
+    
+    // お供切り替えUIの状態を更新する関数
+    function updateOtomoSwitchUI(mode) {
+        currentOtomoMode = mode;
+        
+        // すべてのモードアイテムからactiveクラスを削除
+        const modeItems = otomoSwitchUI.querySelectorAll('.otomo-mode-item');
+        modeItems.forEach(item => item.classList.remove('active'));
+        
+        // 現在のモードに対応するアイテムにactiveクラスを追加
+        const currentItem = otomoSwitchUI.querySelector(`[data-mode="${mode}"]`);
+        if (currentItem) {
+            currentItem.classList.add('active');
+        }
+    }
+    
+    // キーボードでお供切り替え
+    window.addEventListener('keydown', (e) => {
+        if (game && !game.pauseManager.isPaused) {
+            const key = e.key;
+            if (key === '1' || key === '2' || key === '3') {
+                const mode = parseInt(key);
+                if (mode >= 1 && mode <= 3) {
+                    // お供切り替え処理（実際のゲームロジックと連携）
+                    console.log(`お供モード切り替え: ${mode}`);
+                    updateOtomoSwitchUI(mode);
+                    
+                    // 効果音再生
+                    playSE("kettei");
+                }
+            }
+        }
+    });
+
+
     // デバッグパネルの要素
     const debugPanel = document.getElementById('debugPanel');
     const closeDebug = document.getElementById('closeDebug');
@@ -247,6 +295,36 @@ document.addEventListener('DOMContentLoaded', () => {
             gameCanvas.removeEventListener('mousemove', updateCrosshair);
             document.removeEventListener('mousemove', updateCrosshair);
         }
+    }
+
+    // ゲーム内UIを一括で非表示にするヘルパー
+    function hideInGameUI() {
+        // キャンバス/左下系
+        gameCanvas.classList.add('hidden');
+        scoreDisplay.classList.add('hidden');
+        livesDisplay.classList.add('hidden');
+        timerDisplay.classList.add('hidden');
+        minimapContainer.classList.add('hidden');
+        gameOverMessage.classList.add('hidden');
+
+        // 右側UI
+        const gameControlButtons = document.getElementById('gameControlButtons');
+        if (gameControlButtons) gameControlButtons.classList.add('hidden');
+        const gameBasicControls = document.getElementById('gameBasicControls');
+        if (gameBasicControls) gameBasicControls.classList.add('hidden');
+        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
+        if (otomoSwitchUI) otomoSwitchUI.classList.add('hidden');
+        const pauseButtonEl = document.getElementById('pauseButton');
+        if (pauseButtonEl) pauseButtonEl.classList.add('hidden');
+
+        // 桃太郎Lv/回復カウンター
+        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+        if (otomoLevelDisplay) otomoLevelDisplay.classList.add('hidden');
+        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+        if (recoveryItemDisplay) recoveryItemDisplay.classList.add('hidden');
+
+        // 照準
+        hideCrosshair();
     }
 
     // ゲーム状態を監視して照準の表示/非表示を制御
@@ -422,14 +500,38 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('スタートボタンがクリックされました');
         playSE("kettei"); // ← 決定音
 
-        // 障子風アニメーションでボス選択画面へ（開く方向）
-        switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
-            console.log('障子アニメーション完了');
-            // ボス選択画面が確実に表示されるようにする
-            stageSelectArea.style.display = 'flex';
-            stageSelectArea.style.opacity = '1';
-            stageSelectArea.style.transform = 'translateX(0)';
-        });
+        // 初回ログイン時のチュートリアル表示チェック
+        const isFirstTime = !localStorage.getItem('kibidan_tutorial_completed');
+        
+        if (isFirstTime) {
+            console.log('初回ログインです。操作説明を表示します。');
+            // 初回ログイン時は操作説明を表示
+            helpManager.show();
+            // 操作説明が閉じられた後にボス選択画面へ進む
+            // 操作説明の閉じるイベントを監視
+            const checkHelpClosed = setInterval(() => {
+                if (helpManager.elements.modal.classList.contains('hidden')) {
+                    clearInterval(checkHelpClosed);
+                    // 操作説明が閉じられたらボス選択画面へ
+                    switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
+                        console.log('障子アニメーション完了');
+                        // ボス選択画面が確実に表示されるようにする
+                        stageSelectArea.style.display = 'flex';
+                        stageSelectArea.style.opacity = '1';
+                        stageSelectArea.style.transform = 'translateX(0)';
+                    });
+                }
+            }, 100);
+        } else {
+            // 通常の流れ：直接ボス選択画面へ
+            switchToScreenWithShojiOpen(startScreen, stageSelectArea, () => {
+                console.log('障子アニメーション完了');
+                // ボス選択画面が確実に表示されるようにする
+                stageSelectArea.style.display = 'flex';
+                stageSelectArea.style.opacity = '1';
+                stageSelectArea.style.transform = 'translateX(0)';
+            });
+        }
     });
 
     // リスタート時もゲーム画面を維持
@@ -445,12 +547,25 @@ document.addEventListener('DOMContentLoaded', () => {
             game = null;
         }
 
+        // ゲーム中UIを表示
         gameCanvas.classList.remove('hidden');
         scoreDisplay.classList.remove('hidden');
         livesDisplay.classList.remove('hidden');
-        timerDisplay.classList.remove('hidden'); // タイマー表示を維持
-        minimapContainer.classList.remove('hidden'); // ミニマップ表示
-        quickHelp.classList.remove('hidden'); // リスタート時も表示
+        timerDisplay.classList.remove('hidden');
+        minimapContainer.classList.remove('hidden');
+        gameControlButtons.classList.remove('hidden');
+        gameBasicControls.classList.remove('hidden');
+        otomoSwitchUI.classList.remove('hidden');
+        pauseButton.classList.remove('hidden');
+        
+        // お供切り替えUIの初期状態を設定
+        updateOtomoSwitchUI(1);
+        
+        // 桃太郎レベル表示を表示
+        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+        if (otomoLevelDisplay) {
+            otomoLevelDisplay.classList.remove('hidden');
+        }
         
         // 回復アイテムUIを表示
         const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
@@ -477,12 +592,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 操作説明マネージャーの初期化
     const helpManager = new HelpManager();
     
+    // デバッグ用：ローカルストレージのチュートリアル状態をリセット
+    // コンソールから resetTutorialStatus() を呼び出してリセット可能
+    window.resetTutorialStatus = () => {
+        localStorage.removeItem('kibidan_tutorial_completed');
+        console.log('チュートリアル状態をリセットしました。次回の開始ボタンクリック時に操作説明が表示されます。');
+    };
+    
     // 操作説明表示
     helpButton.addEventListener('click', () => {
         playSE("kettei"); // ← 決定音
         helpManager.show();
     });
     
+
     // 音量調節マネージャーの初期化
     const volumeManager = new VolumeManager();
 
@@ -491,6 +614,28 @@ document.addEventListener('DOMContentLoaded', () => {
         const volumeModal = document.getElementById('volumeModal');
         if (volumeModal) {
             volumeModal.classList.remove('hidden');
+
+    // ゲーム中操作ボタンのイベントハンドリング
+    levelUpButton.addEventListener('click', () => {
+        if (game && !game.pauseManager.isPaused) {
+            playSE("kettei"); // ← 決定音
+            openStatusModal();
+        }
+    });
+    
+    pauseButton.addEventListener('click', () => {
+        if (game) {
+            playSE("kettei"); // ← 決定音
+            game.togglePause();
+            // ポーズ切り替え時の照準制御
+            setTimeout(() => {
+                if (game.pauseManager.isPaused) {
+                    hideCrosshair(); // ポーズ時は照準を非表示
+                } else {
+                    showCrosshair(); // ポーズ解除時は照準を表示
+                }
+            }, 50);
+
         }
     });
 
@@ -507,28 +652,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // スタート画面へ戻る
     backToStartButton.addEventListener('click', () => {
-        // ゲーム画面を非表示
-        gameCanvas.classList.add('hidden');
-        scoreDisplay.classList.add('hidden');
-        livesDisplay.classList.add('hidden');
-        timerDisplay.classList.add('hidden');
-        minimapContainer.classList.add('hidden'); // ミニマップ非表示
-        gameOverMessage.classList.add('hidden');
-        quickHelp.classList.add('hidden');
-        
-        // 回復アイテムUIを非表示
-        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
-        if (recoveryItemDisplay) {
-            recoveryItemDisplay.classList.add('hidden');
-        }
-        
-        hideCrosshair(); // 照準を非表示
-
-        // otomoLevelDisplayも非表示にする
-        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
-        if (otomoLevelDisplay) {
-            otomoLevelDisplay.classList.add('hidden');
-        }
+        // ゲーム中UIを非表示（ゲームオーバーからの戻りも含む）
+        hideInGameUI();
 
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
@@ -586,32 +711,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     pauseBackToStartButton.addEventListener('click', () => {
-        // ゲーム画面を非表示
-        gameCanvas.classList.add('hidden');
-        scoreDisplay.classList.add('hidden');
-        livesDisplay.classList.add('hidden');
-        timerDisplay.classList.add('hidden');
-        minimapContainer.classList.add('hidden'); // ミニマップ非表示
-        pauseMessage.classList.add('hidden');
-        quickHelp.classList.add('hidden');
+        // ゲーム中UIを非表示（帰還ボタンからの戻りも含む）
+        hideInGameUI();
         
-        // 回復アイテムUIを非表示
-        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
-        if (recoveryItemDisplay) {
-            recoveryItemDisplay.classList.add('hidden');
+        // ゲームのポーズ状態を確実に解除（右側UIが再表示されないように）
+        if (game && game.pauseManager) {
+            game.pauseManager.isPaused = false;
         }
         
-        hideCrosshair(); // 照準を非表示
-
-        // otomoLevelDisplayも非表示にする
-        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
-        if (otomoLevelDisplay) {
-            otomoLevelDisplay.classList.add('hidden');
+        // ポーズ画面を非表示（右側UIは再表示しない）
+        const pauseMessage = document.getElementById('pauseMessage');
+        if (pauseMessage) {
+            pauseMessage.classList.add('hidden');
         }
 
         // 障子風アニメーションでスタート画面へ（閉じる方向）
         switchToScreenWithShojiClose(null, startScreen, () => {
             if (game) {
+                // ゲームのポーズ状態を解除（右側UIが再表示されないように）
+                if (game.pauseManager && game.pauseManager.isPaused) {
+                    game.pauseManager.isPaused = false;
+                }
                 game.destroy(); // ゲームを完全に破棄
                 game = null; // ゲームインスタンスをリセット
             }
@@ -907,9 +1027,9 @@ document.addEventListener('DOMContentLoaded', () => {
             let statusHTML = `<div>討伐済み: ${defeatedCount}/5</div>`;
             statusHTML += `<div>アンロック済み: ${unlockedCount}/5</div>`;
             statusHTML += `<div>ラスボス解放条件:</div>`;
-            statusHTML += `<div>・砲鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
-            statusHTML += `<div>・バイク鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
-            statusHTML += `<div>・ワープ鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・鋼鉄鬼: ${bossData[1]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・暴走鬼: ${bossData[2]?.defeated ? '✓' : '✗'}</div>`;
+            statusHTML += `<div>・妖術鬼: ${bossData[3]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>・風神・雷神: ${bossData[4]?.defeated ? '✓' : '✗'}</div>`;
             statusHTML += `<div>ラスボス: ${bossData[5]?.unlocked ? '✓ アンロック済み' : '✗ 未解放'}</div>`;
             statusHTML += `<div>お供開放状況:</div>`;
@@ -1143,7 +1263,8 @@ document.addEventListener('DOMContentLoaded', () => {
             bossCards.forEach(c => c.classList.remove('selected'));
             card.classList.add('selected');
             // ボス種別取得
-            const selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
+            selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
+            console.log('ボス選択: ボスID', selectedBossType, 'が選択されました');
 
             // 既存のゲームインスタンスがあれば破棄
             if (game) {
@@ -1154,13 +1275,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 障子風アニメーションでゲーム画面へ（開く方向）
             switchToScreenWithShojiOpen(stageSelectArea, null, () => {
-                // ゲーム画面を表示
+                // ゲーム中UIを表示
                 gameCanvas.classList.remove('hidden');
                 scoreDisplay.classList.remove('hidden');
                 livesDisplay.classList.remove('hidden');
                 timerDisplay.classList.remove('hidden');
-                minimapContainer.classList.remove('hidden'); // ミニマップ表示
-                quickHelp.classList.remove('hidden');
+                minimapContainer.classList.remove('hidden');
+                gameControlButtons.classList.remove('hidden');
+                gameBasicControls.classList.remove('hidden');
+                otomoSwitchUI.classList.remove('hidden');
+                pauseButton.classList.remove('hidden');
+                
+                // お供切り替えUIの初期状態を設定
+                updateOtomoSwitchUI(1);
+                
+                // 桃太郎レベル表示を表示
+                const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+                if (otomoLevelDisplay) {
+                    otomoLevelDisplay.classList.remove('hidden');
+                }
                 
                 // 回復アイテムUIを表示
                 const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
@@ -1172,8 +1305,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 新しいゲームインスタンスを作成
                 console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
+                console.log('グローバルselectedBossType:', window.selectedBossType || 'undefined');
                 
-                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
+                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType, bgmManager);
+                console.log('ゲームインスタンス作成完了。選択されたボス:', selectedBossType);
                 
                 // ゲーム状態監視を開始
                 const gameStateInterval = setInterval(() => {

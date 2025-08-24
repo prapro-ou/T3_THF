@@ -24,6 +24,36 @@ export class TutorialManager {
         this.active = false;
     }
 
+    /**
+     * 初回ログインかどうかをチェック
+     * @returns {boolean} 初回ログインの場合true
+     */
+    isFirstTimeUser() {
+        return !localStorage.getItem('kibidan_tutorial_completed');
+    }
+
+    /**
+     * 初回ログイン時のチュートリアル表示が必要かチェック
+     * @returns {boolean} チュートリアル表示が必要な場合true
+     */
+    shouldShowFirstTimeTutorial() {
+        return this.isFirstTimeUser();
+    }
+
+    /**
+     * チュートリアル完了を記録
+     */
+    markTutorialCompleted() {
+        localStorage.setItem('kibidan_tutorial_completed', 'true');
+    }
+
+    /**
+     * チュートリアル完了状態をリセット（デバッグ用）
+     */
+    resetTutorialStatus() {
+        localStorage.removeItem('kibidan_tutorial_completed');
+    }
+
     start() {
         this.active = true;
         this.currentStep = 0;
@@ -61,6 +91,8 @@ export class TutorialManager {
         this.active = false;
         if (this._oniCheckInterval) clearInterval(this._oniCheckInterval);
         this.game.resumeFromTutorial();
+        // チュートリアル完了を記録
+        this.markTutorialCompleted();
     }
 
     // 鬼が画面内にいるか判定（カメラ範囲内）
