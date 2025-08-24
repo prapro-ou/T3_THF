@@ -413,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let game = null;
     let assetsLoaded = false;
     let selectedBossType = 0; // 選択されたボスの種類
+    let gameStateInterval = null; // ゲーム状態監視のインターバルIDを管理
 
     // 1. ゲーム開始ボタンを一時的に無効化
     startButton.disabled = true;
@@ -613,53 +614,78 @@ document.addEventListener('DOMContentLoaded', () => {
         playSE("kettei"); // ← 決定音
         console.log('現在のselectedBossType:', selectedBossType);
 
-        // 既存のゲームインスタンスを破棄
+        // 既存のゲーム状態監視を停止
+        if (gameStateInterval) {
+            clearInterval(gameStateInterval);
+            gameStateInterval = null;
+        }
+
+        // 照準を一時的に非表示
+        hideCrosshair();
+
+        // 既存のゲームインスタンスを破棄（非同期で処理）
         if (game) {
             console.log('既存のゲームインスタンスを破棄します');
-            game.destroy();
-            game = null;
+            const oldGame = game;
+            game = null; // 先にnullにして新しいインスタンス作成を防ぐ
+            
+            // 破棄処理を非同期で実行
+            setTimeout(() => {
+                oldGame.destroy();
+            }, 50);
         }
 
-        // ゲーム中UIを表示
-        gameCanvas.classList.remove('hidden');
-        scoreDisplay.classList.remove('hidden');
-        livesDisplay.classList.remove('hidden');
-        timerDisplay.classList.remove('hidden');
-        minimapContainer.classList.remove('hidden');
-        gameControlButtons.classList.remove('hidden');
-        gameBasicControls.classList.remove('hidden');
-                        rightUIPanel.classList.remove('hidden');
-        pauseButton.classList.remove('hidden');
-        
-        // お供切り替えUIの初期状態を設定
-        updateOtomoSwitchUI(1);
-        
-        // 桃太郎レベル表示を表示
-        const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
-        if (otomoLevelDisplay) {
-            otomoLevelDisplay.classList.remove('hidden');
-        }
-        
-        // 回復アイテムUIを表示
-        const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
-        if (recoveryItemDisplay) {
-            recoveryItemDisplay.classList.remove('hidden');
-        }
-        
-        showCrosshair(); // 照準を表示
-        // 選択されたボスの種類を使用
-        console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
-
-        game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType,bgmManager);
-        
-        // ゲーム状態監視を開始
-        const gameStateInterval = setInterval(() => {
-            if (game) {
-                monitorGameState();
-            } else {
-                clearInterval(gameStateInterval);
+        // ゲーム再作成を少し遅延させる
+        setTimeout(() => {
+            // ゲーム中UIを表示
+            gameCanvas.classList.remove('hidden');
+            scoreDisplay.classList.remove('hidden');
+            livesDisplay.classList.remove('hidden');
+            timerDisplay.classList.remove('hidden');
+            minimapContainer.classList.remove('hidden');
+            rightUIPanel.classList.remove('hidden');
+            pauseButton.classList.remove('hidden');
+            
+            // お供切り替えUIの初期状態を設定
+            updateOtomoSwitchUI(1);
+            
+            // 桃太郎レベル表示を表示
+            const otomoLevelDisplay = document.getElementById('otomoLevelDisplay');
+            if (otomoLevelDisplay) {
+                otomoLevelDisplay.classList.remove('hidden');
             }
-        }, 100); // 100ms間隔で監視
+            
+            // 回復アイテムUIを表示
+            const recoveryItemDisplay = document.getElementById('recoveryItemDisplay');
+            if (recoveryItemDisplay) {
+                recoveryItemDisplay.classList.remove('hidden');
+            }
+            
+            // 新しいゲームインスタンスを作成
+            console.log('新しいゲームインスタンスを作成、選択されたボス:', selectedBossType);
+            game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType, bgmManager);
+            
+            // ゲームインスタンス作成完了後に照準を表示
+            setTimeout(() => {
+                if (game && !game.gameState?.isGameOver()) {
+                    showCrosshair();
+                }
+            }, 100);
+            
+            // ゲーム状態監視を開始（重複チェック付き）
+            if (!gameStateInterval) {
+                gameStateInterval = setInterval(() => {
+                    if (game) {
+                        monitorGameState();
+                    } else {
+                        if (gameStateInterval) {
+                            clearInterval(gameStateInterval);
+                            gameStateInterval = null;
+                        }
+                    }
+                }, 100); // 100ms間隔で監視
+            }
+        }, 150); // 150ms遅延でゲーム再作成
     });
 
     // 操作説明マネージャーの初期化
@@ -1114,6 +1140,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ページ離脱時やウィンドウクローズ時にゲームを破棄
     window.addEventListener('beforeunload', () => {
+        if (gameStateInterval) {
+            clearInterval(gameStateInterval);
+            gameStateInterval = null;
+        }
         if (game) {
             console.log('ページ離脱によるゲーム破棄');
             game.destroy();
@@ -1132,6 +1162,10 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 if (document.hidden && game) {
                     console.log('ページ長時間非表示によるゲーム破棄');
+                    if (gameStateInterval) {
+                        clearInterval(gameStateInterval);
+                        gameStateInterval = null;
+                    }
                     game.destroy();
                     game = null;
                 }
@@ -1389,11 +1423,20 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedBossType = parseInt(card.getAttribute('data-boss'), 10);
             console.log('ボス選択: ボスID', selectedBossType, 'が選択されました');
 
+            // 既存のゲーム状態監視を停止
+            if (gameStateInterval) {
+                clearInterval(gameStateInterval);
+                gameStateInterval = null;
+            }
+
             // 既存のゲームインスタンスがあれば破棄
             if (game) {
                 console.log('既存のゲームインスタンスを破棄します（ボス選択）');
-                game.destroy();
+                const oldGame = game;
                 game = null;
+                setTimeout(() => {
+                    oldGame.destroy();
+                }, 50);
             }
 
             // 障子風アニメーションでゲーム画面へ（開く方向）
@@ -1421,32 +1464,46 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (recoveryItemDisplay) {
                     recoveryItemDisplay.classList.remove('hidden');
                 }
-                
-                showCrosshair(); // 照準を表示
 
-                // 新しいゲームインスタンスを作成
-                console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
-                console.log('グローバルselectedBossType:', window.selectedBossType || 'undefined');
-                
-                game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType, bgmManager);
-                console.log('ゲームインスタンス作成完了。選択されたボス:', selectedBossType);
-                
-                // ゲーム状態監視を開始
-                const gameStateInterval = setInterval(() => {
-                    if (game) {
-                        monitorGameState();
-                    } else {
-                        clearInterval(gameStateInterval);
+                // 新しいゲームインスタンスを作成（遅延付き）
+                setTimeout(() => {
+                    console.log('新しいゲームインスタンスを作成（ボス選択）、ボス:', selectedBossType);
+                    console.log('グローバルselectedBossType:', window.selectedBossType || 'undefined');
+                    
+                    game = new Game(gameCanvas, gameCanvas.getContext('2d'), scoreDisplay, livesDisplay, gameOverMessage, restartButton, timerDisplay, selectedBossType, bgmManager);
+                    console.log('ゲームインスタンス作成完了。選択されたボス:', selectedBossType);
+                    
+                    // 照準を表示（ゲーム作成完了後）
+                    setTimeout(() => {
+                        if (game && !game.gameState?.isGameOver()) {
+                            showCrosshair();
+                        }
+                    }, 100);
+                    
+                    // ゲーム状態監視を開始（重複チェック付き）
+                    if (!gameStateInterval) {
+                        gameStateInterval = setInterval(() => {
+                            if (game) {
+                                monitorGameState();
+                            } else {
+                                if (gameStateInterval) {
+                                    clearInterval(gameStateInterval);
+                                    gameStateInterval = null;
+                                }
+                            }
+                        }, 100); // 100ms間隔で監視
                     }
-                }, 100); // 100ms間隔で監視
-               
-                // cannon_ballのスプライトシートも読み込み
-                if (game && game.projectileManager) {
-                    game.projectileManager.preloadCannonBallSpriteSheet(() => {
-                        // アセット読み込み完了後の処理
-                    });
-                }
+                   
+                    // cannon_ballのスプライトシートも読み込み
+                    if (game && game.projectileManager) {
+                        game.projectileManager.preloadCannonBallSpriteSheet(() => {
+                            // アセット読み込み完了後の処理
+                        });
+                    }
+                }, 150); // 150ms遅延でゲーム作成
             });
         });
     });
+
+    // ...existing code...
 });
