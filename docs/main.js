@@ -5,6 +5,7 @@ import { BgmManager } from './managers/BgmManager.js';
 import { playSE } from './managers/KoukaonManager.js';
 import { BossProgressManager } from './managers/BossProgressManager.js';
 import { HelpManager } from './help/index.js';
+import { CreditsManager } from './managers/CreditsManager.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -598,6 +599,33 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('チュートリアル状態をリセットしました。次回の開始ボタンクリック時に操作説明が表示されます。');
     };
     
+    // クレジットマネージャーの初期化
+    const creditsManager = new CreditsManager();
+
+    // クレジットボタンの要素取得
+    const creditsButton = document.getElementById('credits');
+    const closeCredits = document.getElementById('closeCredits');
+
+    // クレジット画面表示
+    creditsButton.addEventListener('click', () => {
+        playSE("kettei"); // ← 決定音
+        creditsManager.show();
+    });
+
+    // クレジット画面を閉じる
+    closeCredits.addEventListener('click', () => {
+        playSE("kasoruidou"); // ← 戻り音
+        creditsManager.hide();
+    });
+
+    // クレジット画面外クリックで閉じる
+    document.getElementById('creditsModal').addEventListener('click', (e) => {
+        if (e.target === document.getElementById('creditsModal')) {
+            playSE("kasoruidou"); // ← 戻り音
+            creditsManager.hide();
+        }
+    });
+
     // 操作説明表示
     helpButton.addEventListener('click', () => {
         playSE("kettei"); // ← 決定音
