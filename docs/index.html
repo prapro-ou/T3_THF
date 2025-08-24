@@ -28,6 +28,7 @@
     <div id="startScreen" class="dark-bg">
                 <img id="startButton" src="assets/UI/UI/button/start_button_UI.png" alt="ゲームスタート" class="image-btn">
                 <img id="help" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="操作説明" class="image-btn">
+                <img id="credits" src="assets/UI/UI/button/how_to_play_button_UI.png" alt="クレジット" class="image-btn">
                 <img id="volume" src="" alt="音量" class="image-btn">
                 <div id="audioNotice" class="audio-notice">
                         <p>🔊 最初のクリックでBGMが開始されます</p>
@@ -113,6 +114,22 @@
             </div>
             <div class="volume-buttons">
                 <img id="closeVolume" src="assets/UI/UI/button/modoru_button_UI.png" alt="音量調整を閉じる" class="image-btn">
+            </div>
+        </div>
+    </div>
+
+    <!-- クレジット画面 -->
+    <div id="creditsModal" class="hidden">
+        <div class="credits-content">
+            <div class="credits-header">
+                <h2>クレジット</h2>
+                <button id="closeCredits" class="credits-close-btn">×</button>
+            </div>
+            <div class="credits-body">
+                <!-- クレジット内容はCreditsManagerによって動的に生成されます -->
+                <div class="loading-credits">
+                    <p>クレジット情報を読み込み中...</p>
+                </div>
             </div>
         </div>
     </div>
