@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pauseMessage = document.getElementById('pauseMessage');
     const resumeButton = document.getElementById('resumeButton');
     const pauseHelpButton = document.getElementById('pauseHelpButton');
-
+    const pauseVolumeButton = document.getElementById('pauseVolumeButton');
     const pauseBackToStartButton = document.getElementById('pauseBackToStartButton');
 
     // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
@@ -813,6 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ポーズ画面のボタンイベントハンドラー
     resumeButton.addEventListener('click', () => {
+        playSE("kettei"); // 決定音を追加
         if (game) {
             game.togglePause();
             // ポーズ解除時に照準を再表示
@@ -827,9 +828,12 @@ document.addEventListener('DOMContentLoaded', () => {
         helpManager.show();
     });
 
-
+    pauseVolumeButton.addEventListener('click', () => {
+        volumeManager.showVolumeModal();
+    });
 
     pauseBackToStartButton.addEventListener('click', () => {
+        playSE("kettei"); // 決定音を追加
         // ゲーム中UIを非表示（帰還ボタンからの戻りも含む）
         hideInGameUI();
         

@@ -99,4 +99,14 @@ export class VolumeManager {
 			this.bgmManager = window.game.bgmManager;
 		}
 	}
+
+	// 音量調整モーダルを開く（ポーズ画面から呼び出し用）
+	showVolumeModal() {
+		playSE("kettei");
+		if (this.volumeModal) {
+			this.volumeModal.classList.remove('hidden');
+			// モーダルが開かれた時にBGMマネージャーの参照を再確認
+			this.updateBgmManagerReference();
+		}
+	}
 }
