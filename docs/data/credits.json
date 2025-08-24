@@ -4,27 +4,41 @@
         {
             "title": "開発",
             "items": [
+
                 {
-                    "role": "ゲームデザイン・プログラミング",
-                    "name": "[aaa]"
+                    "role": "開発チーム",
+                    "name": "[TH_フルハウス]"
                 },
+
+                {
+
+                    "role": "リーダー 企画",
+                    "name": "[李皓太]"
+                },
+
+                {
+                    "role": "プログラミング",
+                    "name": "[阿保日翔,塚原甲明]"
+                },
+
                 {
                     "role": "アート・グラフィック",
-                    "name": "[アーティスト名を入力]"
+                    "name": "[李皓太]"
                 },
                 {
-                    "role": "サウンド・音楽",
-                    "name": "[サウンドデザイナー名を入力]"
+                    "role": "SE",
+                    "name": "[河田修佑]"
+                },
+                {
+                    "role": "音楽",
+                    "name": "[孝田陽音]"
                 }
+
             ]
         },
         {
-            "title": "使用素材",
+            "title": "使用素材(敬称略)",
             "items": [
-                {
-                    "role": "フォント",
-                    "name": "Google Fonts (Kiwi Maru, Noto Serif JP)"
-                },
                 {
                     "role": "効果音・BGM",
                     "name": "Sound Effect Lab（効果音ラボ）, Otologic, Mixkit, Pixabay, Uppbeat, Springin, Voicy, On-Jin, PANICPUMPKIN, ユーフルカ"
@@ -47,10 +61,10 @@
             ]
         }
     ],
-    "footer": "© 2024 [プロジェクト名] All Rights Reserved.",
+    "footer": "© 2025 [キビ弾GO] All Rights Reserved.",
     "additionalInfo": {
         "version": "1.0.0",
-        "buildDate": "2024-12-XX",
+        "buildDate": "2025-08-25",
         "website": "[プロジェクトウェブサイトURL]"
     }
 }

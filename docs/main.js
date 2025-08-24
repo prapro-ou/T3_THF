@@ -6,6 +6,7 @@ import { playSE } from './managers/KoukaonManager.js';
 import { BossProgressManager } from './managers/BossProgressManager.js';
 import { HelpManager } from './help/index.js';
 import { CreditsManager } from './managers/CreditsManager.js';
+import { VolumeManager } from './managers/VolumeManager.js';
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -105,6 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const helpButton = document.getElementById('help');
     const helpModal = document.getElementById('helpModal');
     const closeHelp = document.getElementById('closeHelp');
+    
+    // 設定関連の要素
+    const settingsButton = document.getElementById('settingsButton');
+    const settingsModal = document.getElementById('settingsModal');
+    const closeSettings = document.getElementById('closeSettings');
+    const volumeSettingsBtn = document.getElementById('volumeSettingsBtn');
+    const creditsSettingsBtn = document.getElementById('creditsSettingsBtn');
     const backToStartButton = document.querySelector('.backToStart');
     const backToStartFromStageButton = document.getElementById('backToStartButton');
     const loadingScreen = document.getElementById('loading-screen');
@@ -182,6 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // BGMマネージャーの初期化（最初のユーザー操作後に再生開始）
     const bgmManager = new BgmManager();
     bgmManager.play('mainBgm'); // ユーザー操作後まで保留される
+    
+    // グローバル変数として設定（VolumeManagerからアクセス可能にする）
+    window.bgmManager = bgmManager;
 
     // ボス進捗マネージャーの初期化
     const bossProgressManager = new BossProgressManager();
@@ -601,22 +612,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // クレジットマネージャーの初期化
     const creditsManager = new CreditsManager();
-
-    // クレジットボタンの要素取得
-    const creditsButton = document.getElementById('credits');
-    const closeCredits = document.getElementById('closeCredits');
-
-    // クレジット画面表示
-    creditsButton.addEventListener('click', () => {
-        playSE("kettei"); // ← 決定音
-        creditsManager.show();
-    });
+    
+    // 音量マネージャーの初期化
+    const volumeManager = new VolumeManager();
 
     // クレジット画面を閉じる
-    closeCredits.addEventListener('click', () => {
-        playSE("kasoruidou"); // ← 戻り音
-        creditsManager.hide();
-    });
+    const closeCredits = document.getElementById('closeCredits');
 
     // クレジット画面外クリックで閉じる
     document.getElementById('creditsModal').addEventListener('click', (e) => {
@@ -625,11 +626,55 @@ document.addEventListener('DOMContentLoaded', () => {
             creditsManager.hide();
         }
     });
+    
+    // クレジット画面を閉じる
+    closeCredits.addEventListener('click', () => {
+        playSE("kasoruidou"); // ← 戻り音
+        creditsManager.hide();
+    });
 
     // 操作説明表示
     helpButton.addEventListener('click', () => {
         playSE("kettei"); // ← 決定音
         helpManager.show();
+    });
+    
+    // 設定ボタンのイベントハンドラー
+    settingsButton.addEventListener('click', () => {
+        playSE("kettei"); // ← 決定音
+        settingsModal.classList.remove('hidden');
+    });
+    
+    // 設定メニューを閉じる
+    closeSettings.addEventListener('click', () => {
+        playSE("kasoruidou"); // ← 戻り音
+        settingsModal.classList.add('hidden');
+    });
+    
+    // 設定メニュー外クリックで閉じる
+    settingsModal.addEventListener('click', (e) => {
+        if (e.target === settingsModal) {
+            playSE("kasoruidou"); // ← 戻り音
+            settingsModal.classList.add('hidden');
+        }
+    });
+    
+    // 音量設定ボタンのイベントハンドラー
+    volumeSettingsBtn.addEventListener('click', () => {
+        playSE("kettei"); // ← 決定音
+        settingsModal.classList.add('hidden');
+        document.getElementById('volumeModal').classList.remove('hidden');
+        // 音量設定モーダルが開かれた時にBGMマネージャーの参照を再確認
+        if (volumeManager && typeof volumeManager.updateBgmManagerReference === 'function') {
+            volumeManager.updateBgmManagerReference();
+        }
+    });
+    
+    // クレジットボタンのイベントハンドラー
+    creditsSettingsBtn.addEventListener('click', () => {
+        playSE("kettei"); // ← 決定音
+        settingsModal.classList.add('hidden');
+        creditsManager.show();
     });
     
 
