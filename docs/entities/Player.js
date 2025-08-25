@@ -78,6 +78,11 @@ export class Player extends Character {
 
     // 多態性: 親クラスのメソッドをオーバーライド
     update(deltaTime) {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         // 移動前の位置を保存
         this.prevX = this.x;
         this.prevY = this.y;

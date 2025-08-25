@@ -250,12 +250,8 @@ export class EnemyManager {
                 return;
             }
             case 5: {
-                // BossOni5 単体
-                console.log('BossOni5を生成中...');
-                boss = new BossOni5(this.game, centerX, centerY);
-                if (boss._maxHP) boss._maxHP = Math.round(boss._maxHP * 1.5);
-                if (boss._hp) boss._hp = boss._maxHP;
-                this.enemies.push(boss);
+                // ボスID 5は使用されていない（実際のボス選択画面には存在しない）
+                console.log('ボスID 5は使用されていません');
                 return;
             }
             case 6: {
@@ -305,13 +301,13 @@ export class EnemyManager {
                 const colors = ['#e74c3c', '#3498db', '#9b59b6', '#7ed6df', '#f9ca24'];
                 positions.forEach((p, idx) => {
                     const b = new p.Cls(this.game, p.x, p.y);
-                    if (b._maxHP) b._maxHP = Math.round(b._maxHP * 1.5);
+                    if (b._maxHP) b._maxHP = Math.round(b._maxHP * 0.4); // ラストステージは0.4倍
                     if (b._hp) b._hp = b._maxHP;
                     this.enemies.push(b);
                     const color = colors[idx % colors.length];
                     this.game.particleManager.createExplosion(p.x, p.y, color);
                 });
-                console.log('ラスボス5体追加後敵数:', this.enemies.length);
+                console.log('ラストステージ5体追加後敵数:', this.enemies.length);
                 return;
             }
             default: {

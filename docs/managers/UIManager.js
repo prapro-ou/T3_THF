@@ -11,6 +11,12 @@
         this.minimapContainer = document.getElementById('minimapContainer');
         this.minimapCanvas = document.getElementById('minimapCanvas');
         this.minimapCtx = this.minimapCanvas ? this.minimapCanvas.getContext('2d') : null;
+        
+        // 右側UI要素の初期化
+        this.gameControlButtons = document.getElementById('gameControlButtons');
+        this.gameBasicControls = document.getElementById('gameBasicControls');
+        this.otomoSwitchUI = document.getElementById('otomoSwitchUI');
+        this.pauseButton = document.getElementById('pauseButton');
     }
 
     updateScore(score) {
@@ -39,21 +45,17 @@
         this.gameOverMessage.classList.remove('hidden');
         
         // 右側UIを非表示（ゲームオーバー時も）
-        const gameControlButtons = document.getElementById('gameControlButtons');
-        if (gameControlButtons) {
-            gameControlButtons.classList.add('hidden');
+        if (this.gameControlButtons) {
+            this.gameControlButtons.classList.add('hidden');
         }
-        const gameBasicControls = document.getElementById('gameBasicControls');
-        if (gameBasicControls) {
-            gameBasicControls.classList.add('hidden');
+        if (this.gameBasicControls) {
+            this.gameBasicControls.classList.add('hidden');
         }
-        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
-        if (otomoSwitchUI) {
-            otomoSwitchUI.classList.add('hidden');
+        if (this.otomoSwitchUI) {
+            this.otomoSwitchUI.classList.add('hidden');
         }
-        const pauseButton = document.getElementById('pauseButton');
-        if (pauseButton) {
-            pauseButton.classList.add('hidden');
+        if (this.pauseButton) {
+            this.pauseButton.classList.add('hidden');
         }
     }
 
@@ -68,27 +70,21 @@
         }
         
         // ゲーム中操作ボタンを非表示
-        const gameControlButtons = document.getElementById('gameControlButtons');
-        if (gameControlButtons) {
-            gameControlButtons.classList.add('hidden');
+        if (this.gameControlButtons) {
+            this.gameControlButtons.classList.add('hidden');
         }
         
         // ゲーム中基本操作説明を非表示
-        const gameBasicControls = document.getElementById('gameBasicControls');
-        if (gameBasicControls) {
-            gameBasicControls.classList.add('hidden');
+        if (this.gameBasicControls) {
+            this.gameBasicControls.classList.add('hidden');
         }
         
-        // お供切り替えUIを非表示
-        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
-        if (otomoSwitchUI) {
-            otomoSwitchUI.classList.add('hidden');
-        }
+        // 右側UI要素を非表示
+        if (this.otomoSwitchUI) this.otomoSwitchUI.classList.add('hidden');
         
         // ポーズボタンを非表示
-        const pauseButton = document.getElementById('pauseButton');
-        if (pauseButton) {
-            pauseButton.classList.add('hidden');
+        if (this.pauseButton) {
+            this.pauseButton.classList.add('hidden');
         }
     }
 
@@ -98,28 +94,14 @@
             pauseMessage.classList.add('hidden');
         }
         
-        // ゲーム中操作ボタンを再表示
-        const gameControlButtons = document.getElementById('gameControlButtons');
-        if (gameControlButtons) {
-            gameControlButtons.classList.remove('hidden');
-        }
-        
-        // ゲーム中基本操作説明を再表示
-        const gameBasicControls = document.getElementById('gameBasicControls');
-        if (gameBasicControls) {
-            gameBasicControls.classList.remove('hidden');
-        }
-        
-        // お供切り替えUIを再表示
-        const otomoSwitchUI = document.getElementById('otomoSwitchUI');
-        if (otomoSwitchUI) {
-            otomoSwitchUI.classList.remove('hidden');
-        }
+        // 右側UI要素を再表示
+        if (this.gameControlButtons) this.gameControlButtons.classList.remove('hidden');
+        if (this.gameBasicControls) this.gameBasicControls.classList.remove('hidden');
+        if (this.otomoSwitchUI) this.otomoSwitchUI.classList.remove('hidden');
         
         // ポーズボタンを再表示
-        const pauseButton = document.getElementById('pauseButton');
-        if (pauseButton) {
-            pauseButton.classList.remove('hidden');
+        if (this.pauseButton) {
+            this.pauseButton.classList.remove('hidden');
         }
     }
 

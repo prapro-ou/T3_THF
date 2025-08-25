@@ -145,7 +145,7 @@ export class Game {
             if (window.oniHpLogContainer) {
                 const log = document.createElement('div');
                 log.textContent = `赤鬼・青鬼・黒鬼の移動速度が上昇！（現在倍率: x${this.enemySpeedMultiplier.toFixed(1)}）`;
-                log.style.color = 'blue';
+                log.style.color = 'cyan';
                 log.style.fontWeight = 'bold';
                 window.oniHpLogContainer.appendChild(log);
                 setTimeout(() => {
@@ -191,13 +191,13 @@ export class Game {
             if (!this.otomo) return;
             switch (e.key) {
                 case '1':
-                    this.otomo.setMode('follow');
+                    this.setOtomoMode('follow');
                     break;
                 case '2':
-                    this.otomo.setMode('wander');
+                    this.setOtomoMode('wander');
                     break;
                 case '3':
-                    this.otomo.setMode('charge');
+                    this.setOtomoMode('charge');
                     break;
             }
         };
@@ -294,8 +294,16 @@ export class Game {
         if (!this.bossAppeared) {
             this.uiManager.updateTimer(this.timer.getFormattedTime(), 'normal');
         } else if (this.bossAppeared && !this.bossDefeated) {
-            // ボス攻略残り時間を計算
-            const elapsed = Math.floor((Date.now() - this.bossStartTime) / 1000);
+            // ボス攻略残り時間を計算（ポーズ状態を考慮）
+            let elapsed;
+            if (this.pauseManager.isPaused) {
+                // ポーズ中は前回の経過時間を維持
+                elapsed = this.bossElapsedTime || 0;
+            } else {
+                // 通常時は経過時間を更新
+                elapsed = Math.floor((Date.now() - this.bossStartTime) / 1000);
+                this.bossElapsedTime = elapsed;
+            }
             const remaining = Math.max(0, this.bossTimer - elapsed);
             const minutes = String(Math.floor(remaining / 60)).padStart(2, '0');
             const seconds = String(remaining % 60).padStart(2, '0');
@@ -314,6 +322,7 @@ export class Game {
             this.enemyManager.clearEnemies(); // 通常敵を一掃
             this.enemyManager.spawnBoss(this.selectedBossType);
             this.bossStartTime = Date.now();
+            this.bossElapsedTime = 0; // ボス戦経過時間を初期化
 
             this.bossSpawnFrame = this.enemyManager.frame; // ボス出現時のフレームを記録
             this.bossSpawnComplete = false; // ボス生成完了フラグをリセット
@@ -350,12 +359,27 @@ export class Game {
                     this.bossDefeated = true;
                     
                     // ボス討伐の進捗を記録
-                    const clearTime = Math.floor((Date.now() - this.bossStartTime) / 1000);
+                    const clearTime = this.bossElapsedTime || Math.floor((Date.now() - this.bossStartTime) / 1000);
                     this.bossProgressManager.recordBossDefeat(
                         this.selectedBossType, 
                         this.gameState.getScore(), 
                         clearTime
                     );
+                    
+                    // ボス進捗更新イベントを発火
+                    if (typeof window !== 'undefined') {
+                        window.dispatchEvent(new CustomEvent('bossProgressUpdated'));
+                        
+                        // 即座にUI更新を試行（ボス選択画面が表示されている場合のみ）
+                        if (window.isBossSelectScreenVisible && window.updateBossCardProgress) {
+                            try {
+                                window.updateBossCardProgress();
+                                console.log('ボス討伐時に即座にUI更新を実行しました（ボス選択画面表示中）');
+                            } catch (error) {
+                                console.warn('即座のUI更新に失敗しました:', error);
+                            }
+                        }
+                    }
                     
                     this.gameState.setGameOver();
                     this.bgmManager.stop();
@@ -368,7 +392,15 @@ export class Game {
                 }
             }
             // ボス用タイマー
-            const elapsed = Math.floor((Date.now() - this.bossStartTime) / 1000);
+            let elapsed;
+            if (this.pauseManager.isPaused) {
+                // ポーズ中は前回の経過時間を維持
+                elapsed = this.bossElapsedTime || 0;
+            } else {
+                // 通常時は経過時間を更新
+                elapsed = Math.floor((Date.now() - this.bossStartTime) / 1000);
+                this.bossElapsedTime = elapsed;
+            }
             if (elapsed >= this.bossTimer) {
                 this.gameState.setGameOver();
                 this.uiManager.showGameOver('時間切れ！ボス鬼を倒せなかった…');
@@ -818,6 +850,39 @@ export class Game {
     getOtomoAttackCooldown() {
         // デフォルト攻撃速度を速く（例: レベル1で700ms、レベルごとに10%短縮、下限250ms）
         return Math.max(250, 700 * Math.pow(0.9, this.otomoLevel - 1));
+    }
+    
+    // お供のモードを設定するメソッド（外部から呼び出し可能）
+    setOtomoMode(mode) {
+        if (!this.otomo) return;
+        
+        // モードを設定
+        this.otomo.setMode(mode);
+        
+        // 現在のモードを保存
+        this.currentOtomoMode = mode;
+        
+        // UIの更新を通知（グローバル関数として呼び出し）
+        if (typeof window.updateOtomoSwitchUI === 'function') {
+            // モード名を数値に変換
+            let modeNumber;
+            switch (mode) {
+                case 'follow':
+                    modeNumber = 1;
+                    break;
+                case 'wander':
+                    modeNumber = 2;
+                    break;
+                case 'charge':
+                    modeNumber = 3;
+                    break;
+                default:
+                    modeNumber = 1;
+            }
+            window.updateOtomoSwitchUI(modeNumber);
+        }
+        
+        console.log(`お供モード切り替え: ${mode}`);
     }
 
     // ゲッター

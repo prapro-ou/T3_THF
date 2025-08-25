@@ -63,6 +63,11 @@ export class Enemy extends Character {
     }
 
     update(deltaTime) {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         this.updateMovement();
         this.updateDirection();
     }

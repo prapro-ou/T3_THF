@@ -6,7 +6,7 @@ export class BossOni1 extends BossOni {
         super(game, x, y);
         this.color = '#e74c3c'; // 赤系
 
-     this._baseMaxHP = 1200;
+     this._baseMaxHP = 5000;
 
         this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
         this._hp = this._maxHP;
@@ -24,6 +24,11 @@ export class BossOni1 extends BossOni {
     }
 
     update() {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         // HP倍率に応じてmaxHPを更新
         const newMax = this._baseMaxHP * (this.game.oniHpMultiplier || 1);
         if (this._maxHP !== newMax) {
@@ -31,19 +36,9 @@ export class BossOni1 extends BossOni {
             this._maxHP = newMax;
             this._hp = Math.ceil(this._maxHP * ratio); // 現在HPも割合維持
         }
+        
         super.update();
-        // 弾発射ロジック
-        this.shootTimer++;
-        if (this.shootTimer >= this.shootInterval) {
-            this.shootTimer = 0;
-            this.shootAtPlayer();
-        }
-    }
-
-    update() {
-        // 親クラスの更新処理を呼び出し
-        super.update();
-
+        
         // 弾発射ロジック
         this.shootTimer++;
         if (this.shootTimer >= this.shootInterval) {

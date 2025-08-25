@@ -98,6 +98,9 @@ export class BossProgressManager {
             
             this.saveBossProgress();
             console.log(`ボス${bossId}（${this.bossData[bossId].name}）の討伐を記録しました`);
+            
+            // 即座にUI更新を試行（ボス選択画面が表示されている場合）
+            this.updateUIImmediately();
         }
     }
 
@@ -327,6 +330,28 @@ export class BossProgressManager {
             
             // 最終ステージの解放条件をチェック
             this.checkFinalStageUnlock();
+        }
+    }
+
+    /**
+     * 即座にUI更新を試行
+     * ボス選択画面が表示されている場合は即座に更新
+     */
+    updateUIImmediately() {
+        // ボス選択画面が表示されている場合のみ即座にUI更新
+        if (typeof window !== 'undefined' && window.isBossSelectScreenVisible && window.updateBossCardProgress) {
+            try {
+                // 即座にUI更新を実行
+                window.updateBossCardProgress();
+                console.log('ボス選択画面表示中: 即座にUI更新を実行しました');
+            } catch (error) {
+                console.warn('即座のUI更新に失敗しました:', error);
+            }
+        }
+        
+        // イベントも発火（遅延更新用）
+        if (typeof window !== 'undefined') {
+            window.dispatchEvent(new CustomEvent('bossProgressUpdated'));
         }
     }
 }

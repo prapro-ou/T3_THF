@@ -1,37 +1,37 @@
 {
     "title": "クレジット",
+    "team": {
+        "name": "TH_fullhouse",
+        "logo": "assets/UI/TH_fullhouse.png",
+        "description": "ゲーム開発チーム"
+    },
     "sections": [
         {
-            "title": "開発",
+            "title": "開発メンバー",
             "items": [
-
-                {
-                    "role": "開発チーム",
-                    "name": "[TH_フルハウス]"
-                },
 
                 {
 
                     "role": "リーダー 企画",
-                    "name": "[李皓太]"
+                    "name": "李皓太"
                 },
 
                 {
                     "role": "プログラミング",
-                    "name": "[阿保日翔,塚原甲明]"
+                    "name": "阿保日翔,塚原甲明"
                 },
 
                 {
                     "role": "アート・グラフィック",
-                    "name": "[李皓太]"
+                    "name": "李皓太"
                 },
                 {
                     "role": "SE",
-                    "name": "[河田修佑]"
+                    "name": "河田修佑"
                 },
                 {
                     "role": "音楽",
-                    "name": "[孝田陽音]"
+                    "name": "孝田陽音"
                 }
 
             ]
@@ -45,7 +45,11 @@
                 },
                 {
                     "role": "グラフィック素材",
-                    "name": "[グラフィック素材の詳細を入力]"
+                    "name": "Soraを用いて作成したAI画像を使用"
+                },
+                {
+                    "role": "フォント",
+                    "name": "玉ねぎ楷書「激」無料版v7"
                 }
             ]
         },
@@ -53,10 +57,10 @@
             "title": "スペシャルサンクス",
             "items": [
                 {
-                    "name": "[サンクスメッセージを入力]"
+                    "name": "You!!"
                 },
                 {
-                    "name": "[追加のサンクスメッセージ]"
+                    "name": "Thanks for playing!"
                 }
             ]
         }
