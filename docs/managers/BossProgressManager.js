@@ -194,8 +194,17 @@ export class BossProgressManager {
                 // まだ解放されていない場合は2番目のシルエット画像
                 return bossData.shadowIcon2;
             }
+        } else if (bossId === 1 || bossId === 2 || bossId === 3 || bossId === 4) {
+            // boss1〜4（砲鬼、バイク鬼、ワープ鬼、風神・雷神）の場合は討伐前でも通常画像を表示
+            if (bossData.unlocked) {
+                // アンロック済みなら討伐状況に関係なく通常画像
+                return bossData.icon;
+            } else {
+                // 未開放の場合は2番目のシルエット画像
+                return bossData.shadowIcon2;
+            }
         } else {
-            // 通常のボスの処理
+            // その他のボスの処理（将来的な拡張用）
             if (bossData.defeated) {
                 // 討伐済みの場合は通常の画像
                 return bossData.icon;
