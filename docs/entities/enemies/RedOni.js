@@ -7,9 +7,10 @@ import { playSE } from '../../managers/KoukaonManager.js'; // 追加
  * 継承: Enemyから基本機能を継承
  */
 export class RedOni extends Enemy {
-    constructor(game, color = 'red', maxHP = 20) {
+    constructor(game, color = 'red', maxHP = 20, isBossSummoned = false) {
         super(game, color, maxHP);
         this.speed += 0;
+        this.isBossSummoned = isBossSummoned; // ボスが召喚したかどうかのフラグ
     }
 
     // 多態性: 親クラスのメソッドをオーバーライド
@@ -21,8 +22,8 @@ export class RedOni extends Enemy {
     onDeath() {
         playSE("enemy-death"); // 死亡時に効果音
         
-        // 回復アイテムドロップ処理
-        if (this.game && this.game.recoveryItemManager) {
+        // ボスが召喚した赤鬼は回復アイテムをドロップしない
+        if (!this.isBossSummoned && this.game && this.game.recoveryItemManager) {
             const centerX = this.x + this.width / 2;
             const centerY = this.y + this.height / 2;
             this.game.recoveryItemManager.tryDropItem(centerX, centerY, 'red');

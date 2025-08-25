@@ -19,8 +19,9 @@ export class BossOni2 extends BossOni {
             console.log('BossOni2: Super constructor completed');
 
             this.color = '#3498db'; // 青系
-            this._maxHP = 6000; // HP増加（2倍）
-            this._hp = 6000;
+            this._baseMaxHP = 800; // 基本最大HP
+            this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
+            this._hp = this._maxHP;
             this.name = 'BossOni2';
             // 視覚的サイズを設定
             this.setSize(120, 120);
@@ -115,8 +116,9 @@ export class BossOni2 extends BossOni {
         switch (this.difficulty) {
             case 'easy':
                 this.dashSpeed = 14;
-                this._maxHP = 1200;
-                this._hp = 1200;
+                this._baseMaxHP = 1200;
+                this._maxHP = this._baseMaxHP * (this.game.oniHpMultiplier || 1);
+                this._hp = this._maxHP;
                 this.specialAttackMaxCooldown = 240;
                 this.knockbackStrength = 15; // 弱いノックバック
                 this.noteAttackMaxCooldown = 180; // 音符攻撃のクールダウン長め
@@ -126,8 +128,9 @@ export class BossOni2 extends BossOni {
                 break;
             case 'normal':
                 this.dashSpeed = 18;
-                this._maxHP = 800;
-                this._hp = 800;
+                this._baseMaxHP = 800;
+                this._maxHP = this._baseMaxHP * (this.game.oniHpMultiplier || 1);
+                this._hp = this._maxHP;
                 this.specialAttackMaxCooldown = 180;
                 this.knockbackStrength = 18; // 通常のノックバック
                 this.noteAttackMaxCooldown = 120; // 音符攻撃のクールダウン通常
@@ -137,8 +140,9 @@ export class BossOni2 extends BossOni {
                 break;
             case 'hard':
                 this.dashSpeed = 22;
-                this._maxHP = 1000;
-                this._hp = 1000;
+                this._baseMaxHP = 1000;
+                this._maxHP = this._baseMaxHP * (this.game.oniHpMultiplier || 1);
+                this._hp = this._maxHP;
                 this.specialAttackMaxCooldown = 120;
                 this.predictionLevel = 0.9;
                 this.knockbackStrength = 22; // 強いノックバック

@@ -247,6 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetBossProgress = document.getElementById('resetBossProgress');
     const unlockAllBosses = document.getElementById('unlockAllBosses');
     const bossProgressStatus = document.getElementById('bossProgressStatus');
+    const addSkillPoints = document.getElementById('addSkillPoints');
 
     // ポーズ画面の要素
     const pauseMessage = document.getElementById('pauseMessage');
@@ -899,6 +900,29 @@ document.addEventListener('DOMContentLoaded', () => {
         debugPanel.classList.add('hidden');
     });
 
+    // スキルアップポイント+100ボタンのイベントハンドラー
+    addSkillPoints.addEventListener('click', () => {
+        if (!game) {
+            console.log('ゲームが開始されていません');
+            return;
+        }
+
+        // スキルアップポイントを100追加
+        if (game.gameState && typeof game.gameState.addStatusPoints === 'function') {
+            game.gameState.addStatusPoints(100);
+            console.log('スキルアップポイントを100追加しました');
+            
+            // 効果音を再生
+            playSE("levelup");
+            
+            // 成功メッセージを表示
+            alert('スキルアップポイントを100追加しました！');
+        } else {
+            console.warn('gameState.addStatusPointsが見つかりません');
+            alert('スキルアップポイントの追加に失敗しました');
+        }
+    });
+
     applyDebugSettings.addEventListener('click', () => {
         if (!game) return;
 
@@ -931,6 +955,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const enableLineIntersection = document.getElementById('enableLineIntersection').checked;
 
         // ボス設定を適用
+        const oniHpMultiplier = parseFloat(document.getElementById('oniHpMultiplier').value);
         const bossOni1ProjectileSpeed = parseFloat(document.getElementById('bossOni1ProjectileSpeed').value);
         const bossOni1ProjectileDamage = parseInt(document.getElementById('bossOni1ProjectileDamage').value);
 
@@ -977,6 +1002,7 @@ document.addEventListener('DOMContentLoaded', () => {
             highSpeedThreshold,
             maxSubframeSteps,
             enableLineIntersection,
+            oniHpMultiplier,
             bossOni1ProjectileSpeed,
             bossOni1ProjectileDamage,
             showCollisionDebug,
@@ -1020,6 +1046,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('enableLineIntersection').checked = true;
 
         // ボス設定をデフォルトにリセット
+        document.getElementById('oniHpMultiplier').value = 1;
         document.getElementById('bossOni1ProjectileSpeed').value = 3;
         document.getElementById('bossOni1ProjectileDamage').value = 15;
 
@@ -1073,6 +1100,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             if (game) {
                 debugPanel.classList.remove('hidden');
+                // 開発者ツール表示時に現在の設定値を反映
+                updateDebugPanelValues();
             }
         }
         
@@ -1163,6 +1192,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300000); // 5分後
         }
     });
+
+    // 開発者ツールの現在値を更新する関数
+    function updateDebugPanelValues() {
+        if (!game) return;
+        
+        // 鬼HP倍率を現在値に設定
+        if (game.oniHpMultiplier !== undefined) {
+            const oniHpMultiplierInput = document.getElementById('oniHpMultiplier');
+            if (oniHpMultiplierInput) {
+                oniHpMultiplierInput.value = game.oniHpMultiplier;
+            }
+        }
+        
+        // その他の設定値も必要に応じて更新
+        console.log('開発者ツールの設定値を現在値に更新しました');
+    }
 
     // ボス進捗状況を表示する関数
     function updateBossProgressStatus() {

@@ -7,7 +7,7 @@ export class BossOni5 extends BossOni {
         this.color = '#e67e22'; // オレンジ系（雷）
         
 
-    this._baseMaxHP = 4000; // 風神・雷神ペアボスとして適切なHPに調整（単体ボスより低め）
+    this._baseMaxHP = 2500; // 風神・雷神ペアボスとして適切なHPに調整（単体ボスより高め）
 
         this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
         this._hp = this._maxHP;
@@ -140,12 +140,6 @@ export class BossOni5 extends BossOni {
     activateRageMode() {
         this.rageMode = true;
         console.log('雷神: 風神が倒された！怒りモード発動！');
-        
-        // 怒りモード時のHP回復・強化
-        const currentHPRatio = this._hp / this._maxHP;
-        this._baseMaxHP = 2000; // 怒りモード時は基本最大HPを2000に増加
-        this._maxHP = this._baseMaxHP * (this.game.oniHpMultiplier || 1);
-        this._hp = Math.ceil(this._maxHP * currentHPRatio); // 現在HPの割合を維持
         
         // 怒りモード時のパラメータを適用
         this.attackCooldownFrames = this.rageAttackCooldownFrames;

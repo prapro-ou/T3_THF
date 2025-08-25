@@ -35,6 +35,15 @@
         return this.score;
     }
 
+    addStatusPoints(points) {
+        if (this.game && this.game.statusPoints !== undefined) {
+            this.game.statusPoints += points;
+            console.log(`スキルアップポイントを${points}追加しました。現在: ${this.game.statusPoints}`);
+        } else {
+            console.warn('statusPointsプロパティが見つかりません');
+        }
+    }
+
     getDeltaTime() {
         return this.deltaTime;
     }
