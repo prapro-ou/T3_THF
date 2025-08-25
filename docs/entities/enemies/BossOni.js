@@ -109,6 +109,11 @@ export class BossOni extends Enemy {
 
     // 多態性: 親クラスのメソッドをオーバーライド
     update() {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         super.update();
         // ボス特有の挙動を追加する場合はここに記述
     }

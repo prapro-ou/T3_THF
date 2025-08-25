@@ -48,6 +48,11 @@ export class GameEntity {
 
     // 多態性: サブクラスでオーバーライド可能なメソッド
     update(deltaTime) {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game && this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         // 基本実装（何もしない）
         // サブクラスでオーバーライドして具体的な処理を実装
     }

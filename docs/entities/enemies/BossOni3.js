@@ -13,8 +13,9 @@ export class BossOni3 extends BossOni {
             console.log('BossOni3: Super constructor completed');
 
             this.color = '#9b59b6'; // 紫系（ワープのイメージ）
-            this._maxHP = 800;
-            this._hp = 800;
+            this._baseMaxHP = 2500; // 基本最大HP
+            this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
+            this._hp = this._maxHP;
             this.name = 'BossOni3';
 
             // warp_oni画像のサイズに合わせて調整
@@ -128,6 +129,11 @@ export class BossOni3 extends BossOni {
     }
 
     update() {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         super.update();
 
         // 体力段階に応じた行動変化のチェック
@@ -455,7 +461,7 @@ export class BossOni3 extends BossOni {
         const numMinions = this.healthRatio > 0.8 ? 3 : 1;
         
         for (let i = 0; i < numMinions; i++) {
-            const minion = new RedOni(this.game, 'red', 15);
+            const minion = new RedOni(this.game, 'red', 15, true); // ボスが召喚した赤鬼
             const offsetX = (Math.random() - 0.5) * 120; // 60→120に拡大
             const offsetY = (Math.random() - 0.5) * 120; // 60→120に拡大
             
@@ -473,7 +479,7 @@ export class BossOni3 extends BossOni {
         const numMinions = this.healthRatio > 0.8 ? 4 : this.healthRatio > 0.5 ? 3 : 2;
         
         for (let i = 0; i < numMinions; i++) {
-            const minion = new RedOni(this.game, 'red', 12);
+            const minion = new RedOni(this.game, 'red', 12, true); // ボスが召喚した赤鬼
             const angle = (Math.PI * 2 * i) / numMinions;
             const distance = 80; // 40→80に拡大
             
@@ -491,7 +497,7 @@ export class BossOni3 extends BossOni {
         const numMinions = this.healthRatio > 0.8 ? 5 : this.healthRatio > 0.5 ? 4 : 3;
         
         for (let i = 0; i < numMinions; i++) {
-            const minion = new RedOni(this.game, 'red', 10);
+            const minion = new RedOni(this.game, 'red', 10, true); // ボスが召喚した赤鬼
             const angle = (Math.PI * 2 * i) / numMinions;
             const distance = 90; // 45→90に拡大
             
@@ -513,7 +519,7 @@ export class BossOni3 extends BossOni {
             const baseDistance = 100; // 60→100に拡大
             const distance = baseDistance + (Math.random() - 0.5) * 40; // 20→40に拡大
             
-            const minion = new RedOni(this.game, 'red', 6); // HP: 8→6に強化
+            const minion = new RedOni(this.game, 'red', 6, true); // ボスが召喚した赤鬼、HP: 8→6に強化
             
             // プレイヤーの位置を考慮して配置
             const player = this.game.player;
@@ -563,7 +569,7 @@ export class BossOni3 extends BossOni {
         const numMinions = this.healthRatio > 0.8 ? 6 : this.healthRatio > 0.5 ? 5 : 4;
         
         for (let i = 0; i < numMinions; i++) {
-            const minion = new RedOni(this.game, 'red', 6);
+            const minion = new RedOni(this.game, 'red', 6, true); // ボスが召喚した赤鬼
             const angle = (Math.PI * 2 * i) / numMinions;
             const distance = 100 + (Math.random() - 0.5) * 40; // 60→100、20→40に拡大
             
@@ -593,7 +599,7 @@ export class BossOni3 extends BossOni {
             const angle = (Math.PI * 2 * i) / numMinions;
             const baseDistance = 80; // 40→80に拡大
             const distance = baseDistance + (i * 25); // 15→25に拡大
-            const minion = new RedOni(this.game, 'red', 5);
+            const minion = new RedOni(this.game, 'red', 5, true); // ボスが召喚した赤鬼
             
             // プレイヤーの位置を考慮して反対側に配置
             const player = this.game.player;
@@ -640,7 +646,7 @@ export class BossOni3 extends BossOni {
         
         // 横の壁（より分散）
         for (let i = 0; i < wallLength; i++) {
-            const minion = new RedOni(this.game, 'red', 4);
+            const minion = new RedOni(this.game, 'red', 4, true); // ボスが召喚した赤鬼
             minion.x = this.x + this.width / 2 - minion.width / 2 + (i - Math.floor(wallLength/2)) * spacing + offsetX;
             minion.y = this.y + this.height / 2 - minion.height / 2 - 80 + (Math.random() - 0.5) * 30; // 50→80、20→30に拡大
             
@@ -649,7 +655,7 @@ export class BossOni3 extends BossOni {
         
         // 縦の壁（より分散）
         for (let i = 0; i < wallLength; i++) {
-            const minion = new RedOni(this.game, 'red', 4);
+            const minion = new RedOni(this.game, 'red', 4, true); // ボスが召喚した赤鬼
             minion.x = this.x + this.width / 2 - minion.width / 2 - 80 + (Math.random() - 0.5) * 30; // 50→80、20→30に拡大
             minion.y = this.y + this.height / 2 - minion.height / 2 + (i - Math.floor(wallLength/2)) * spacing + offsetY;
             
@@ -667,7 +673,7 @@ export class BossOni3 extends BossOni {
         for (let i = 0; i < numMinions; i++) {
             const angle = (Math.PI * 2 * i) / numMinions;
             const distance = baseDistance + Math.random() * 80; // 40→80に拡大
-            const minion = new RedOni(this.game, 'red', 3);
+            const minion = new RedOni(this.game, 'red', 3, true); // ボスが召喚した赤鬼
             
             // プレイヤーの位置を考慮して分散配置
             const player = this.game.player;

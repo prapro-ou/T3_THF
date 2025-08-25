@@ -32,23 +32,36 @@ document.addEventListener('DOMContentLoaded', () => {
     let tempPoints = 0;
 
     function openStatusModal() {
-    if (!game) return;
-    // 一時停止
-    if (!game.isPaused) game.togglePause();
-    // crosshair非表示
-    if (crosshair) crosshair.classList.add('hidden');
-    // 現在の割り振りをコピー
-    tempAlloc = { ...game.statusAlloc };
-    tempPoints = game.statusPoints;
-    updateStatusModalUI();
-    statusModal.classList.remove('hidden');
+        if (!game) return;
+        // 一時停止
+        if (!game.isPaused) game.togglePause();
+        // ボス戦中の場合はボス戦用タイマーも停止
+        if (game.bossAppeared && !game.bossDefeated) {
+            // 現在の経過時間を正確に記録
+            const currentElapsed = Math.floor((Date.now() - game.bossStartTime) / 1000);
+            game.bossElapsedTime = currentElapsed;
+        }
+        // crosshair非表示
+        if (crosshair) crosshair.classList.add('hidden');
+        // 現在の割り振りをコピー
+        tempAlloc = { ...game.statusAlloc };
+        tempPoints = game.statusPoints;
+        updateStatusModalUI();
+        statusModal.classList.remove('hidden');
     }
     function closeStatusModal() {
-    statusModal.classList.add('hidden');
-    // crosshair再表示
-    if (crosshair) crosshair.classList.remove('hidden');
-    // 再開
-    if (game && game.isPaused) game.togglePause();
+        statusModal.classList.add('hidden');
+        // crosshair再表示
+        if (crosshair) crosshair.classList.remove('hidden');
+        // 再開
+        if (game && game.isPaused) {
+            game.togglePause();
+            // ボス戦中の場合はボス戦用タイマーも再開
+            if (game.bossAppeared && !game.bossDefeated && game.bossElapsedTime !== undefined) {
+                // 記録された経過時間分だけ開始時刻を調整
+                game.bossStartTime = Date.now() - (game.bossElapsedTime * 1000);
+            }
+        }
     }
     function updateStatusModalUI() {
         statusPointsValue.textContent = tempPoints;
@@ -247,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetBossProgress = document.getElementById('resetBossProgress');
     const unlockAllBosses = document.getElementById('unlockAllBosses');
     const bossProgressStatus = document.getElementById('bossProgressStatus');
+    const addSkillPoints = document.getElementById('addSkillPoints');
 
     // ポーズ画面の要素
     const pauseMessage = document.getElementById('pauseMessage');
@@ -424,6 +438,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const bossCardElements = document.querySelectorAll('.boss-card');
     console.log('ボスカード要素数:', bossCardElements.length);
     
+    // ボス選択画面の表示状態を管理
+    let isBossSelectScreenVisible = false;
+    
     // ボスカードの進捗状況を更新する関数
     function updateBossCardProgress() {
         bossCardElements.forEach((card) => {
@@ -471,6 +488,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 初期表示時に進捗状況を更新
     updateBossCardProgress();
+    
+    // グローバルに公開（BossProgressManagerから呼び出し可能にする）
+    window.updateBossCardProgress = updateBossCardProgress;
+    window.isBossSelectScreenVisible = isBossSelectScreenVisible;
     
     // 初期表示時にボス画像を更新
     bossCardElements.forEach((card) => {
@@ -593,6 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         stageSelectArea.style.display = 'flex';
                         stageSelectArea.style.opacity = '1';
                         stageSelectArea.style.transform = 'translateX(0)';
+                        // ボス選択画面表示時に進捗状況を更新
+                        updateBossCardProgress();
+                        // ボス選択画面表示フラグを設定
+                        isBossSelectScreenVisible = true;
                     });
                 }
             }, 100);
@@ -604,6 +629,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 stageSelectArea.style.display = 'flex';
                 stageSelectArea.style.opacity = '1';
                 stageSelectArea.style.transform = 'translateX(0)';
+                // ボス選択画面表示時に進捗状況を更新
+                updateBossCardProgress();
+                // ボス選択画面表示フラグを設定
+                isBossSelectScreenVisible = true;
             });
         }
     });
@@ -813,6 +842,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 game = null; // ゲームインスタンスをリセット
             }
             bgmManager.play('mainBgm');
+            
+            // ボス選択画面表示フラグをリセット
+            isBossSelectScreenVisible = false;
+            
+            // ボス選択画面に戻る際に進捗状況を更新
+            updateBossCardProgress();
         });
     });
 
@@ -885,6 +920,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 game = null; // ゲームインスタンスをリセット
             }
             bgmManager.play('mainBgm');
+            
+            // ボス選択画面表示フラグをリセット
+            isBossSelectScreenVisible = false;
+            
+            // ボス選択画面に戻る際に進捗状況を更新
+            updateBossCardProgress();
         });
     });
 
@@ -898,6 +939,29 @@ document.addEventListener('DOMContentLoaded', () => {
     // デバッグパネルのイベントハンドラー
     closeDebug.addEventListener('click', () => {
         debugPanel.classList.add('hidden');
+    });
+
+    // スキルアップポイント+100ボタンのイベントハンドラー
+    addSkillPoints.addEventListener('click', () => {
+        if (!game) {
+            console.log('ゲームが開始されていません');
+            return;
+        }
+
+        // スキルアップポイントを100追加
+        if (game.gameState && typeof game.gameState.addStatusPoints === 'function') {
+            game.gameState.addStatusPoints(100);
+            console.log('スキルアップポイントを100追加しました');
+            
+            // 効果音を再生
+            playSE("levelup");
+            
+            // 成功メッセージを表示
+            alert('スキルアップポイントを100追加しました！');
+        } else {
+            console.warn('gameState.addStatusPointsが見つかりません');
+            alert('スキルアップポイントの追加に失敗しました');
+        }
     });
 
     applyDebugSettings.addEventListener('click', () => {
@@ -932,6 +996,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const enableLineIntersection = document.getElementById('enableLineIntersection').checked;
 
         // ボス設定を適用
+        const oniHpMultiplier = parseFloat(document.getElementById('oniHpMultiplier').value);
         const bossOni1ProjectileSpeed = parseFloat(document.getElementById('bossOni1ProjectileSpeed').value);
         const bossOni1ProjectileDamage = parseInt(document.getElementById('bossOni1ProjectileDamage').value);
 
@@ -978,6 +1043,7 @@ document.addEventListener('DOMContentLoaded', () => {
             highSpeedThreshold,
             maxSubframeSteps,
             enableLineIntersection,
+            oniHpMultiplier,
             bossOni1ProjectileSpeed,
             bossOni1ProjectileDamage,
             showCollisionDebug,
@@ -1021,6 +1087,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('enableLineIntersection').checked = true;
 
         // ボス設定をデフォルトにリセット
+        document.getElementById('oniHpMultiplier').value = 1;
         document.getElementById('bossOni1ProjectileSpeed').value = 3;
         document.getElementById('bossOni1ProjectileDamage').value = 15;
 
@@ -1074,6 +1141,8 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             if (game) {
                 debugPanel.classList.remove('hidden');
+                // 開発者ツール表示時に現在の設定値を反映
+                updateDebugPanelValues();
             }
         }
         
@@ -1172,6 +1241,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 300000); // 5分後
         }
     });
+
+    // 開発者ツールの現在値を更新する関数
+    function updateDebugPanelValues() {
+        if (!game) return;
+        
+        // 鬼HP倍率を現在値に設定
+        if (game.oniHpMultiplier !== undefined) {
+            const oniHpMultiplierInput = document.getElementById('oniHpMultiplier');
+            if (oniHpMultiplierInput) {
+                oniHpMultiplierInput.value = game.oniHpMultiplier;
+            }
+        }
+        
+        // その他の設定値も必要に応じて更新
+        console.log('開発者ツールの設定値を現在値に更新しました');
+    }
 
     // ボス進捗状況を表示する関数
     function updateBossProgressStatus() {

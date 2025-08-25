@@ -5,9 +5,10 @@ export class BossOni4 extends BossOni {
 
     constructor(game, x = null, y = null) {
         super(game, x, y);
-        this.color = '#9b59b6'; // 紫系
-    this._maxHP = 800;
-    this._hp = 800;
+                this.color = '#9b59b6'; // 紫系
+        this._baseMaxHP = 2500; // 風神・雷神ペアボスとして適切なHPに調整（単体ボスより高め）
+        this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
+        this._hp = this._maxHP;
         this.name = 'BossOni4';
         // 視覚的サイズを設定
         this.setSize(250, 250);
@@ -70,6 +71,11 @@ export class BossOni4 extends BossOni {
     }
 
     update() {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         // 親クラスの更新処理を呼び出し
         super.update();
         
