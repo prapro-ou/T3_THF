@@ -32,23 +32,36 @@ document.addEventListener('DOMContentLoaded', () => {
     let tempPoints = 0;
 
     function openStatusModal() {
-    if (!game) return;
-    // 一時停止
-    if (!game.isPaused) game.togglePause();
-    // crosshair非表示
-    if (crosshair) crosshair.classList.add('hidden');
-    // 現在の割り振りをコピー
-    tempAlloc = { ...game.statusAlloc };
-    tempPoints = game.statusPoints;
-    updateStatusModalUI();
-    statusModal.classList.remove('hidden');
+        if (!game) return;
+        // 一時停止
+        if (!game.isPaused) game.togglePause();
+        // ボス戦中の場合はボス戦用タイマーも停止
+        if (game.bossAppeared && !game.bossDefeated) {
+            // 現在の経過時間を正確に記録
+            const currentElapsed = Math.floor((Date.now() - game.bossStartTime) / 1000);
+            game.bossElapsedTime = currentElapsed;
+        }
+        // crosshair非表示
+        if (crosshair) crosshair.classList.add('hidden');
+        // 現在の割り振りをコピー
+        tempAlloc = { ...game.statusAlloc };
+        tempPoints = game.statusPoints;
+        updateStatusModalUI();
+        statusModal.classList.remove('hidden');
     }
     function closeStatusModal() {
-    statusModal.classList.add('hidden');
-    // crosshair再表示
-    if (crosshair) crosshair.classList.remove('hidden');
-    // 再開
-    if (game && game.isPaused) game.togglePause();
+        statusModal.classList.add('hidden');
+        // crosshair再表示
+        if (crosshair) crosshair.classList.remove('hidden');
+        // 再開
+        if (game && game.isPaused) {
+            game.togglePause();
+            // ボス戦中の場合はボス戦用タイマーも再開
+            if (game.bossAppeared && !game.bossDefeated && game.bossElapsedTime !== undefined) {
+                // 記録された経過時間分だけ開始時刻を調整
+                game.bossStartTime = Date.now() - (game.bossElapsedTime * 1000);
+            }
+        }
     }
     function updateStatusModalUI() {
         statusPointsValue.textContent = tempPoints;

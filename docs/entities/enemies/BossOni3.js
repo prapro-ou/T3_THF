@@ -129,6 +129,11 @@ export class BossOni3 extends BossOni {
     }
 
     update() {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         super.update();
 
         // 体力段階に応じた行動変化のチェック

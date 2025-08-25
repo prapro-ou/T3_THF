@@ -43,6 +43,11 @@ export class Otomo extends Character {
     }
 
     updateBehavior(player, deltaTime) {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+        
         // 移動方向を更新
         if (this.x !== this.lastX) {
             this.direction = this.x > this.lastX ? 1 : -1;

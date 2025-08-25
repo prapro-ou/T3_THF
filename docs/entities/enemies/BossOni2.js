@@ -221,6 +221,11 @@ export class BossOni2 extends BossOni {
     }
 
     update() {
+        // ゲームがポーズ中またはレベルアップ中は処理を停止
+        if (this.game.pauseManager && this.game.pauseManager.isPaused) {
+            return;
+        }
+
         // 怒りモードチェック
         this.checkRageMode();
 
