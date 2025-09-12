@@ -71,7 +71,7 @@ export class BossOni1 extends BossOni {
         switch (currentProjectileType) {
             case 'cannon_ball':
                 projectileSpeed = this.game.bossOni1ProjectileSpeed || 3;
-                projectileDamage = this.game.bossOni1ProjectileDamage || 15;
+                projectileDamage = this.game.bossOni1ProjectileDamage || 30;
                 console.log("BossOni1 shooting cannon ball projectile at:", x, y, "speed:", projectileSpeed, "damage:", projectileDamage);
                 this.game.projectileManager.spawnCannonBallProjectile(x, y, player, projectileSpeed, projectileDamage);
                 playSE("taihou"); // 大砲効果音

@@ -7,7 +7,7 @@ export class BossOni5 extends BossOni {
         this.color = '#e67e22'; // オレンジ系（雷）
         
 
-    this._baseMaxHP = 2500; // 風神・雷神ペアボスとして適切なHPに調整（単体ボスより高め）
+    this._baseMaxHP = 1200; // 風神・雷神ペアボスとして適切なHPに調整（単体ボスより高め）
 
         this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
         this._hp = this._maxHP;
