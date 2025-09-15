@@ -13,25 +13,25 @@
                 {
 
                     "role": "リーダー 企画",
-                    "name": "李皓太"
+                    "name": "りったー"
                 },
 
                 {
                     "role": "プログラミング",
-                    "name": "阿保日翔,塚原甲明"
+                    "name": "えびお,はじめん"
                 },
 
                 {
                     "role": "アート・グラフィック",
-                    "name": "李皓太"
+                    "name": "りったー"
                 },
                 {
                     "role": "SE",
-                    "name": "河田修佑"
+                    "name": "ヒネ"
                 },
                 {
                     "role": "音楽",
-                    "name": "孝田陽音"
+                    "name": "ジョージ"
                 }
 
             ]
@@ -57,7 +57,7 @@
             "title": "スペシャルサンクス",
             "items": [
                 {
-                    "name": "You!!"
+                    "name": "遊んでくれたあなた!"
                 },
                 {
                     "name": "Thanks for playing!"
@@ -69,6 +69,6 @@
     "additionalInfo": {
         "version": "1.0.0",
         "buildDate": "2025-08-25",
-        "website": "[プロジェクトウェブサイトURL]"
+        "website": "https://prapro-ou.github.io/T3_THF/"
     }
 }
