@@ -2353,7 +2353,7 @@ hr,
 }
 
 .team-name {
-    color: white;
+    color: #C1272D;
     font-size: 1.8em;
     font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
     font-weight: bold;
@@ -2363,7 +2363,7 @@ hr,
 }
 
 .team-description {
-    color: rgba(255, 255, 255, 0.8);
+    color: #C1272D;
     font-size: 1em;
     font-family: 'Kiwi Maru', 'Noto Serif JP', serif;
     margin: 0.5em 0 0 0;
