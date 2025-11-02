@@ -29,14 +29,6 @@ export class BossOni1 extends BossOni {
             return;
         }
         
-        // HP倍率に応じてmaxHPを更新
-        //const newMax = this._baseMaxHP * (this.game.oniHpMultiplier || 1);
-        //if (this._maxHP !== newMax) {
-            //const ratio = this._hp / this._maxHP;
-            //this._maxHP = newMax;
-            //this._hp = Math.ceil(this._maxHP * ratio); // 現在HPも割合維持
-        //}
-        
         super.update();
         
         // 弾発射ロジック
