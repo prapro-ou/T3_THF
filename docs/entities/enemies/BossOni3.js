@@ -13,7 +13,7 @@ export class BossOni3 extends BossOni {
             console.log('BossOni3: Super constructor completed');
 
             this.color = '#9b59b6'; // 紫系（ワープのイメージ）
-            this._baseMaxHP = 2500; // 基本最大HP
+            this._baseMaxHP = 250; // 基本最大HP
             this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
             this._hp = this._maxHP;
             this.name = 'BossOni3';
