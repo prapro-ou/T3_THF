@@ -6,7 +6,7 @@ export class BossOni4 extends BossOni {
     constructor(game, x = null, y = null) {
         super(game, x, y);
                 this.color = '#9b59b6'; // 紫系
-        this._baseMaxHP = 1200; // 風神・雷神ペアボスとして適切なHPに調整（単体ボスより高め）
+        this._baseMaxHP = 120; // 風神・雷神ペアボスとして適切なHPに調整（単体ボスより高め）
         this._maxHP = this._baseMaxHP * (game.oniHpMultiplier || 1);
         this._hp = this._maxHP;
         this.name = 'BossOni4';
